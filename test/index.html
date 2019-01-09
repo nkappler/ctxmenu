@@ -3,6 +3,25 @@
 
 <head>
     <meta charset="utf8" />
+    <script>
+        document.addEventListener("readystatechange", (event) => {
+            if (document.readyState === "complete") {
+
+                ContextMenu.attach("html", [
+                    {
+                        href: "",
+                        action: "",
+                        text: "1abc"
+                    },
+                    {
+                        href: "",
+                        action: "",
+                        text: "2def"
+                    }
+                ]);
+            }
+        });
+    </script>
     <script src="../dist/ctxmenu.js"></script>
 </head>
 
