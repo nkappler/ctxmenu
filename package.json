@@ -1,0 +1,22 @@
+{
+  "name": "ctxmenu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nkappler/ctxmenu.git"
+  },
+  "author": "Nikolaj Kappler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nkappler/ctxmenu/issues"
+  },
+  "homepage": "https://github.com/nkappler/ctxmenu#readme",
+  "devDependencies": {
+    "typescript": "^3.2.2"
+  }
+}
