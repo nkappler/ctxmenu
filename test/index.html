@@ -2,6 +2,14 @@
 <html>
 
 <head>
+    <style>
+        * {
+            font-family: sans-serif;
+        }
+        html, body {
+            height: 100%;
+        }
+    </style>
     <meta charset="utf8" />
     <script>
         document.addEventListener("readystatechange", (event) => {
@@ -9,12 +17,13 @@
 
                 ContextMenu.attach("html", [
                     {
-                        href: "",
-                        text: "1abc"
+                        href: "http://www.google.de",
+                        text: "Google"
                     },
                     {
-                        href: "",
-                        text: "2def"
+                        href: "http://www.google.de",
+                        target: "_blank",
+                        text: "Google (neuer Tab)"
                     }
                 ]);
                 ContextMenu.attach("h1", [
@@ -23,6 +32,8 @@
                         text: "Heading"
                     }
                 ]);
+                ContextMenu.attach("h1", []);
+                ContextMenu.attach(".thisClassDoesNotExist", []);
             }
         });
     </script>

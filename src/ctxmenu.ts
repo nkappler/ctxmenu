@@ -16,65 +16,112 @@ type CTXMItem = CTXMAnchor | CTXMAction;
 
 type CTXMenu = CTXMItem[];
 
-function itemIsAction(item: CTXMItem): item is CTXMAction {
-    return item.hasOwnProperty("action");
-}
-
-function itemIsAnchor(item: CTXMItem): item is CTXMAnchor {
-    return item.hasOwnProperty("href");
+interface CTXCache {
+    [key: string]: {
+        ctxmenu: CTXMenu,
+        handler: Function,
+    } | undefined;
 }
 
 class ContextMenu {
     private menu: HTMLUListElement | undefined;
+    private cache: CTXCache = {};
     public constructor() {
         window.addEventListener("click", () => this.closeMenu());
         window.addEventListener("resize", () => this.closeMenu());
         window.addEventListener("scroll", () => this.closeMenu());
     }
 
-    public attach(target: Element | string, ctxmenu: CTXMenu) {
-        const t = typeof target === "string" ? document.querySelector(target) : target;
-        if (t) {
-            window.addEventListener("contextmenu", e => {
-                if (e.target === t) {
-                    e.stopImmediatePropagation();
-                    //close any open menu
-                    this.closeMenu();
-
-                    const container = document.createElement("ul");
-                    ctxmenu.forEach(item => {
-                        const li = document.createElement("li");
-                        li.innerHTML = item.text;
-                        li.title = item.title || "";
-                        if (itemIsAction(item)) {
-                            li.addEventListener("click", () => item.action());
-                            li.className = "interactive";
-                        }
-                        else if (itemIsAnchor(item)) {
-                            li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
-                            li.className = "interactive";
-                        }
-                        container.appendChild(li);
-                    });
-                    Object.assign<CSSStyleDeclaration, Partial<CSSStyleDeclaration>>(container.style, {
-                        position: "fixed",
-                        left: e.offsetX + "px",
-                        top: e.offsetY + "px"
-                    });
-                    container.className = "ctxmenu";
-                    this.menu = container;
-                    document.body.appendChild(container);
-
-                    e.preventDefault();
-                }
-            });
-        } else {
-            console.error(`target element ${target} not found`);
+    public attach(target: string, ctxmenu: CTXMenu) {
+        const t = document.querySelector(target);
+        if (this.cache[target] !== undefined) {
+            console.error(`target element ${target} already has a context menu assigned. Use ContextMenu.update() intstead.`);
+            return;
         }
+        if (!t) {
+            console.error(`target element ${target} not found`);
+            return;
+        }
+        const handler = (e: MouseEvent) => {
+            e.stopImmediatePropagation();
+            //close any open menu
+            this.closeMenu();
+
+            this.menu = ContextMenu.generateDOM(e, ctxmenu);
+            document.body.appendChild(this.menu);
+
+            e.preventDefault();
+        };
+
+        this.cache[target] = {
+            ctxmenu,
+            handler
+        };
+        t.addEventListener("contextmenu", handler as EventListener);
+    }
+
+    public update(target: string, ctxmenu: CTXMenu) {
+        const o = this.cache[target];
+        const t = document.querySelector(target);
+        t && t.removeEventListener("contextmenu", (o && o.handler) as EventListener);
+        delete this.cache[target];
+        this.attach(target, ctxmenu);
+    }
+
+    public delete(target: string) {
+        const o = this.cache[target];
+        if (!o) {
+            console.error(`no context menu for target element ${target} found`);
+            return;
+        }
+        const t = document.querySelector(target);
+        if (!t) {
+            console.error(`target element ${target} does not exist (anymore)`);
+            return;
+        }
+        t.removeEventListener("contextmenu", o.handler as EventListener);
+        delete this.cache[target];
     }
 
     public closeMenu() {
         this.menu && this.menu.remove();
+        delete this.menu;
+    }
+
+    private static generateDOM(e: MouseEvent, ctxmenu: CTXMenu) {
+        const container = document.createElement("ul");
+        if (ctxmenu.length === 0) {
+            container.style.display = "none";
+        }
+        ctxmenu.forEach(item => {
+            const li = document.createElement("li");
+            li.innerHTML = `<span>${item.text}</span>`;
+            li.title = item.title || "";
+            if (ContextMenu.itemIsAction(item)) {
+                li.addEventListener("click", () => item.action());
+                li.className = "interactive";
+            }
+            else if (ContextMenu.itemIsAnchor(item)) {
+                li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
+                li.className = "interactive";
+            }
+            container.appendChild(li);
+        });
+        Object.assign<CSSStyleDeclaration, Partial<CSSStyleDeclaration>>(container.style, {
+            position: "fixed",
+            left: e.offsetX + "px",
+            top: e.offsetY + "px"
+        });
+        container.className = "ctxmenu";
+        return container;
+    }
+
+    private static itemIsAction(item: CTXMItem): item is CTXMAction {
+        return item.hasOwnProperty("action");
+    }
+
+    private static itemIsAnchor(item: CTXMItem): item is CTXMAnchor {
+        return item.hasOwnProperty("href");
     }
 }
 
@@ -95,8 +142,11 @@ document.addEventListener("readystatechange", e => {
             }
             ul.ctxmenu li {
                 margin: 1px 0;
-                padding: 2px 15px;
                 display: block;
+            }
+            ul.ctxmenu li * {
+                display: block;
+                padding: 2px 20px;
             }
             ul.ctxmenu li a {
                 color: inherit;
