@@ -7,8 +7,9 @@ var ContextMenu = /** @class */ (function () {
         window.addEventListener("resize", function () { return _this.closeMenu(); });
         window.addEventListener("scroll", function () { return _this.closeMenu(); });
     }
-    ContextMenu.prototype.attach = function (target, ctxmenu) {
+    ContextMenu.prototype.attach = function (target, ctxmenu, beforeRender) {
         var _this = this;
+        if (beforeRender === void 0) { beforeRender = function (m) { return m; }; }
         var t = document.querySelector(target);
         if (this.cache[target] !== undefined) {
             console.error("target element " + target + " already has a context menu assigned. Use ContextMenu.update() intstead.");
@@ -22,7 +23,8 @@ var ContextMenu = /** @class */ (function () {
             e.stopImmediatePropagation();
             //close any open menu
             _this.closeMenu();
-            _this.menu = ContextMenu.generateDOM(e, ctxmenu);
+            var newMenu = beforeRender(ctxmenu.slice(), e);
+            _this.menu = ContextMenu.generateDOM(e, newMenu);
             document.body.appendChild(_this.menu);
             e.preventDefault();
         };

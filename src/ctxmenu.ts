@@ -32,7 +32,7 @@ class ContextMenu {
         window.addEventListener("scroll", () => this.closeMenu());
     }
 
-    public attach(target: string, ctxmenu: CTXMenu) {
+    public attach(target: string, ctxmenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu = m => m) {
         const t = document.querySelector(target);
         if (this.cache[target] !== undefined) {
             console.error(`target element ${target} already has a context menu assigned. Use ContextMenu.update() intstead.`);
@@ -47,7 +47,8 @@ class ContextMenu {
             //close any open menu
             this.closeMenu();
 
-            this.menu = ContextMenu.generateDOM(e, ctxmenu);
+            const newMenu = beforeRender([...ctxmenu], e);
+            this.menu = ContextMenu.generateDOM(e, newMenu);
             document.body.appendChild(this.menu);
 
             e.preventDefault();
