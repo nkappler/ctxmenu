@@ -10,13 +10,17 @@
                 ContextMenu.attach("html", [
                     {
                         href: "",
-                        action: "",
                         text: "1abc"
                     },
                     {
                         href: "",
-                        action: "",
                         text: "2def"
+                    }
+                ]);
+                ContextMenu.attach("h1", [
+                    {
+                        action: () => alert("Clicked h1"),
+                        text: "Heading"
                     }
                 ]);
             }
