@@ -1,6 +1,4 @@
-/*! ctxMenu v0.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE */
-
-"use strict";
+/*! ctxMenu v0.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 interface CTXMInteractive {
     text: string;
@@ -28,6 +26,7 @@ interface CTXCache {
         handler: Function,
     } | undefined;
 }
+
 
 class ContextMenu {
     private menu: HTMLUListElement | undefined;
