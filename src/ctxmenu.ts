@@ -1,7 +1,13 @@
+/*! ctxMenu v0.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE */
+
+"use strict";
+
 interface CTXMInteractive {
     text: string;
     title?: string;
 }
+
+declare const css: any;
 
 interface CTXMAction extends CTXMInteractive {
     action: Function;
@@ -134,8 +140,8 @@ document.addEventListener("readystatechange", e => {
     if (document.readyState === "interactive") {
         //insert default styles as css -> low priority
         const styles = document.createElement("style");
-        styles.innerHTML = `
-            ul.ctxmenu {
+        styles.innerHTML =
+            css`ul.ctxmenu {
                 border: 1px solid #999;
                 padding: 2px 0;
                 box-shadow: 3px 3px 3px #aaa;
