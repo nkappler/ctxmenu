@@ -8,16 +8,15 @@ NOTE: _ctxMenu.js is currently still in alpha stage. Expect more features to com
 
 - Create custom context menus for every browser.
 - Style the context menu with css.
-- no dependencies.
-- Create anchors, javascript functions or plain text.
+- No dependencies.
 - Callback to customize based on event properties _(Cursor position, etc.)_
+- Different menu items: headings, anchors, action items and more to come...
+- Interactive menu items can be disabled
 
 ## Planned Features
 
 - Submenus
-- Headings
 - Splitters / Groups
-- Disable entries
 
 ## Installation
 
@@ -60,9 +59,9 @@ There are multiple types of menu items, which have different properties and beha
 
 #
 
-### Text Item
+### Heading Item
 
-This is a basic menu item which displays a text and optionally shows a tooltip when hovering over it.
+This is a heading item which displays a text and optionally shows a tooltip when hovering over it.
 
 ```typescript
 {
@@ -84,7 +83,8 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
     text: string,
     href: string, // URL
     target: string, // eg. "_blank" to open link in new tab
-    tooltip?: string
+    tooltip?: string,
+    disabled?: boolean // default false
 }
 ```
 
@@ -98,7 +98,8 @@ This is an interactive item which will execute a given javascript function when 
 {
     text: string,
     action: Function,
-    tooltip?: string
+    tooltip?: string,
+    disabled?: boolean // default false
 }
 ```
 

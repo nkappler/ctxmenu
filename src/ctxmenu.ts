@@ -1,11 +1,15 @@
 /*! ctxMenu v0.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
-interface CTXMInteractive {
+declare const css: any;
+
+interface CTXMHeading {
     text: string;
     tooltip?: string;
 }
 
-declare const css: any;
+interface CTXMInteractive extends CTXMHeading {
+    disabled?: boolean;
+}
 
 interface CTXMAction extends CTXMInteractive {
     action: Function;
@@ -16,7 +20,7 @@ interface CTXMAnchor extends CTXMInteractive {
     target?: string;
 }
 
-type CTXMItem = CTXMAnchor | CTXMAction;
+type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading;
 
 type CTXMenu = CTXMItem[];
 
@@ -110,13 +114,21 @@ class ContextMenu {
             const li = document.createElement("li");
             li.innerHTML = `<span>${item.text}</span>`;
             li.title = item.tooltip || "";
-            if (ContextMenu.itemIsAction(item)) {
-                li.addEventListener("click", () => item.action());
-                li.className = "interactive";
-            }
-            else if (ContextMenu.itemIsAnchor(item)) {
-                li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
-                li.className = "interactive";
+            if (!(item as CTXMInteractive).disabled) {
+                if (ContextMenu.itemIsAction(item)) {
+                    li.addEventListener("click", () => item.action());
+                    li.className = "interactive";
+                }
+                else if (ContextMenu.itemIsAnchor(item)) {
+                    li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
+                    li.className = "interactive";
+                } else {
+                    //Heading
+                    li.style.fontWeight = "bold";
+                    li.style.marginLeft = "-5px";
+                }
+            } else {
+                li.className = "disabled";
             }
             container.appendChild(li);
         });
@@ -156,13 +168,14 @@ document.addEventListener("readystatechange", e => {
             ul.ctxmenu li * {
                 display: block;
                 padding: 2px 20px;
+                cursor: default;
             }
             ul.ctxmenu li a {
                 color: inherit;
                 text-decoration: none;
             }
-            ul.ctxmenu li.interactive {
-                cursor: pointer;
+            ul.ctxmenu li.disabled {
+                color: #aaa;
             }
             ul.ctxmenu li.interactive:hover {
                 background: rgba(0,0,0,0.1);
