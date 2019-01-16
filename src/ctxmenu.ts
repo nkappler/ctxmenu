@@ -27,6 +27,10 @@ interface CTXCache {
     } | undefined;
 }
 
+interface Window {
+    ContextMenu: ContextMenu;
+}
+
 
 class ContextMenu {
     private menu: HTMLUListElement | undefined;
@@ -90,8 +94,11 @@ class ContextMenu {
     }
 
     public closeMenu() {
-        this.menu && this.menu.remove();
-        delete this.menu;
+        if (this.menu) {
+            const p = this.menu.parentElement;
+            p && p.removeChild(this.menu);
+            delete this.menu;
+        }
     }
 
     private static generateDOM(e: MouseEvent, ctxmenu: CTXMenu) {
@@ -113,11 +120,9 @@ class ContextMenu {
             }
             container.appendChild(li);
         });
-        Object.assign<CSSStyleDeclaration, Partial<CSSStyleDeclaration>>(container.style, {
-            position: "fixed",
-            left: e.offsetX + "px",
-            top: e.offsetY + "px"
-        });
+        container.style.position = "fixed";
+        container.style.left = e.offsetX + "px";
+        container.style.top = e.offsetY + "px";
         container.className = "ctxmenu";
         return container;
     }
@@ -131,9 +136,7 @@ class ContextMenu {
     }
 }
 
-Object.assign(window, {
-    ContextMenu: new ContextMenu()
-});
+window.ContextMenu = new ContextMenu();
 
 document.addEventListener("readystatechange", e => {
     if (document.readyState === "interactive") {

@@ -12,7 +12,7 @@
     </style>
     <meta charset="utf8" />
     <script>
-        document.addEventListener("readystatechange", (event) => {
+        document.addEventListener("readystatechange", function (event) {
             if (document.readyState === "complete") {
 
                 ContextMenu.attach("html", [
@@ -25,7 +25,7 @@
                         target: "_blank",
                         text: "Google (neuer Tab)"
                     }
-                ], (m, e) => {
+                ], function (m, e) {
                     m.push({
                         text: "Coordinates: x"+e.offsetX+" y"+e.offsetY
                     });
@@ -33,7 +33,7 @@
                 });
                 ContextMenu.attach("h1", [
                     {
-                        action: () => alert("Clicked h1"),
+                        action: function () { alert("Clicked h1") },
                         text: "Heading"
                     }
                 ]);
