@@ -2,7 +2,7 @@
 
 interface CTXMInteractive {
     text: string;
-    title?: string;
+    tooltip?: string;
 }
 
 declare const css: any;
@@ -93,7 +93,7 @@ class ContextMenu {
         delete this.cache[target];
     }
 
-    public closeMenu() {
+    private closeMenu() {
         if (this.menu) {
             const p = this.menu.parentElement;
             p && p.removeChild(this.menu);
@@ -109,7 +109,7 @@ class ContextMenu {
         ctxmenu.forEach(item => {
             const li = document.createElement("li");
             li.innerHTML = `<span>${item.text}</span>`;
-            li.title = item.title || "";
+            li.title = item.tooltip || "";
             if (ContextMenu.itemIsAction(item)) {
                 li.addEventListener("click", () => item.action());
                 li.className = "interactive";
