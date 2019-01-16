@@ -32,7 +32,7 @@ Just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
 </head>
 ```
 
-## [Menu Definition](#mdef)
+## [](#Menu-Definition)Menu Definition
 
 Menu definitions are used to describe the content of a context menu. A menu definition is an array of objects, where each object defines a single item in the menu.
 
@@ -118,7 +118,7 @@ attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, event: Mouse
 
 This method is used to bind a context menu to any DOM Node and takes the following arguments:
 - `target`: A selector string to define the target node (eg `'body'`, or `'#someID'`)
-- `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#mdef).
+- `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#Menu-Definition).
 - `beforeRender?`: An optional callback function that is called before the context menu is opened. It is passed two arguments: `menu` - the menu definition, `event` - the MouseEvent and needs to return a new menu definition which will be used.
 
 #
