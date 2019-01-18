@@ -16,7 +16,7 @@ interface CTXMInteractive extends CTXMHeading {
 }
 
 interface CTXMAction extends CTXMInteractive {
-    action: Function;
+    action: (ev: MouseEvent) => void;
 }
 
 interface CTXMAnchor extends CTXMInteractive {
@@ -65,7 +65,7 @@ class ContextMenu {
             this.closeMenu();
 
             const newMenu = beforeRender([...ctxmenu], e);
-            this.menu = ContextMenu.generateDOM(e, newMenu);
+            this.menu = this.generateDOM(e, newMenu);
             document.body.appendChild(this.menu);
 
             e.preventDefault();
@@ -109,33 +109,35 @@ class ContextMenu {
         }
     }
 
-    private static generateDOM(e: MouseEvent, ctxmenu: CTXMenu) {
+    private generateDOM(e: MouseEvent, ctxmenu: CTXMenu) {
         const container = document.createElement("ul");
         if (ctxmenu.length === 0) {
             container.style.display = "none";
         }
         ctxmenu.forEach(item => {
             const li = document.createElement("li");
-            if (this.itemIsDivider(item)) {
+            if (ContextMenu.itemIsDivider(item)) {
                 li.className = "divider";
             } else {
                 li.innerHTML = `<span>${item.text}</span>`;
                 li.title = item.tooltip || "";
-                if (!(item as CTXMInteractive).disabled) {
-                    if (this.itemIsAction(item)) {
-                        li.addEventListener("click", () => item.action());
-                        li.className = "interactive";
-                    }
-                    else if (this.itemIsAnchor(item)) {
-                        li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
-                        li.className = "interactive";
+                if (ContextMenu.itemIsInteractive(item)) {
+                    if (!item.disabled) {
+                        if (ContextMenu.itemIsAction(item)) {
+                            li.addEventListener("click", item.action);
+                            li.className = "interactive";
+                        }
+                        else if (ContextMenu.itemIsAnchor(item)) {
+                            li.innerHTML = `<a onclick="${this.closeMenu()}" href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
+                            li.className = "interactive";
+                        }
                     } else {
-                        //Heading
-                        li.style.fontWeight = "bold";
-                        li.style.marginLeft = "-5px";
+                        li.className = "disabled";
                     }
                 } else {
-                    li.className = "disabled";
+                    //Heading
+                    li.style.fontWeight = "bold";
+                    li.style.marginLeft = "-5px";
                 }
             }
             container.appendChild(li);
@@ -144,7 +146,20 @@ class ContextMenu {
         container.style.left = e.offsetX + "px";
         container.style.top = e.offsetY + "px";
         container.className = "ctxmenu";
+        container.addEventListener("contextmenu", ev => {
+            ev.stopPropagation();
+            ev.preventDefault();
+        });
+        container.addEventListener("click", ev => {
+            if (ev.toElement && ev.toElement.parentElement && ev.toElement.parentElement.className !== "interactive") {
+                ev.stopPropagation();
+            }
+        });
         return container;
+    }
+
+    private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor) {
+        return this.itemIsAction(item) || this.itemIsAnchor(item);
     }
 
     private static itemIsAction(item: CTXMItem): item is CTXMAction {
@@ -164,7 +179,7 @@ window.ContextMenu = new ContextMenu();
 
 document.addEventListener("readystatechange", e => {
     if (document.readyState === "interactive") {
-        //insert default styles as css -> low priority
+        //insert default styles as first css -> low priority -> user can overwrite it easily
         const styles = document.createElement("style");
         styles.innerHTML =
             css`.ctxmenu {
