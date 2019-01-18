@@ -2,6 +2,10 @@
 
 declare const css: any;
 
+interface CTXMDivider {
+    isDivider: true;
+}
+
 interface CTXMHeading {
     text: string;
     tooltip?: string;
@@ -20,7 +24,7 @@ interface CTXMAnchor extends CTXMInteractive {
     target?: string;
 }
 
-type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading;
+type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider;
 
 type CTXMenu = CTXMItem[];
 
@@ -112,23 +116,27 @@ class ContextMenu {
         }
         ctxmenu.forEach(item => {
             const li = document.createElement("li");
-            li.innerHTML = `<span>${item.text}</span>`;
-            li.title = item.tooltip || "";
-            if (!(item as CTXMInteractive).disabled) {
-                if (ContextMenu.itemIsAction(item)) {
-                    li.addEventListener("click", () => item.action());
-                    li.className = "interactive";
-                }
-                else if (ContextMenu.itemIsAnchor(item)) {
-                    li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
-                    li.className = "interactive";
-                } else {
-                    //Heading
-                    li.style.fontWeight = "bold";
-                    li.style.marginLeft = "-5px";
-                }
+            if (this.itemIsDivider(item)) {
+                li.className = "divider";
             } else {
-                li.className = "disabled";
+                li.innerHTML = `<span>${item.text}</span>`;
+                li.title = item.tooltip || "";
+                if (!(item as CTXMInteractive).disabled) {
+                    if (this.itemIsAction(item)) {
+                        li.addEventListener("click", () => item.action());
+                        li.className = "interactive";
+                    }
+                    else if (this.itemIsAnchor(item)) {
+                        li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
+                        li.className = "interactive";
+                    } else {
+                        //Heading
+                        li.style.fontWeight = "bold";
+                        li.style.marginLeft = "-5px";
+                    }
+                } else {
+                    li.className = "disabled";
+                }
             }
             container.appendChild(li);
         });
@@ -146,6 +154,10 @@ class ContextMenu {
     private static itemIsAnchor(item: CTXMItem): item is CTXMAnchor {
         return item.hasOwnProperty("href");
     }
+
+    private static itemIsDivider(item: CTXMItem): item is CTXMDivider {
+        return item.hasOwnProperty("isDivider");
+    }
 }
 
 window.ContextMenu = new ContextMenu();
@@ -155,29 +167,33 @@ document.addEventListener("readystatechange", e => {
         //insert default styles as css -> low priority
         const styles = document.createElement("style");
         styles.innerHTML =
-            css`ul.ctxmenu {
+            css`.ctxmenu {
                 border: 1px solid #999;
                 padding: 2px 0;
                 box-shadow: 3px 3px 3px #aaa;
                 background: #fff;
             }
-            ul.ctxmenu li {
+            .ctxmenu li {
                 margin: 1px 0;
                 display: block;
             }
-            ul.ctxmenu li * {
+            .ctxmenu li * {
                 display: block;
                 padding: 2px 20px;
                 cursor: default;
             }
-            ul.ctxmenu li a {
+            .ctxmenu li a {
                 color: inherit;
                 text-decoration: none;
             }
-            ul.ctxmenu li.disabled {
-                color: #aaa;
+            .ctxmenu li.disabled {
+                color: #ccc;
             }
-            ul.ctxmenu li.interactive:hover {
+            .ctxmenu li.divider {
+                border-bottom: 1px solid #aaa;
+                margin: 5px 0;
+            }
+            .ctxmenu li.interactive:hover {
                 background: rgba(0,0,0,0.1);
             }
         `;
