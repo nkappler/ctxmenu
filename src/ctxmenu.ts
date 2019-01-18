@@ -151,7 +151,8 @@ class ContextMenu {
             ev.preventDefault();
         });
         container.addEventListener("click", ev => {
-            if (ev.toElement && ev.toElement.parentElement && ev.toElement.parentElement.className !== "interactive") {
+            const item = ev.target && (ev.target as Element).parentElement;
+            if (item && item.className !== "interactive") {
                 ev.stopPropagation();
             }
         });
