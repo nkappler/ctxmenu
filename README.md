@@ -38,12 +38,7 @@ Menu definitions are used to describe the content of a context menu. A menu defi
 
 Example:
 
-<div style="dislpay: inline-block; float:right; margin: 3px 20px">
-
-![Screenshot](https://raw.githubusercontent.com/nkappler/ctxmenu/master/doc/simpleMenu.png)
-
-</div>
-<div style="float: left">
+![Screenshot](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/simpleMenu.png)
 
 ```javascript
 var menuDefinition = [
@@ -51,8 +46,6 @@ var menuDefinition = [
     { text: "Item 2" }
 ]
 ```
-
-</div>
 
 These items don't have any functionality however, they are only displaying text.
 There are multiple types of menu items, which have different properties and behave differently.
