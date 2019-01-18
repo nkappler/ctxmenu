@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc && npx babel dist -d lib && npx babel dist --out-file lib/ctxMenu.min.js --presets=minify"
+    "build": "npx tsc && npx babel dist -d lib --plugins=css-template && npx babel lib/ctxMenu.js --out-file lib/ctxMenu.min.js --presets=minify"
   },
   "repository": {
     "type": "git",

@@ -1,9 +1,5 @@
 {
     "presets": [
         "es2015-loose"
-    ],
-    "plugins": [
-        "css-template"
-    ],
-
+    ]
 }
