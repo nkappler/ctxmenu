@@ -39,6 +39,10 @@ interface Window {
     ContextMenu: ContextMenu;
 }
 
+interface Pos {
+    x: number;
+    y: number;
+}
 
 class ContextMenu {
     private menu: HTMLUListElement | undefined;
@@ -143,9 +147,13 @@ class ContextMenu {
             container.appendChild(li);
         });
         container.style.position = "fixed";
-        container.style.left = e.offsetX + "px";
-        container.style.top = e.offsetY + "px";
         container.className = "ctxmenu";
+
+        const rect = ContextMenu.getBounding(container);
+        const pos = ContextMenu.getPosition(rect, { x: e.offsetX, y: e.offsetY });
+
+        container.style.left = pos.x + "px";
+        container.style.top = pos.y + "px";
         container.addEventListener("contextmenu", ev => {
             ev.stopPropagation();
             ev.preventDefault();
@@ -157,6 +165,22 @@ class ContextMenu {
             }
         });
         return container;
+    }
+
+    private static getBounding(elem: HTMLElement): ClientRect | DOMRect {
+        const container = elem.cloneNode(true) as HTMLElement;
+        container.style.visibility = "hidden";
+        document.body.append(container);
+        const result = container.getBoundingClientRect();
+        document.body.removeChild(container);
+        return result;
+    }
+
+    private static getPosition(rect: DOMRect | ClientRect, pos: Pos): Pos {
+        return {
+            x: pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x,
+            y: pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
+        };
     }
 
     private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor) {
@@ -188,6 +212,7 @@ document.addEventListener("readystatechange", e => {
                 padding: 2px 0;
                 box-shadow: 3px 3px 3px #aaa;
                 background: #fff;
+                margin: 0;
             }
             .ctxmenu li {
                 margin: 1px 0;
