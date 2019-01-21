@@ -170,7 +170,7 @@ class ContextMenu {
     private static getBounding(elem: HTMLElement): ClientRect | DOMRect {
         const container = elem.cloneNode(true) as HTMLElement;
         container.style.visibility = "hidden";
-        document.body.append(container);
+        document.body.appendChild(container);
         const result = container.getBoundingClientRect();
         document.body.removeChild(container);
         return result;
