@@ -19,6 +19,19 @@
 
                 ContextMenu.attach("html", [
                     {
+                        text : "Actions",
+                        tooltip: "JS Functions"
+                    },
+                    {
+                        action: function () { alert("Clicked action item") },
+                        text: "click me"
+                    },
+                    { isDivider: true },
+                    {
+                        text: "Anchors",
+                        tooltip: "links (<a>)"
+                    },
+                    {
                         href: "http://www.google.de",
                         text: "Google"
                     },
@@ -28,12 +41,23 @@
                         text: "Google (neuer Tab)",
                         tooltip: "Öffnet in neuem Tab"
                     },
+                    { isDivider: true },
                     {
-                        isDivider: true
+                        text: "Menuception"
                     },
                     {
                         text: "more actions",
-                        subMenu: []
+                        subMenu: [
+                            {
+                                text: "more",
+                                subMenu: [
+                                    {
+                                        text: "and more",
+                                        subMenu: []
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     {
                         text: "even more actions",
@@ -48,7 +72,8 @@
                                 ]
                             }
                         ]
-                    }
+                    },
+                    { isDivider:true }
                 ], function (m, e) {
                     m.push({
                         text: "Coordinates: x" + e.offsetX + " y" + e.offsetY
