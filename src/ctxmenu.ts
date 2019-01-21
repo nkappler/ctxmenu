@@ -24,7 +24,11 @@ interface CTXMAnchor extends CTXMInteractive {
     target?: string;
 }
 
-type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider;
+interface CTXMSubMenu extends CTXMInteractive {
+    subMenu: CTXMenu;
+}
+
+type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
 
 type CTXMenu = CTXMItem[];
 
@@ -113,7 +117,8 @@ class ContextMenu {
         }
     }
 
-    private generateDOM(e: MouseEvent, ctxmenu: CTXMenu) {
+    // tslint:disable-next-line:no-non-null-assertion
+    private generateDOM(e: MouseEvent, ctxmenu: CTXMenu, parentMenu = this.menu!) {
         const container = document.createElement("ul");
         if (ctxmenu.length === 0) {
             container.style.display = "none";
@@ -127,13 +132,22 @@ class ContextMenu {
                 li.title = item.tooltip || "";
                 if (ContextMenu.itemIsInteractive(item)) {
                     if (!item.disabled) {
+                        li.className = "interactive";
                         if (ContextMenu.itemIsAction(item)) {
                             li.addEventListener("click", item.action);
-                            li.className = "interactive";
                         }
                         else if (ContextMenu.itemIsAnchor(item)) {
                             li.innerHTML = `<a onclick="${this.closeMenu()}" href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
-                            li.className = "interactive";
+                        }
+                        else {
+                            if (item.subMenu.length === 0) {
+                                li.className = "disabled submenu";
+                            } else {
+                                li.className = "interactive submenu";
+                                li.addEventListener("mouseenter", (ev) => {
+                                    this.openSubMenu(ev, item.subMenu, parentMenu);
+                                });
+                            }
                         }
                     } else {
                         li.className = "disabled";
@@ -150,7 +164,7 @@ class ContextMenu {
         container.className = "ctxmenu";
 
         const rect = ContextMenu.getBounding(container);
-        const pos = ContextMenu.getPosition(rect, { x: e.offsetX, y: e.offsetY });
+        const pos = ContextMenu.getPosition(rect, { x: e.clientX, y: e.clientY });
 
         container.style.left = pos.x + "px";
         container.style.top = pos.y + "px";
@@ -165,6 +179,12 @@ class ContextMenu {
             }
         });
         return container;
+    }
+
+    // tslint:disable-next-line:no-non-null-assertion
+    private openSubMenu(e: MouseEvent, ctxMenu: CTXMenu, parentMenu: HTMLUListElement = this.menu!) {
+        parentMenu["subMenu"] = this.generateDOM(e, ctxMenu, parentMenu);
+        document.body.appendChild(parentMenu["subMenu"]);
     }
 
     private static getBounding(elem: HTMLElement): ClientRect | DOMRect {
@@ -183,8 +203,8 @@ class ContextMenu {
         };
     }
 
-    private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor) {
-        return this.itemIsAction(item) || this.itemIsAnchor(item);
+    private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor | CTXMSubMenu) {
+        return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item);
     }
 
     private static itemIsAction(item: CTXMItem): item is CTXMAction {
@@ -197,6 +217,10 @@ class ContextMenu {
 
     private static itemIsDivider(item: CTXMItem): item is CTXMDivider {
         return item.hasOwnProperty("isDivider");
+    }
+
+    private static itemIsSubMenu(item: CTXMItem): item is CTXMSubMenu {
+        return item.hasOwnProperty("subMenu");
     }
 }
 
@@ -213,10 +237,12 @@ document.addEventListener("readystatechange", e => {
                 box-shadow: 3px 3px 3px #aaa;
                 background: #fff;
                 margin: 0;
+                font-size: 15px;
             }
             .ctxmenu li {
                 margin: 1px 0;
                 display: block;
+                position: relative;
             }
             .ctxmenu li * {
                 display: block;
@@ -236,6 +262,14 @@ document.addEventListener("readystatechange", e => {
             }
             .ctxmenu li.interactive:hover {
                 background: rgba(0,0,0,0.1);
+            }
+            .ctxmenu li.submenu::after {
+                content: '>';
+                position: absolute;
+                display: block;
+                top: 0;
+                right: 0.3em;
+                font-family: monospace;
             }
         `;
         document.head.insertBefore(styles, document.head.childNodes[0]);

@@ -6,7 +6,9 @@
         * {
             font-family: sans-serif;
         }
-        html, body {
+
+        html,
+        body {
             height: 100%;
         }
     </style>
@@ -28,10 +30,28 @@
                     },
                     {
                         isDivider: true
+                    },
+                    {
+                        text: "more actions",
+                        subMenu: []
+                    },
+                    {
+                        text: "even more actions",
+                        subMenu: [
+                            {
+                                text: "more",
+                                subMenu: [
+                                    {
+                                        text: "and more",
+                                        subMenu: []
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ], function (m, e) {
                     m.push({
-                        text: "Coordinates: x"+e.offsetX+" y"+e.offsetY
+                        text: "Coordinates: x" + e.offsetX + " y" + e.offsetY
                     });
                     return m;
                 });
