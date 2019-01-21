@@ -19,7 +19,7 @@
 
                 ContextMenu.attach("html", [
                     {
-                        text : "Actions",
+                        text: "Actions",
                         tooltip: "JS Functions"
                     },
                     {
@@ -46,14 +46,15 @@
                         text: "Menuception"
                     },
                     {
-                        text: "more actions",
+                        text: "more ...",
                         subMenu: [
                             {
-                                text: "more",
+                                text: "even more...",
                                 subMenu: [
                                     {
-                                        text: "and more",
-                                        subMenu: []
+                                        text: "there's nothing here...",
+                                        action: undefined,
+                                        disabled: true
                                     }
                                 ]
                             }
@@ -64,22 +65,27 @@
                         subMenu: [
                             {
                                 text: "more",
-                                subMenu: [
-                                    {
-                                        text: "and more",
-                                        subMenu: []
-                                    }
-                                ]
+                                subMenu: menuception("what's this? deeper and deeper into the rabbit hole ... will it ever end? nobody knows ........ ....... it is still going .... man, this is a deeply nested menu .... almost there .... I\u2800promise ... You did it ...".split(" "))
                             }
                         ]
                     },
-                    { isDivider:true }
+                    { isDivider: true }
                 ], function (m, e) {
                     m.push({
                         text: "Coordinates: x" + e.offsetX + " y" + e.offsetY
                     });
                     return m;
                 });
+
+                function menuception(array) {
+                    if (array.length === 0) return [];
+
+                    return [{
+                        text: array.shift(),
+                        subMenu: menuception(array)
+                    }];
+                }
+
                 ContextMenu.attach("h1", [
                     {
                         action: function () { alert("Clicked h1") },

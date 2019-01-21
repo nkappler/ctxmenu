@@ -51,6 +51,7 @@ interface Pos {
 class ContextMenu {
     private menu: HTMLUListElement | undefined;
     private cache: CTXCache = {};
+    private dir: "r" | "l" = "r";
     public constructor() {
         window.addEventListener("click", () => this.closeMenu());
         window.addEventListener("resize", () => this.closeMenu());
@@ -73,7 +74,7 @@ class ContextMenu {
             this.closeMenu();
 
             const newMenu = beforeRender([...ctxmenu], e);
-            this.menu = this.generateDOM(e, newMenu);
+            this.menu = this.generateDOM(newMenu, e);
             document.body.appendChild(this.menu);
 
             e.preventDefault();
@@ -119,14 +120,39 @@ class ContextMenu {
         }
     }
 
-    // tslint:disable-next-line:no-non-null-assertion
-    private generateDOM(e: MouseEvent, ctxmenu: CTXMenu, parentMenu?: HTMLElement) {
+    /**
+     * assigns an eventhandler to a list item, that gets triggered after a short timeout,
+     * but only if the cursor is still targeting that list item after the timeout. when
+     * hovering fast over different list items, the actions do not get triggered.
+     * @param target the target list item
+     * @param action the event that should trigger after the timeout
+     */
+    private debounce(target: HTMLLIElement, action: (e: MouseEvent) => void) {
+        let timeout: number;
+        target.addEventListener("mouseenter", (e) => {
+            timeout = setTimeout(() => action(e), 150);
+        });
+        target.addEventListener("mouseleave", () => clearTimeout(timeout));
+    }
+
+    private generateDOM(ctxMenu: CTXMenu, event: MouseEvent): HTMLUListElement;
+    private generateDOM(ctxMenu: CTXMenu, parentElement: HTMLLIElement): HTMLUListElement;
+    private generateDOM(ctxmenu: CTXMenu, parentOrEvent: HTMLLIElement | MouseEvent): HTMLUListElement {
         const container = document.createElement("ul");
         if (ctxmenu.length === 0) {
             container.style.display = "none";
         }
         ctxmenu.forEach(item => {
             const li = document.createElement("li");
+            //all items shoud have a handler to close submenus on hover (except if its their own)
+            this.debounce(li, () => {
+                const subMenu = li.parentElement && li.parentElement.querySelector("ul");
+                if (subMenu && subMenu.parentElement !== li) {
+                    this.closeMenu(subMenu);
+                }
+            });
+
+            //Item type specific stuff
             if (ContextMenu.itemIsDivider(item)) {
                 li.className = "divider";
             } else {
@@ -146,16 +172,12 @@ class ContextMenu {
                                 li.className = "disabled submenu";
                             } else {
                                 li.className = "interactive submenu";
-                                let to: number;
-                                li.addEventListener("mouseenter", (ev) => {
+                                this.debounce(li, (ev) => {
                                     const subMenu = li.querySelector("ul");
-                                    if (subMenu) {
-                                        //if this specific submenu is already open, don't do anything
-                                        return;
+                                    if (!subMenu) { //if it's already open, do nothing
+                                        this.openSubMenu(ev, item.subMenu, li);
                                     }
-                                    to = setTimeout(() => this.openSubMenu(ev, item.subMenu, li), 150);
                                 });
-                                li.addEventListener("mouseleave", () => clearTimeout(to));
                             }
                         }
                     } else {
@@ -169,15 +191,6 @@ class ContextMenu {
                     li.style.fontWeight = "bold";
                     li.style.marginLeft = "-5px";
                 }
-                //all items shoud have a handler to close submenus (except if its their own)
-                let tout: number;
-                li.addEventListener("mouseenter", (ev) => {
-                    const subMenu = li.parentElement && li.parentElement.querySelector("ul");
-                    if (subMenu && subMenu !== li.querySelector("ul")) {
-                        tout = setTimeout(() => this.closeMenu(subMenu), 150);
-                    }
-                });
-                li.addEventListener("mouseleave", () => clearTimeout(tout));
             }
             container.appendChild(li);
         });
@@ -185,11 +198,20 @@ class ContextMenu {
         container.className = "ctxmenu";
 
         const rect = ContextMenu.getBounding(container);
-        const pos = ContextMenu.getPosition(rect, { x: e.clientX, y: e.clientY });
-        if (parentMenu) {
-            const parentRect = parentMenu.getBoundingClientRect();
-            pos.x = parentRect.left + parentRect.width;
-            pos.y = e.target ? (e.target as Element).getBoundingClientRect().top - 4 : pos.y;
+        let pos = { x: 0, y: 0 };
+        if (parentOrEvent instanceof Element) {
+            const parentRect = parentOrEvent.getBoundingClientRect();
+            pos = {
+                x: this.dir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
+                y: parentRect.top - 4
+            };
+            //change direction when reaching edge of screen
+            if (pos.x !== this.getPosition(rect, pos).x) {
+                this.dir = this.dir === "r" ? "l" : "r";
+                pos.x = this.dir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width;
+            }
+        } else {
+            pos = this.getPosition(rect, { x: parentOrEvent.clientX, y: parentOrEvent.clientY });
         }
 
         container.style.left = pos.x + "px";
@@ -213,7 +235,7 @@ class ContextMenu {
         if (subMenu && subMenu.parentElement !== listElement) {
             this.closeMenu(subMenu);
         }
-        listElement.appendChild(this.generateDOM(e, ctxMenu, listElement));
+        listElement.appendChild(this.generateDOM(ctxMenu, listElement));
     }
 
     private static getBounding(elem: HTMLElement): ClientRect | DOMRect {
@@ -225,9 +247,11 @@ class ContextMenu {
         return result;
     }
 
-    private static getPosition(rect: DOMRect | ClientRect, pos: Pos): Pos {
+    private getPosition(rect: DOMRect | ClientRect, pos: Pos): Pos {
         return {
-            x: pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x,
+            x: this.dir === "r"
+                ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x
+                : pos.x < 0 ? 0 : pos.x,
             y: pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
         };
     }
@@ -267,6 +291,7 @@ document.addEventListener("readystatechange", e => {
                 background: #fff;
                 margin: 0;
                 font-size: 15px;
+                z-index: 9999;
             }
             .ctxmenu li {
                 margin: 1px 0;
