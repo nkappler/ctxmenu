@@ -153,7 +153,7 @@ The update method is used to update an existing context menu. If you try to upda
 
 `update` takes two arguments: `target` - the selector string to define the target element and `ctxmenu` - the updated menu definition.
 
-### `ContextMenu.update`
+### `ContextMenu.delete`
 ```typescript
 ContextMenu.delete(target: string)
 ```
