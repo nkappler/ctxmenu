@@ -3,12 +3,12 @@
 Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
 
 #### Table of contents
-[Features](#features)\
-[Installation](#installation)\
-[Menu Definition](#Menu-Definition) / [Item Types](#itemtypes) \
-[API](#api)
+[Features](#Features)\
+[Installation](#Installation)\
+[Menu Definition](#Menu-Definition)\
+[Item Types](#item-types) \
+[API](#API)
 
-[](#features)
 ## Features
 
 - Create custom context menus for every browser.
@@ -18,7 +18,7 @@ Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
 - Different menu items: headings, anchors, action items, dividers and submenus
 - Interactive menu items can be disabled
 
-[](#installation)
+
 ## Installation
 
 Just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
@@ -32,7 +32,7 @@ Just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
 </head>
 ```
 
-## [](#Menu-Definition)Menu Definition
+## Menu Definition
 
 Menu definitions are used to describe the content of a context menu. A menu definition is an array of objects, where each object defines a single item in the menu.
 
@@ -57,16 +57,14 @@ var menuDefinition = [
 ]
 ```
 
-[](#itemtypes)
-There are several **item types**:
+## Item Types
 
-[Heading](#heading) \
-[Anchor](#anchor) \
-[Action item](#action) \
-[Submenu](#submenu)\
-[Divider](#divider)
+[Heading](#heading-item) \
+[Anchor](#anchor-item) \
+[Action Item](#action-item) \
+[Submenu](#submenu-item)\
+[Divider](#divider-item)
 
-[](#heading)
 ### Heading Item
 
 This is a heading item which displays a text and optionally shows a tooltip when hovering over it.
@@ -80,7 +78,6 @@ This is a heading item which displays a text and optionally shows a tooltip when
 
 NOTE: _All other menu items (except the divider item) derive from this and have at least these two properties_
 
-[](#anchor)
 ### Anchor Item
 
 This is an interactive item which implements an anchor tag (`<a>`) and will redirect to a given URL (`href`).
@@ -95,7 +92,6 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 }
 ```
 
-[](#action)
 ### Action Item
 
 This is an interactive item which will execute a given javascript function when clicked.
@@ -109,7 +105,6 @@ This is an interactive item which will execute a given javascript function when 
 }
 ```
 
-[](#submenu)
 ### Submenu Item
 
 This is an interactive item which holds another [menu definition](#Menu-Definition). You can create infinitely deep nested submenus.
@@ -122,7 +117,7 @@ This is an interactive item which holds another [menu definition](#Menu-Definiti
     disabled?: boolean  // default false
 }
 ```
-[](#divider)
+
 ### Divider Item
 
 This is a divider item which draws a horizontal line.
@@ -131,16 +126,15 @@ This is a divider item which draws a horizontal line.
 { isDivider: true }
 ```
 
-[](#api)
 ## API
 
 This library defines a global object `ContextMenu` with three APIs:
 
-[attach](#attach)\
-[update](#update)\
-[delete](#delete)
+[attach](#contextmenu.attach)\
+[update](#contextmenu.update)\
+[delete](#contextmenu.delete)
 
-[](#attach)
+### `ContextMenu.attach`
 ```typescript
 ContextMenu.attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
 ```
@@ -150,7 +144,7 @@ The attach method is used to bind a context menu to any DOM Node and takes the f
 - `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#Menu-Definition).
 - `beforeRender?`: An optional callback function that is called before the context menu is opened. It is passed two arguments: `menu` - the menu definition, `event` - the MouseEvent and needs to return a new menu definition which will be used.
 
-[](#update)
+### `ContextMenu.update`
 ```typescript
 ContextMenu.update(target: string, ctxmenu: Array)
 ```
@@ -159,7 +153,7 @@ The update method is used to update an existing context menu. If you try to upda
 
 `update` takes two arguments: `target` - the selector string to define the target element and `ctxmenu` - the updated menu definition.
 
-[](#delete)
+### `ContextMenu.update`
 ```typescript
 ContextMenu.delete(target: string)
 ```
