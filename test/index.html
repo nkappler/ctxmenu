@@ -102,7 +102,19 @@
                 //Should produce error because selector returns nothing
                 ContextMenu.attach(".thisClassDoesNotExist", []);
                 //Should silently add the not yet existing context menu.
-                ContextMenu.update("p", []);
+                ContextMenu.update("p", [
+                    { text: "Heading" },
+                    {
+                        text: "Action Item",
+                        action: () => alert("Hello World!")
+                    },
+                    { isDivider: true },
+                    {
+                        text: "Anchor Item",
+                        href: "",
+                        disabled: true
+                    }
+                ]);
             }
         });
     </script>

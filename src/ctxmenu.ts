@@ -73,6 +73,9 @@ class ContextMenu {
             //close any open menu
             this.closeMenu();
 
+            //reset direction
+            this.dir = "r";
+
             const newMenu = beforeRender([...ctxmenu], e);
             this.menu = this.generateDOM(newMenu, e);
             document.body.appendChild(this.menu);
