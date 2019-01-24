@@ -168,7 +168,7 @@ class ContextMenu {
                             li.addEventListener("click", item.action);
                         }
                         else if (ContextMenu.itemIsAnchor(item)) {
-                            li.innerHTML = `<a onclick="${this.closeMenu()}" href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
+                            li.innerHTML = `<a href="${item.href}" target="${item.target || ""}">${item.text}</a>`;
                         }
                         else {
                             if (item.subMenu.length === 0) {
