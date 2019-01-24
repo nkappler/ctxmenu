@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu|Yatra+One" rel="stylesheet">
+    <style>
+        * {
+            font-family: sans-serif;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: "Ubuntu";
+            font-size: 22px;
+        }
+        .bold {
+            text-shadow: 2px 2px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-family: "Yatra One";
+            text-shadow: 4px 2px rgba(0,0,0,0.25);
+            font-size: 70px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .ctxmenu li.disabled {
+            color: #000;
+        }
+        .ctxmenu li ul li.disabled {
+            color: #999999;
+        }
+
+        .fork {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .content {
+            margin: auto;
+            width: 800px;
+            max-width: 100%;
+            padding: 20px;
+            text-align: justify;
+        }
+
+        .hr {
+            position: relative;
+            margin-top: 20px;
+            margin-bottom: 45px;
+            width: 100%;
+            border-bottom: 2px solid #999;
+        }
+        .hr:after {
+            display: block;
+            position: absolute;
+            content: '';
+            width: 20%;
+            border-bottom: 2px solid #666;
+            left: 40%;
+            top: 4px;
+        }
+
+        .hint {
+            color: #666;
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        .download {
+            border: 3px dashed #3366aa;
+            background-color: rgba( 50, 70, 200, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .download p {
+            text-align: center;
+        }
+    </style>
+    <link rel="shortcut icon" type="image/x-icon" href="./favicon.png">
+    <meta charset="utf8" />
+    <script>
+        document.addEventListener("readystatechange", function (event) {
+            if (document.readyState === "complete") {
+
+                ContextMenu.attach("html", [
+                    {
+                        text: "Actions",
+                        tooltip: "JS Functions"
+                    },
+                    {
+                        action: function () { alert("Clicked action item") },
+                        text: "click me"
+                    },
+                    { isDivider: true },
+                    {
+                        text: "Anchors",
+                        tooltip: "links (<a>)"
+                    },
+                    {
+                        href: "http://www.google.de",
+                        target: "_blank",
+                        text: "Google (new tab)",
+                        tooltip: "opens in new tab"
+                    },
+                    { isDivider: true },
+                    {
+                        text: "Tooltips",
+                        tooltip: "Tooltips are awesome"
+                    },
+                    {
+                        href: "",
+                        text: "Hover me!",
+                        tooltip: "Nicely done =)",
+                        disabled: true
+                    },
+                    { isDivider: true },
+                    {
+                        text: "Menuception"
+                    },
+                    {
+                        text: "more ...",
+                        subMenu: [
+                            {
+                                text: "even more...",
+                                subMenu: [
+                                    {
+                                        text: "there's nothing here...",
+                                        action: undefined,
+                                        disabled: true
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        text: "even more actions",
+                        subMenu: [
+                            {
+                                text: "more",
+                                subMenu: menuception("what's this? deeper and deeper into the rabbit hole ... will it ever end? nobody knows ....... it is still going .... man, this is a deeply nested menu .... almost there .... I\u2800promise ... You did it ... Well done.".split(" "))
+                            }
+                        ]
+                    },
+                    { isDivider: true },
+                    { text: "Event specific stuff" }
+                ], function (m, e) {
+                    m.push({
+                        text: "e.g. Cursor Position: X:" + e.clientX + " / Y:" + e.clientY,
+                        href: "",
+                        disabled: true
+                    });
+                    return m;
+                });
+
+                function menuception(array) {
+                    if (array.length === 0) return [];
+
+                    return [{
+                        text: array.shift(),
+                        subMenu: menuception(array)
+                    }];
+                }
+
+                ContextMenu.attach("#header", []);
+
+                ContextMenu.attach(".download", [
+                    {
+                        text: "Downloads",
+                        subMenu: [
+                            {
+                                text: "ctxMenu.js",
+                                href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxMenu.js"
+                            },
+                            {
+                                text: "ctxMenu.min.js",
+                                href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxMenu.min.js"
+                            }
+                        ]
+                    },
+                    {
+                        text: "Documentation (github)",
+                        href: "https://www.github.com/nkappler/ctxmenu"
+                    }
+                ]);
+            }
+        });
+    </script>
+    <script src="./lib/ctxMenu.js"></script>
+</head>
+
+<body>
+    <a class="fork" href="https://github.com/nkappler/ctxmenu">
+        <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_gray_6d6d6d.png?resize=149%2C149"
+            class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
+    </a>
+
+    <div class="content">
+        <div id="header">
+            <h1 style="margin: auto;">ctxMenu.js</h1>
+            <img src="favicon_nc.png" style="margin:auto; display: block;" />
+            <div class="hr"></div>
+        </div>
+        <p>
+            ctxMenu.js is a lightweight, customizable javascript library for creating custom context menus.<br />
+            Go ahead and <span class="bold">try it out!</span> Press your secondary mouse button anywhere on this page,
+            or press and hold when your on a touch-device.
+        </p>
+        <div class="download">
+            <p>Download section<br/>
+            <span class="hint">
+                Right-click here to download ctxMenu.js or go to the full documentation.
+            </span>
+            </p>
+        </div>
+        <p>
+            Some of ctxMenu.js' features:
+            <ul>
+                <li>Create as many context menus as you want. Have specific menus for different elements on your
+                    website. <br />
+                    <span class="hint">(The header on this page for example does not have a context menu, but prevents
+                        the default browser
+                        context menu from appearing)</span></li>
+                <li>Use JavaScript functions or HTML Anchors for interactive items</li>
+                <li>Infinitely deep submenus. <br />
+                    <span class="hint">(Try
+                        <ul class="ctxmenu" style="display: inline-block; box-shadow: none; font-style: normal;">
+                            <li class="submenu"><span>even more actions</span></li>
+                        </ul> in this page's context menu)</span>
+                </li>
+                <li>Update the menu before it appears to include event specific items, such as the cursor position or
+                    run any arbitrary javascript function</li>
+                <li>Fully customizable! <span style="display: none;">Fancy <button>dark mode</button>?</span></li>
+            </ul>
+        </p>
+    </div>
+
+
+</body>
+
+</html>
