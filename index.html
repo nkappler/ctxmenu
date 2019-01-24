@@ -40,7 +40,6 @@
 
         .content {
             margin: auto;
-            margin-top: 60px;
             width: 800px;
             max-width: 100%;
             padding: 20px;
@@ -81,6 +80,23 @@
 
         .download p {
             text-align: center;
+        }
+
+        a img {
+            width: 149px;
+            height: 149px;
+        }
+
+        /* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+        @media screen and (max-width: 600px) {
+            h1 {
+                font-size: 13vw;
+            }
+
+            a img {
+                width: 20vw;
+                height: 20vw;
+            }
         }
     </style>
     <link rel="shortcut icon" type="image/x-icon" href="./favicon.png">
@@ -198,7 +214,7 @@
 
 <body>
     <a class="fork" href="https://github.com/nkappler/ctxmenu">
-        <img width="149" height="149" src="https://github.blog/wp-content/uploads/2008/12/forkme_right_gray_6d6d6d.png?resize=149%2C149"
+        <img src="https://github.blog/wp-content/uploads/2008/12/forkme_right_gray_6d6d6d.png?resize=149%2C149"
             class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
     </a>
 
@@ -238,6 +254,7 @@
                 <li>Update the menu before it appears to include event specific items, such as the cursor position or
                     run any arbitrary javascript function</li>
                 <li>Fully customizable! <span style="display: none;">Fancy <button>dark mode</button>?</span></li>
+                <li>Mobile support</li>
             </ul>
         </p>
     </div>
