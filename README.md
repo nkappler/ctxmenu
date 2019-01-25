@@ -1,6 +1,6 @@
 # ctxMenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/favicon.png)
 
-Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
+## Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
