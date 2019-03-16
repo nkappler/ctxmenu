@@ -294,6 +294,7 @@ document.addEventListener("readystatechange", e => {
                 background: #fff;
                 margin: 0;
                 font-size: 15px;
+                font-family: Verdana, sans-serif;
                 z-index: 9999;
             }
             .ctxmenu li {
@@ -327,6 +328,7 @@ document.addEventListener("readystatechange", e => {
                 top: 0;
                 right: 0.3em;
                 font-family: monospace;
+                line-height: 22px;
             }
         `;
         document.head.insertBefore(styles, document.head.childNodes[0]);
