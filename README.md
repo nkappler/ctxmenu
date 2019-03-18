@@ -1,6 +1,7 @@
 # ctxMenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/favicon.png)
 
 ## Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
+[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxmenu.d.ts)
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
@@ -23,6 +24,18 @@
 
 ## Installation
 
+### with npm:
+Install ctxmenu
+```console
+your_project> npm install -s ctxmenu
+```
+
+Import ctxmenu:
+```typescript
+import { ctxmenu } from "ctxmenu";
+```
+
+### without npm
 Just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
 
 ```html

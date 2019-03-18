@@ -39,13 +39,15 @@ interface CTXCache {
     } | undefined;
 }
 
-interface Window {
-    ContextMenu: ContextMenu;
-}
-
 interface Pos {
     x: number;
     y: number;
+}
+
+const test: CTXMItem = {
+    text: "H",
+    action: () => { },
+    href: ""
 }
 
 class ContextMenu {
@@ -56,9 +58,10 @@ class ContextMenu {
         window.addEventListener("click", () => this.closeMenu());
         window.addEventListener("resize", () => this.closeMenu());
         window.addEventListener("scroll", () => this.closeMenu());
+        ContextMenu.addStylesToDom();
     }
 
-    public attach(target: string, ctxmenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu = m => m) {
+    public attach(target: string, ctxMenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu = m => m) {
         const t = document.querySelector(target);
         if (this.cache[target] !== undefined) {
             console.error(`target element ${target} already has a context menu assigned. Use ContextMenu.update() intstead.`);
@@ -76,7 +79,7 @@ class ContextMenu {
             //reset direction
             this.dir = "r";
 
-            const newMenu = beforeRender([...ctxmenu], e);
+            const newMenu = beforeRender([...ctxMenu], e);
             this.menu = this.generateDOM(newMenu, e);
             document.body.appendChild(this.menu);
 
@@ -84,18 +87,18 @@ class ContextMenu {
         };
 
         this.cache[target] = {
-            ctxmenu,
+            ctxmenu: ctxMenu,
             handler
         };
         t.addEventListener("contextmenu", handler as EventListener);
     }
 
-    public update(target: string, ctxmenu: CTXMenu) {
+    public update(target: string, ctxMenu: CTXMenu) {
         const o = this.cache[target];
         const t = document.querySelector(target);
         t && t.removeEventListener("contextmenu", (o && o.handler) as EventListener);
         delete this.cache[target];
-        this.attach(target, ctxmenu);
+        this.attach(target, ctxMenu);
     }
 
     public delete(target: string) {
@@ -140,12 +143,12 @@ class ContextMenu {
 
     private generateDOM(ctxMenu: CTXMenu, event: MouseEvent): HTMLUListElement;
     private generateDOM(ctxMenu: CTXMenu, parentElement: HTMLLIElement): HTMLUListElement;
-    private generateDOM(ctxmenu: CTXMenu, parentOrEvent: HTMLLIElement | MouseEvent): HTMLUListElement {
+    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLLIElement | MouseEvent): HTMLUListElement {
         const container = document.createElement("ul");
-        if (ctxmenu.length === 0) {
+        if (ctxMenu.length === 0) {
             container.style.display = "none";
         }
-        ctxmenu.forEach(item => {
+        ctxMenu.forEach(item => {
             const li = document.createElement("li");
             //all items shoud have a handler to close submenus on hover (except if its their own)
             this.debounce(li, () => {
@@ -278,59 +281,71 @@ class ContextMenu {
     private static itemIsSubMenu(item: CTXMItem): item is CTXMSubMenu {
         return item.hasOwnProperty("subMenu");
     }
+
+    private static addStylesToDom() {
+        const append = () => {
+            //insert default styles as first css -> low priority -> user can overwrite it easily
+            const styles = document.createElement("style");
+            styles.innerHTML =
+                css`.ctxmenu {
+                        border: 1px solid #999;
+                        padding: 2px 0;
+                        box-shadow: 3px 3px 3px #aaa;
+                        background: #fff;
+                        margin: 0;
+                        font-size: 15px;
+                        font-family: Verdana, sans-serif;
+                        z-index: 9999;
+                    }
+                    .ctxmenu li {
+                        margin: 1px 0;
+                        display: block;
+                        position: relative;
+                    }
+                    .ctxmenu li span, .ctxmenu li a {
+                        display: block;
+                        padding: 2px 20px;
+                        cursor: default;
+                    }
+                    .ctxmenu li a {
+                        color: inherit;
+                        text-decoration: none;
+                    }
+                    .ctxmenu li.disabled {
+                        color: #ccc;
+                    }
+                    .ctxmenu li.divider {
+                        border-bottom: 1px solid #aaa;
+                        margin: 5px 0;
+                    }
+                    .ctxmenu li.interactive:hover {
+                        background: rgba(0,0,0,0.1);
+                    }
+                    .ctxmenu li.submenu::after {
+                        content: '>';
+                        position: absolute;
+                        display: block;
+                        top: 0;
+                        right: 0.3em;
+                        font-family: monospace;
+                        line-height: 22px;
+                    }
+                `;
+            document.head.insertBefore(styles, document.head.childNodes[0]);
+        };
+
+        if (document.readyState === "interactive") {
+            append();
+        } else {
+            document.addEventListener("readystatechange", () => {
+                if (document.readyState === "interactive") {
+                    append();
+                }
+            });
+        }
+    }
 }
 
-window.ContextMenu = new ContextMenu();
+export const ctxmenu = new ContextMenu();
 
-document.addEventListener("readystatechange", e => {
-    if (document.readyState === "interactive") {
-        //insert default styles as first css -> low priority -> user can overwrite it easily
-        const styles = document.createElement("style");
-        styles.innerHTML =
-            css`.ctxmenu {
-                border: 1px solid #999;
-                padding: 2px 0;
-                box-shadow: 3px 3px 3px #aaa;
-                background: #fff;
-                margin: 0;
-                font-size: 15px;
-                font-family: Verdana, sans-serif;
-                z-index: 9999;
-            }
-            .ctxmenu li {
-                margin: 1px 0;
-                display: block;
-                position: relative;
-            }
-            .ctxmenu li span, .ctxmenu li a {
-                display: block;
-                padding: 2px 20px;
-                cursor: default;
-            }
-            .ctxmenu li a {
-                color: inherit;
-                text-decoration: none;
-            }
-            .ctxmenu li.disabled {
-                color: #ccc;
-            }
-            .ctxmenu li.divider {
-                border-bottom: 1px solid #aaa;
-                margin: 5px 0;
-            }
-            .ctxmenu li.interactive:hover {
-                background: rgba(0,0,0,0.1);
-            }
-            .ctxmenu li.submenu::after {
-                content: '>';
-                position: absolute;
-                display: block;
-                top: 0;
-                right: 0.3em;
-                font-family: monospace;
-                line-height: 22px;
-            }
-        `;
-        document.head.insertBefore(styles, document.head.childNodes[0]);
-    }
-});
+
