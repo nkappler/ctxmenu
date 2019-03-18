@@ -11,7 +11,7 @@
     "declarationDir": "./lib",
     // "declarationMap": true,                /* Generates a sourcemap for each corresponding '.d.ts' file. */
     // "sourceMap": true,                     /* Generates corresponding '.map' file. */
-    // "outFile": "./dist/ctxmenu.js",                       /* Concatenate and emit output to single file. */
+    // "outFile": "./index.js",                       /* Concatenate and emit output to single file. */
     "outDir": "./dist", /* Redirect output structure to the directory. */
     "rootDir": "./src", /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     // "composite": true,                     /* Enable project compilation */
@@ -52,6 +52,5 @@
     // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "exclude": ["./test", "lib", "./node_modules"],
-  // "include": ["src"]
+  "exclude": ["./test", "lib", "./node_modules"]
 }

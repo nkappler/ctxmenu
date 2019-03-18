@@ -1,6 +1,5 @@
 import { ctxmenu } from "../lib/ctxmenu";
 
-
 document.addEventListener("readystatechange", function (event) {
     if (document.readyState === "complete") {
 

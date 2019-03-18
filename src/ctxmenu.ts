@@ -2,35 +2,35 @@
 
 declare const css: any;
 
-interface CTXMDivider {
+export interface CTXMDivider {
     isDivider: true;
 }
 
-interface CTXMHeading {
+export interface CTXMHeading {
     text: string;
     tooltip?: string;
 }
 
-interface CTXMInteractive extends CTXMHeading {
+export interface CTXMInteractive extends CTXMHeading {
     disabled?: boolean;
 }
 
-interface CTXMAction extends CTXMInteractive {
+export interface CTXMAction extends CTXMInteractive {
     action: (ev: MouseEvent) => void;
 }
 
-interface CTXMAnchor extends CTXMInteractive {
+export interface CTXMAnchor extends CTXMInteractive {
     href: string;
     target?: string;
 }
 
-interface CTXMSubMenu extends CTXMInteractive {
+export interface CTXMSubMenu extends CTXMInteractive {
     subMenu: CTXMenu;
 }
 
-type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
+export type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
 
-type CTXMenu = CTXMItem[];
+export type CTXMenu = CTXMItem[];
 
 interface CTXCache {
     [key: string]: {
@@ -44,21 +44,29 @@ interface Pos {
     y: number;
 }
 
-const test: CTXMItem = {
-    text: "H",
-    action: () => { },
-    href: ""
+export interface CTXMenuSingleton {
+    attach(target: string, ctxMenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu): void;
+    update(target: string, ctxMenu: CTXMenu): void;
+    delete(target: string): void;
 }
 
-class ContextMenu {
+class ContextMenu implements CTXMenuSingleton {
+    private static instance: ContextMenu;
     private menu: HTMLUListElement | undefined;
     private cache: CTXCache = {};
     private dir: "r" | "l" = "r";
-    public constructor() {
+    private constructor() {
         window.addEventListener("click", () => this.closeMenu());
         window.addEventListener("resize", () => this.closeMenu());
         window.addEventListener("scroll", () => this.closeMenu());
         ContextMenu.addStylesToDom();
+    }
+
+    public static getInstance() {
+        if (!ContextMenu.instance) {
+            ContextMenu.instance = new ContextMenu();
+        }
+        return ContextMenu.instance;
     }
 
     public attach(target: string, ctxMenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu = m => m) {
@@ -346,6 +354,6 @@ class ContextMenu {
     }
 }
 
-export const ctxmenu = new ContextMenu();
+export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
 
 
