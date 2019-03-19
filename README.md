@@ -10,7 +10,8 @@
 [Installation](#Installation)\
 [Menu Definition](#Menu-Definition)\
 [Item Types](#item-types) \
-[API](#API)
+[API](#API) \
+[Customize](#Customize)
 
 ## Features
 
@@ -36,7 +37,8 @@ import { ctxmenu } from "ctxmenu";
 ```
 
 ### without npm
-Just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
+ctxmenu.js is also available as a standalone version.
+to use it, just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
 
 ```html
 <head>
@@ -173,3 +175,16 @@ The update method is used to update an existing context menu. If you try to upda
 ContextMenu.delete(target: string)
 ```
 The delete method is used to delete a context menu and only takes the `target` selector string.
+
+## Customize
+
+ctxmenu.js uses the following css classes which you might want to overwrite:
+
+```css
+.ctxmenu                /* the main menu div */
+.ctxmenu li             /* any menu item */
+.ctxmenu li.disabled    /* any disabled menu item */
+.ctxmenu li.divider     /* any horizontal divider */
+.ctxmenu li.interactive /* any interactive item (anchor, action item, submenu)*/
+.ctxmenu li.submenu     /* any menu item that has a submenu */
+```

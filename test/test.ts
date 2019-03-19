@@ -1,6 +1,6 @@
-import { ctxmenu } from "../lib/ctxmenu.min";
+import "../standalone/ctxmenu";
 
-ctxmenu.attach("body", [
+window.ctxmenu.attach("body", [
     {
         text: "",
         href: "",

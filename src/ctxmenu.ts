@@ -45,7 +45,7 @@ interface Pos {
 }
 
 export interface CTXMenuSingleton {
-    attach(target: string, ctxMenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu): void;
+    attach(target: string, ctxMenu: CTXMenu, beforeRender?: (menu: CTXMenu, e: MouseEvent) => CTXMenu): void;
     update(target: string, ctxMenu: CTXMenu): void;
     delete(target: string): void;
 }

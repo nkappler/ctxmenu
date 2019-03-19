@@ -2,11 +2,20 @@
   "name": "ctxmenu",
   "version": "1.0.1",
   "description": "",
-  "main": "lib/ctxmenu.min.js",
-  "types": "lib/ctxmenu.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "prepublish": "npm run build",
-    "build": "npx tsc && npx babel dist -d lib --plugins=css-template && npx babel lib/ctxmenu.js --out-file lib/ctxmenu.min.js --presets=minify"
+    "compileTypescript": "npx tsc",
+    "compileRootDeclaration": "npx tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly",
+    "babelRoot": "npx babel compile/root -d compile/babel --plugins=css-template && npx babel compile/root/ctxmenu.js --out-file index.js --plugins=css-template",
+    "build_root": "npm run compileTypescript && npm run compileRootDeclaration && npm run babelRoot",
+
+    "compileStandaloneDeclaration": "npx tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly",
+    "makeStandalone": "npx browserify compile/babel/standalone.js > standalone/ctxmenu.js",
+    "minifyStandalone": "npx babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
+    "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone",
+
+    "build": "npm run build_root && npm run build_standalone"
   },
   "repository": {
     "type": "git",
