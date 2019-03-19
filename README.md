@@ -1,7 +1,7 @@
-# ctxMenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)
+# ctxmenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)
 
 ## Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
-[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxmenu.d.ts)
+[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/index.d.ts)
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
@@ -38,13 +38,13 @@ import { ctxmenu } from "ctxmenu";
 
 ### without npm
 ctxmenu.js is also available as a standalone version.
-to use it, just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
+to use it, just download and link ctxmenu.js or ctxmenu.min.js in your websites header.
 
 ```html
 <head>
     <!-- ... -->
 
-    <script src="../ctxMenu.js"></script>
+    <script src="../ctxmenu.js"></script>
 
 </head>
 ```

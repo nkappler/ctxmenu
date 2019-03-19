@@ -87,12 +87,12 @@ document.addEventListener("readystatechange", function (event) {
                 text: "Downloads",
                 subMenu: [
                     {
-                        text: "ctxMenu.js",
-                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxMenu.js"
+                        text: "ctxmenu.js",
+                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxmenu.js"
                     },
                     {
-                        text: "ctxMenu.min.js",
-                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxMenu.min.js"
+                        text: "ctxmenu.min.js",
+                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxmenu.min.js"
                     }
                 ]
             },
