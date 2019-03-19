@@ -88,11 +88,11 @@ document.addEventListener("readystatechange", function (event) {
                 subMenu: [
                     {
                         text: "ctxMenu.js",
-                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxMenu.js"
+                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxMenu.js"
                     },
                     {
                         text: "ctxMenu.min.js",
-                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxMenu.min.js"
+                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxMenu.min.js"
                     }
                 ]
             },

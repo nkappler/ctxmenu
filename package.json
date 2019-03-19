@@ -13,7 +13,8 @@
     "compileStandaloneDeclaration": "npx tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly",
     "makeStandalone": "npx browserify compile/babel/standalone.js > standalone/ctxmenu.js",
     "minifyStandalone": "npx babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
-    "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone",
+    "minifyToDocs": "npx babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
+    "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run minifyToDocs",
 
     "build": "npm run build_root && npm run build_standalone"
   },
@@ -42,9 +43,8 @@
   "files": [
     "README.md",
     "LICENSE",
-    "lib/ctxmenu.js",
-    "lib/ctxmenu.min.js",
-    "lib/ctxmenu.d.ts"
+    "index.js",
+    "index.d.ts"
   ],
   "keywords": [
     "context menu"
