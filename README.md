@@ -1,6 +1,7 @@
-# ctxMenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/favicon.png)
+# ctxMenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)
 
 ## Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
+[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/lib/ctxmenu.d.ts)
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
@@ -9,7 +10,8 @@
 [Installation](#Installation)\
 [Menu Definition](#Menu-Definition)\
 [Item Types](#item-types) \
-[API](#API)
+[API](#API) \
+[Customize](#Customize)
 
 ## Features
 
@@ -23,7 +25,20 @@
 
 ## Installation
 
-Just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
+### with npm:
+Install ctxmenu
+```console
+your_project> npm install -s ctxmenu
+```
+
+Import ctxmenu:
+```typescript
+import { ctxmenu } from "ctxmenu";
+```
+
+### without npm
+ctxmenu.js is also available as a standalone version.
+to use it, just download and link ctxMenu.js or ctxMenu.min.js in your websites header.
 
 ```html
 <head>
@@ -160,3 +175,16 @@ The update method is used to update an existing context menu. If you try to upda
 ContextMenu.delete(target: string)
 ```
 The delete method is used to delete a context menu and only takes the `target` selector string.
+
+## Customize
+
+ctxmenu.js uses the following css classes which you might want to overwrite:
+
+```css
+.ctxmenu                /* the main menu div */
+.ctxmenu li             /* any menu item */
+.ctxmenu li.disabled    /* any disabled menu item */
+.ctxmenu li.divider     /* any horizontal divider */
+.ctxmenu li.interactive /* any interactive item (anchor, action item, submenu)*/
+.ctxmenu li.submenu     /* any menu item that has a submenu */
+```

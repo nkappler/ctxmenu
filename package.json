@@ -1,10 +1,22 @@
 {
   "name": "ctxmenu",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "build": "npx tsc && npx babel dist -d lib --plugins=css-template && npx babel lib/ctxMenu.js --out-file lib/ctxMenu.min.js --presets=minify"
+    "compileTypescript": "npx tsc",
+    "compileRootDeclaration": "npx tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly",
+    "babelRoot": "npx babel compile/root -d compile/babel --plugins=css-template && npx babel compile/root/ctxmenu.js --out-file index.js --plugins=css-template",
+    "build_root": "npm run compileTypescript && npm run compileRootDeclaration && npm run babelRoot",
+
+    "compileStandaloneDeclaration": "npx tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly",
+    "makeStandalone": "npx browserify compile/babel/standalone.js > standalone/ctxmenu.js",
+    "minifyStandalone": "npx babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
+    "minifyToDocs": "npx babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
+    "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run minifyToDocs",
+
+    "build": "npm run build_root && npm run build_standalone"
   },
   "repository": {
     "type": "git",
@@ -15,14 +27,26 @@
   "bugs": {
     "url": "https://github.com/nkappler/ctxmenu/issues"
   },
-  "homepage": "https://github.com/nkappler/ctxmenu#readme",
+  "homepage": "https://nkappler.github.io/ctxmenu",
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-plugin-css-template": "^1.0.4",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-es2015-loose": "^8.0.0",
     "babel-preset-minify": "^0.5.0",
-    "typescript": "^3.2.2"
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.3",
+    "typescript": "^3.3.3333"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "files": [
+    "README.md",
+    "LICENSE",
+    "index.js",
+    "index.d.ts"
+  ],
+  "keywords": [
+    "context menu"
+  ]
 }
