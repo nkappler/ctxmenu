@@ -1,6 +1,6 @@
 {
   "name": "ctxmenu",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "types": "index.d.ts",
@@ -16,7 +16,8 @@
     "minifyToDocs": "npx babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
     "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run minifyToDocs",
 
-    "build": "npm run build_root && npm run build_standalone"
+    "build": "npm run build_root && npm run build_standalone",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",

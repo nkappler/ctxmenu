@@ -1,4 +1,4 @@
-/*! ctxMenu v1.0.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.0.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 declare const css: any;
 
