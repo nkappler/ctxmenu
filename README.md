@@ -145,15 +145,17 @@ This is a divider item which draws a horizontal line.
 
 ## API
 
-This library defines a global object `ContextMenu` with three APIs:
+This library exports a singleton object `ctxmenu`.
+In the standalone version the singleton is a global variable (`window.ctxmenu`).
+It has the following three APIs:
 
-[attach](#contextmenu.attach)\
-[update](#contextmenu.update)\
-[delete](#contextmenu.delete)
+[attach](#ctxmenuattach)\
+[update](#ctxmenuupdate)\
+[delete](#ctxmenudelete)
 
-### `ContextMenu.attach`
+### `ctxmenu.attach`
 ```typescript
-ContextMenu.attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
+ctxmenu.attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
 ```
 
 The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
@@ -161,18 +163,18 @@ The attach method is used to bind a context menu to any DOM Node and takes the f
 - `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#Menu-Definition).
 - `beforeRender?`: An optional callback function that is called before the context menu is opened. It is passed two arguments: `menu` - the menu definition, `event` - the MouseEvent and needs to return a new menu definition which will be used.
 
-### `ContextMenu.update`
+### `ctxmenu.update`
 ```typescript
-ContextMenu.update(target: string, ctxmenu: Array)
+ctxmenu.update(target: string, ctxmenu: Array)
 ```
 
 The update method is used to update an existing context menu. If you try to update a menu which does not exist, it will silently be [attached](#attach) instead.
 
 `update` takes two arguments: `target` - the selector string to define the target element and `ctxmenu` - the updated menu definition.
 
-### `ContextMenu.delete`
+### `ctxmenu.delete`
 ```typescript
-ContextMenu.delete(target: string)
+ctxmenu.delete(target: string)
 ```
 The delete method is used to delete a context menu and only takes the `target` selector string.
 
