@@ -1,7 +1,6 @@
-# ctxmenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)
+# ctxmenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/index.d.ts)
 
 ## Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
-[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/index.d.ts)
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
@@ -103,7 +102,7 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 {
     text: string,
     href: string,       // URL
-    target: string,     // eg. "_blank" to open link in new tab
+    target?: string,    // eg. "_blank" to open link in new tab
     tooltip?: string,
     disabled?: boolean  // default false
 }
