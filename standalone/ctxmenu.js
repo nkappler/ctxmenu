@@ -68,7 +68,7 @@ var ContextMenu = function () {
     ContextMenu.prototype.update = function update(target, ctxMenu) {
         var o = this.cache[target];
         var t = document.querySelector(target);
-        t && t.removeEventListener("contextmenu", o && o.handler);
+        o && t && t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
         this.attach(target, ctxMenu);
     };
