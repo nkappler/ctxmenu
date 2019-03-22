@@ -32,10 +32,12 @@ export type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTX
 
 export type CTXMenu = CTXMItem[];
 
+type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
+
 interface CTXCache {
     [key: string]: {
         ctxmenu: CTXMenu,
-        handler: Function,
+        handler: CTXHandler,
     } | undefined;
 }
 
@@ -70,7 +72,7 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     public attach(target: string, ctxMenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu = m => m) {
-        const t = document.querySelector(target);
+        const t = document.querySelector<HTMLElement>(target);
         if (this.cache[target] !== undefined) {
             console.error(`target element ${target} already has a context menu assigned. Use ContextMenu.update() intstead.`);
             return;
@@ -79,7 +81,7 @@ class ContextMenu implements CTXMenuSingleton {
             console.error(`target element ${target} not found`);
             return;
         }
-        const handler = (e: MouseEvent) => {
+        const handler: CTXHandler = e => {
             e.stopImmediatePropagation();
             //close any open menu
             this.closeMenu();
@@ -98,13 +100,13 @@ class ContextMenu implements CTXMenuSingleton {
             ctxmenu: ctxMenu,
             handler
         };
-        t.addEventListener("contextmenu", handler as EventListener);
+        t.addEventListener("contextmenu", handler);
     }
 
     public update(target: string, ctxMenu: CTXMenu) {
         const o = this.cache[target];
-        const t = document.querySelector(target);
-        t && t.removeEventListener("contextmenu", (o && o.handler) as EventListener);
+        const t = document.querySelector<HTMLElement>(target);
+        o && t && t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
         this.attach(target, ctxMenu);
     }
@@ -115,12 +117,12 @@ class ContextMenu implements CTXMenuSingleton {
             console.error(`no context menu for target element ${target} found`);
             return;
         }
-        const t = document.querySelector(target);
+        const t = document.querySelector<HTMLElement>(target);
         if (!t) {
             console.error(`target element ${target} does not exist (anymore)`);
             return;
         }
-        t.removeEventListener("contextmenu", o.handler as EventListener);
+        t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
     }
 
