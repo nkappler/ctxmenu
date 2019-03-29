@@ -81,6 +81,8 @@ document.addEventListener("readystatechange", function (event) {
         }
 
         ctxmenu.attach("#header", []);
+        ctxmenu.attach("header", []);
+        ctxmenu.attach("[sidebarjs]", []);
 
         ctxmenu.attach(".download", [
             {
