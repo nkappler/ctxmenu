@@ -105,3 +105,21 @@ document.addEventListener("readystatechange", function (event) {
         ]);
     }
 });
+
+function toggleDarkMode() {
+    const darkCss = document.querySelector("#darkTheme");
+    const toggle = document.querySelector("#switch");
+    if (darkCss) {
+        document.head.removeChild(darkCss);
+        toggle.innerHTML = "Fancy dark mode?";
+    }
+    else {
+        const link = document.createElement("link");
+        link.id = "darkTheme";
+        link.rel = "stylesheet";
+        link.type = "text/css";
+        link.href = "./darkTheme.css";
+        document.head.appendChild(link);
+        toggle.innerHTML = "Back to normal!";
+    }
+}
