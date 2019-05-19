@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Update()</title>
+    <script src="../standalone/ctxmenu.js"></script>
+</head>
+
+<body>
+    <script>
+        ctxmenu.attach("body", [{ text: "Test Update" }], (ctx, e) => {
+            ctx.push({ text: JSON.stringify({ x: e.x, y: e.y }) });
+            return ctx;
+        });
+
+        function updateDef() {
+            ctxmenu.update("body", [{ text: "Updated Def" }]);
+        }
+
+        function updateFn() {
+            ctxmenu.update("body", undefined, (ctx, e) => {
+                ctx.push({ text: JSON.stringify({ x: e.x, y: e.y, time: performance.now() }) });
+                return ctx;
+            });
+        }
+
+        function updateBoth() {
+            ctxmenu.update("body", [{ text: "Updated Both" }], (ctx, e) => {
+                ctx.push({ text: JSON.stringify({ x: e.x, y: e.y, time: performance.now() }) });
+                return ctx;
+            });
+        }
+    </script>
+
+    <!-- clicking this should not overwrite the beforeRender function -->
+    <button onclick="updateDef()">Update Menu Def</button>
+
+    <!-- clicking this should not overwrite the menu definition -->
+    <button onclick="updateFn()">Update Before Render Funtion</button>
+
+    <button onclick="updateBoth()">Update Both</button>
+</body>
+
+</html>

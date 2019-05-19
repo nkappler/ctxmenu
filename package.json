@@ -1,6 +1,6 @@
 {
   "name": "ctxmenu",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "",
   "main": "index.js",
   "types": "index.d.ts",
@@ -9,13 +9,11 @@
     "compileRootDeclaration": "npx tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly",
     "babelRoot": "npx babel compile/root -d compile/babel --plugins=css-template && npx babel compile/root/ctxmenu.js --out-file index.js --plugins=css-template",
     "build_root": "npm run compileTypescript && npm run compileRootDeclaration && npm run babelRoot",
-
     "compileStandaloneDeclaration": "npx tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly",
-    "makeStandalone": "npx browserify compile/babel/standalone.js > standalone/ctxmenu.js",
+    "makeStandalone": "browserify --no-install compile/babel/standalone.js > standalone/ctxmenu.js",
     "minifyStandalone": "npx babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
     "minifyToDocs": "npx babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
     "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run minifyToDocs",
-
     "build": "npm run build_root && npm run build_standalone",
     "prepublishOnly": "npm run build"
   },

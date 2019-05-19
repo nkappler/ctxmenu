@@ -40,6 +40,13 @@ declare module "ctxmenu" {
      * This is a Menu Definition. In fact, it's just an array of Context Menu Items
      */
     export type CTXMenu = CTXMItem[];
+    /**
+     * A function that is called before the context menu is opened.
+     * It is passed the menu definition and the MouseEvent.
+     * Can be used to manipulate the menu based on the Event. (e.g. Cursor Position)
+     * Needs to return a menu definition.
+     */
+    export type BeforeRenderFN = (menu: CTXMenu, e: MouseEvent) => CTXMenu;
     export interface CTXMenuSingleton {
         /**
          * The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
@@ -51,14 +58,20 @@ declare module "ctxmenu" {
          * `event` - the MouseEvent.
          * `beforeRender` needs to return a new menu definition which will be used.
          */
-        attach(target: string, ctxMenu: CTXMenu, beforeRender?: (menu: CTXMenu, e: MouseEvent) => CTXMenu): void;
+        attach(target: string, ctxMenu: CTXMenu, beforeRender?: BeforeRenderFN): void;
         /**
          * The update method is used to update an existing context menu.
+         * You can update each the menu definition or beforeRender function only by passing undefined for the other argument.
          * If you try to update a menu which does not exist, it will silently be attached instead.
          * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
-         * @param ctxMenu An array of objects defining the updated menu layout.
+         * @param ctxMenu An array of objects defining the updated menu layout. _(might be undefined when only updating beforeRender)_
+         * @param beforeRender The updated callback function that is called before the context menu is opened.
+         * It is passed two arguments:
+         * `menu` - the menu definition,
+         * `event` - the MouseEvent.
+         * `beforeRender` needs to return a new menu definition which will be used.
          */
-        update(target: string, ctxMenu: CTXMenu): void;
+        update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN): void;
         /**
          * The delete method is used to delete a context menu
          * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)

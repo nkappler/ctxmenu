@@ -1,6 +1,6 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
-/*! ctxMenu v1.1.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.1.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -60,17 +60,18 @@ var ContextMenu = function () {
         };
         this.cache[target] = {
             ctxmenu: ctxMenu,
-            handler: handler
+            handler: handler,
+            beforeRender: beforeRender
         };
         t.addEventListener("contextmenu", handler);
     };
 
-    ContextMenu.prototype.update = function update(target, ctxMenu) {
+    ContextMenu.prototype.update = function update(target, ctxMenu, beforeRender) {
         var o = this.cache[target];
         var t = document.querySelector(target);
         o && t && t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
-        this.attach(target, ctxMenu);
+        this.attach(target, ctxMenu || o && o.ctxmenu || [], beforeRender || o && o.beforeRender);
     };
 
     ContextMenu.prototype.delete = function _delete(target) {

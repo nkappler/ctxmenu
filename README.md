@@ -157,19 +157,22 @@ It has the following three APIs:
 ctxmenu.attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
 ```
 
-The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
+The `attach` method is used to bind a context menu to any DOM Node and takes the following arguments:
 - `target`: A selector string to define the target node (eg `'body'`, or `'#someID'`)
 - `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#Menu-Definition).
 - `beforeRender?`: An optional callback function that is called before the context menu is opened. It is passed two arguments: `menu` - the menu definition, `event` - the MouseEvent and needs to return a new menu definition which will be used.
 
 ### `ctxmenu.update`
 ```typescript
-ctxmenu.update(target: string, ctxmenu: Array)
+ctxmenu.update(target: string, ctxmenu?: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
 ```
 
-The update method is used to update an existing context menu. If you try to update a menu which does not exist, it will silently be [attached](#attach) instead.
+The update method is used to update an existing context menu. You can update each the menu definition or beforeRender function only by passing undefined for the other argument. If you try to update a menu which does not exist, it will silently be [attached](#attach) instead.
 
-`update` takes two arguments: `target` - the selector string to define the target element and `ctxmenu` - the updated menu definition.
+`update` takes two or three arguments: 
+- `target` - the selector string to define the target element
+- `ctxmenu` - the updated menu definition.  _(might be undefined when only updating beforeRender)_
+- `beforeRender` - the updated callback function that is called before the context menu is opened.
 
 ### `ctxmenu.delete`
 ```typescript

@@ -1,5 +1,5 @@
 "use strict";
-/*! ctxMenu v1.1.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.1.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -59,17 +59,18 @@ var ContextMenu = function () {
         };
         this.cache[target] = {
             ctxmenu: ctxMenu,
-            handler: handler
+            handler: handler,
+            beforeRender: beforeRender
         };
         t.addEventListener("contextmenu", handler);
     };
 
-    ContextMenu.prototype.update = function update(target, ctxMenu) {
+    ContextMenu.prototype.update = function update(target, ctxMenu, beforeRender) {
         var o = this.cache[target];
         var t = document.querySelector(target);
         o && t && t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
-        this.attach(target, ctxMenu);
+        this.attach(target, ctxMenu || o && o.ctxmenu || [], beforeRender || o && o.beforeRender);
     };
 
     ContextMenu.prototype.delete = function _delete(target) {

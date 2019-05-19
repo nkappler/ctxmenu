@@ -1,4 +1,4 @@
-/*! ctxMenu v1.1.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.1.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 declare const css: any;
 
@@ -51,6 +51,14 @@ export type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTX
  */
 export type CTXMenu = CTXMItem[];
 
+/**
+ * A function that is called before the context menu is opened.
+ * It is passed the menu definition and the MouseEvent.
+ * Can be used to manipulate the menu based on the Event. (e.g. Cursor Position)
+ * Needs to return a menu definition.
+ */
+export type BeforeRenderFN = (menu: CTXMenu, e: MouseEvent) => CTXMenu;
+
 export interface CTXMenuSingleton {
     /**
      * The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
@@ -62,14 +70,20 @@ export interface CTXMenuSingleton {
      * `event` - the MouseEvent.
      * `beforeRender` needs to return a new menu definition which will be used.
      */
-    attach(target: string, ctxMenu: CTXMenu, beforeRender?: (menu: CTXMenu, e: MouseEvent) => CTXMenu): void;
+    attach(target: string, ctxMenu: CTXMenu, beforeRender?: BeforeRenderFN): void;
     /**
      * The update method is used to update an existing context menu.
+     * You can update each the menu definition or beforeRender function only by passing undefined for the other argument.
      * If you try to update a menu which does not exist, it will silently be attached instead.
      * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
-     * @param ctxMenu An array of objects defining the updated menu layout.
+     * @param ctxMenu An array of objects defining the updated menu layout. _(might be undefined when only updating beforeRender)_
+     * @param beforeRender The updated callback function that is called before the context menu is opened.
+     * It is passed two arguments:
+     * `menu` - the menu definition,
+     * `event` - the MouseEvent.
+     * `beforeRender` needs to return a new menu definition which will be used.
      */
-    update(target: string, ctxMenu: CTXMenu): void;
+    update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN): void;
     /**
      * The delete method is used to delete a context menu
      * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
@@ -83,6 +97,7 @@ interface CTXCache {
     [key: string]: {
         ctxmenu: CTXMenu,
         handler: CTXHandler,
+        beforeRender: BeforeRenderFN
     } | undefined;
 }
 
@@ -110,7 +125,7 @@ class ContextMenu implements CTXMenuSingleton {
         return ContextMenu.instance;
     }
 
-    public attach(target: string, ctxMenu: CTXMenu, beforeRender: (menu: CTXMenu, e: MouseEvent) => CTXMenu = m => m) {
+    public attach(target: string, ctxMenu: CTXMenu, beforeRender: BeforeRenderFN = m => m) {
         const t = document.querySelector<HTMLElement>(target);
         if (this.cache[target] !== undefined) {
             console.error(`target element ${target} already has a context menu assigned. Use ContextMenu.update() intstead.`);
@@ -137,17 +152,18 @@ class ContextMenu implements CTXMenuSingleton {
 
         this.cache[target] = {
             ctxmenu: ctxMenu,
-            handler
+            handler,
+            beforeRender
         };
         t.addEventListener("contextmenu", handler);
     }
 
-    public update(target: string, ctxMenu: CTXMenu) {
+    public update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN) {
         const o = this.cache[target];
         const t = document.querySelector<HTMLElement>(target);
         o && t && t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
-        this.attach(target, ctxMenu);
+        this.attach(target, ctxMenu || o && o.ctxmenu || [], beforeRender || o && o.beforeRender);
     }
 
     public delete(target: string) {
