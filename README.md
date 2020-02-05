@@ -26,7 +26,7 @@
 
 ### with npm:
 Install ctxmenu
-```console
+```shell
 your_project> npm install -s ctxmenu
 ```
 
