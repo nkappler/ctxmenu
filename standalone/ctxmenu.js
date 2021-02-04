@@ -32,7 +32,8 @@ var ContextMenu = /*#__PURE__*/function () {
     _classCallCheck(this, ContextMenu);
 
     this.cache = {};
-    this.dir = "r";
+    this.hdir = "r";
+    this.vdir = "d";
     window.addEventListener("click", function () {
       return _this.closeMenu();
     });
@@ -70,7 +71,8 @@ var ContextMenu = /*#__PURE__*/function () {
 
         _this2.closeMenu();
 
-        _this2.dir = "r";
+        _this2.hdir = "r";
+        _this2.vdir = "d";
         var newMenu = beforeRender(_toConsumableArray(ctxMenu), e);
         _this2.menu = _this2.generateDOM(newMenu, e);
         document.body.appendChild(_this2.menu);
@@ -217,14 +219,22 @@ var ContextMenu = /*#__PURE__*/function () {
       if (parentOrEvent instanceof Element) {
         var parentRect = parentOrEvent.getBoundingClientRect();
         pos = {
-          x: this.dir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-          y: parentRect.top - 4
+          x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
+          y: parentRect.top + (this.vdir === "d" ? 4 : -8)
         };
+        var savePos = this.getPosition(rect, pos);
 
-        if (pos.x !== this.getPosition(rect, pos).x) {
-          this.dir = this.dir === "r" ? "l" : "r";
-          pos.x = this.dir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width;
+        if (pos.x !== savePos.x) {
+          this.hdir = this.hdir === "r" ? "l" : "r";
+          pos.x = this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width;
         }
+
+        if (pos.y !== savePos.y) {
+          this.vdir = this.vdir === "u" ? "d" : "u";
+          pos.y = savePos.y;
+        }
+
+        pos = this.getPosition(rect, pos);
       } else {
         pos = this.getPosition(rect, {
           x: parentOrEvent.clientX,
@@ -262,8 +272,8 @@ var ContextMenu = /*#__PURE__*/function () {
     key: "getPosition",
     value: function getPosition(rect, pos) {
       return {
-        x: this.dir === "r" ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x : pos.x < 0 ? 0 : pos.x,
-        y: pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
+        x: this.hdir === "r" ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x : pos.x < 0 ? 0 : pos.x,
+        y: this.vdir === "d" ? pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y : pos.y < 0 ? 0 : pos.y
       };
     }
   }], [{

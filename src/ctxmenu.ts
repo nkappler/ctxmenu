@@ -110,7 +110,8 @@ class ContextMenu implements CTXMenuSingleton {
     private static instance: ContextMenu;
     private menu: HTMLUListElement | undefined;
     private cache: CTXCache = {};
-    private dir: "r" | "l" = "r";
+    private hdir: "r" | "l" = "r";
+    private vdir: "u" | "d" = "d";
     private constructor() {
         window.addEventListener("click", () => this.closeMenu());
         window.addEventListener("resize", () => this.closeMenu());
@@ -140,8 +141,9 @@ class ContextMenu implements CTXMenuSingleton {
             //close any open menu
             this.closeMenu();
 
-            //reset direction
-            this.dir = "r";
+            //reset directions
+            this.hdir = "r";
+            this.vdir = "d";
 
             const newMenu = beforeRender([...ctxMenu], e);
             this.menu = this.generateDOM(newMenu, e);
@@ -272,15 +274,21 @@ class ContextMenu implements CTXMenuSingleton {
         let pos = { x: 0, y: 0 };
         if (parentOrEvent instanceof Element) {
             const parentRect = parentOrEvent.getBoundingClientRect();
-            pos = {
-                x: this.dir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-                y: parentRect.top - 4
+            pos = {                     //const rightOfParent = rightofParent
+                x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
+                y: parentRect.top + (this.vdir === "d" ? 4 : -8)
             };
-            //change direction when reaching edge of screen
-            if (pos.x !== this.getPosition(rect, pos).x) {
-                this.dir = this.dir === "r" ? "l" : "r";
-                pos.x = this.dir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width;
+            const savePos = this.getPosition(rect, pos);
+            // change direction when reaching edge of screen
+            if (pos.x !== savePos.x) {
+                this.hdir = this.hdir === "r" ? "l" : "r";
+                pos.x = this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width;
             }
+            if (pos.y !== savePos.y) {
+                this.vdir = this.vdir === "u" ? "d" : "u";
+                pos.y = savePos.y
+            }
+            pos = this.getPosition(rect, pos); //on very tiny screens, the submenu may overlap the parent menu
         } else {
             pos = this.getPosition(rect, { x: parentOrEvent.clientX, y: parentOrEvent.clientY });
         }
@@ -318,12 +326,15 @@ class ContextMenu implements CTXMenuSingleton {
         return result;
     }
 
+/** gets a save position inside the screen */
     private getPosition(rect: DOMRect | ClientRect, pos: Pos): Pos {
         return {
-            x: this.dir === "r"
+            x: this.hdir === "r"
                 ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x
                 : pos.x < 0 ? 0 : pos.x,
-            y: pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
+            y: this.vdir === "d"
+                ? pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
+                : pos.y < 0 ? 0 : pos.y
         };
     }
 
