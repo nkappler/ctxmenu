@@ -167,19 +167,19 @@ var ContextMenu = /*#__PURE__*/function () {
         if (ContextMenu.itemIsDivider(item)) {
           li.className = "divider";
         } else {
-          li.innerHTML = "<span>".concat(item.text, "</span>");
-          li.title = item.tooltip || "";
+          li.innerHTML = "<span>".concat(ContextMenu.getProp(item.text), "</span>");
+          li.title = ContextMenu.getProp(item.tooltip) || "";
 
           if (ContextMenu.itemIsInteractive(item)) {
-            if (!item.disabled) {
+            if (!ContextMenu.getProp(item.disabled)) {
               li.className = "interactive";
 
               if (ContextMenu.itemIsAction(item)) {
                 li.addEventListener("click", item.action);
               } else if (ContextMenu.itemIsAnchor(item)) {
-                li.innerHTML = "<a href=\"".concat(item.href, "\" ").concat(item.target ? 'target="' + item.target + '"' : "", ">").concat(item.text, "</a>");
+                li.innerHTML = "<a href=\"".concat(ContextMenu.getProp(item.href), "\" ").concat(item.target ? 'target="' + ContextMenu.getProp(item.target) + '"' : "", ">").concat(ContextMenu.getProp(item.text), "</a>");
               } else {
-                if (item.subMenu.length === 0) {
+                if (ContextMenu.getProp(item.subMenu).length === 0) {
                   li.className = "disabled submenu";
                 } else {
                   li.className = "interactive submenu";
@@ -188,7 +188,7 @@ var ContextMenu = /*#__PURE__*/function () {
                     var subMenu = li.querySelector("ul");
 
                     if (!subMenu) {
-                      _this3.openSubMenu(ev, item.subMenu, li);
+                      _this3.openSubMenu(ev, ContextMenu.getProp(item.subMenu), li);
                     }
                   });
                 }
@@ -294,6 +294,11 @@ var ContextMenu = /*#__PURE__*/function () {
       var result = container.getBoundingClientRect();
       document.body.removeChild(container);
       return result;
+    }
+  }, {
+    key: "getProp",
+    value: function getProp(prop) {
+      return typeof prop === "function" ? prop() : prop;
     }
   }, {
     key: "itemIsInteractive",

@@ -29,8 +29,27 @@ document.addEventListener("readystatechange", function (event) {
             {
                 href: "",
                 text: "Hover me!",
-                tooltip: "Nicely done =)",
+                tooltip: "Disabled items can also have a tooltip",
                 disabled: true
+            },
+            { isDivider: true },
+            {
+                text: () => "Callbacks",
+                tooltip: () => "Properties can also be defined by a tooltip"
+            },
+            {
+                href: () => "",
+                text: () => "Every property can be defined in a callback",
+                tooltip: () => "Disabled items can also have a tooltip",
+                disabled: () => true
+            },
+            {
+                text: () => "Submenus can also be defined in a callback.",
+                subMenu: () => [{
+                    href: () => "",
+                    text: () => "empty",
+                    disabled: () => true
+                }]
             },
             { isDivider: true },
             {

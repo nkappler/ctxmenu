@@ -1,6 +1,6 @@
 /*! ctxMenu v1.1.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
-declare const css: any;
+export type ValueOrFunction<T> = T | (() => T);
 
 /** This is a Divider Menu Item */
 export interface CTXMDivider {
@@ -14,14 +14,14 @@ export interface CTXMDivider {
  */
 export interface CTXMHeading {
     /** The text of the Context Menu Item */
-    text: string;
+    text: ValueOrFunction<string>;
     /** The tooltip of the Context Menu Item */
-    tooltip?: string;
+    tooltip?: ValueOrFunction<string>;
 }
 
 export interface CTXMInteractive extends CTXMHeading {
     /** Whether the Context Menu Item is disabled or not. Defaults to `false` */
-    disabled?: boolean;
+    disabled?: ValueOrFunction<boolean>;
 }
 
 /** This is an interactive item which will execute a given javascript function when clicked. */
@@ -33,15 +33,15 @@ export interface CTXMAction extends CTXMInteractive {
 /** This is an interactive item which implements an anchor tag (`<a>`) and will redirect to a given URL (`href`). */
 export interface CTXMAnchor extends CTXMInteractive {
     /** Contains a URL or a URL fragment that the hyperlink points to. */
-    href: string;
+    href: ValueOrFunction<string>;
     /** Specifies where to display the linked URL. (e.g. `"_blank"` to open it in a new tab) */
-    target?: string;
+    target?: ValueOrFunction<string>;
 }
 
 /** This is an interactive item which holds a menu definition. You can create infinitely deep nested submenus. */
 export interface CTXMSubMenu extends CTXMInteractive {
     /** The menu definition for the nested menu */
-    subMenu: CTXMenu;
+    subMenu: ValueOrFunction<CTXMenu>;
 }
 
 export type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
@@ -229,26 +229,27 @@ class ContextMenu implements CTXMenuSingleton {
             if (ContextMenu.itemIsDivider(item)) {
                 li.className = "divider";
             } else {
-                li.innerHTML = `<span>${item.text}</span>`;
-                li.title = item.tooltip || "";
+                li.innerHTML = `<span>${ContextMenu.getProp(item.text)}</span>`;
+                li.title = ContextMenu.getProp(item.tooltip) || "";
                 if (ContextMenu.itemIsInteractive(item)) {
-                    if (!item.disabled) {
+                    if (!ContextMenu.getProp(item.disabled)) {
                         li.className = "interactive";
                         if (ContextMenu.itemIsAction(item)) {
                             li.addEventListener("click", item.action);
                         }
                         else if (ContextMenu.itemIsAnchor(item)) {
-                            li.innerHTML = `<a href="${item.href}" ${item.target ? 'target="' + item.target + '"' : ""}>${item.text}</a>`;
+                            li.innerHTML = `<a href="${ContextMenu.getProp(item.href)}" ${item.target ? 'target="' +
+                                ContextMenu.getProp(item.target) + '"' : ""}>${ContextMenu.getProp(item.text)}</a>`;
                         }
                         else {
-                            if (item.subMenu.length === 0) {
+                            if (ContextMenu.getProp(item.subMenu).length === 0) {
                                 li.className = "disabled submenu";
                             } else {
                                 li.className = "interactive submenu";
                                 this.debounce(li, (ev) => {
                                     const subMenu = li.querySelector("ul");
                                     if (!subMenu) { //if it's already open, do nothing
-                                        this.openSubMenu(ev, item.subMenu, li);
+                                        this.openSubMenu(ev, ContextMenu.getProp(item.subMenu), li);
                                     }
                                 });
                             }
@@ -326,7 +327,7 @@ class ContextMenu implements CTXMenuSingleton {
         return result;
     }
 
-/** gets a save position inside the screen */
+    /** gets a save position inside the screen */
     private getPosition(rect: DOMRect | ClientRect, pos: Pos): Pos {
         return {
             x: this.hdir === "r"
@@ -336,6 +337,10 @@ class ContextMenu implements CTXMenuSingleton {
                 ? pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
                 : pos.y < 0 ? 0 : pos.y
         };
+    }
+
+    private static getProp<T>(prop: ValueOrFunction<T>): T {
+        return typeof prop === "function" ? (prop as () => T)() : prop;
     }
 
     private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor | CTXMSubMenu) {

@@ -1,4 +1,6 @@
 declare module "ctxmenu" {
+    /*! ctxMenu v1.1.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+    export type ValueOrFunction<T> = T | (() => T);
     /** This is a Divider Menu Item */
     export interface CTXMDivider {
         isDivider: true;
@@ -10,13 +12,13 @@ declare module "ctxmenu" {
      */
     export interface CTXMHeading {
         /** The text of the Context Menu Item */
-        text: string;
+        text: ValueOrFunction<string>;
         /** The tooltip of the Context Menu Item */
-        tooltip?: string;
+        tooltip?: ValueOrFunction<string>;
     }
     export interface CTXMInteractive extends CTXMHeading {
         /** Whether the Context Menu Item is disabled or not. Defaults to `false` */
-        disabled?: boolean;
+        disabled?: ValueOrFunction<boolean>;
     }
     /** This is an interactive item which will execute a given javascript function when clicked. */
     export interface CTXMAction extends CTXMInteractive {
@@ -26,14 +28,14 @@ declare module "ctxmenu" {
     /** This is an interactive item which implements an anchor tag (`<a>`) and will redirect to a given URL (`href`). */
     export interface CTXMAnchor extends CTXMInteractive {
         /** Contains a URL or a URL fragment that the hyperlink points to. */
-        href: string;
+        href: ValueOrFunction<string>;
         /** Specifies where to display the linked URL. (e.g. `"_blank"` to open it in a new tab) */
-        target?: string;
+        target?: ValueOrFunction<string>;
     }
     /** This is an interactive item which holds a menu definition. You can create infinitely deep nested submenus. */
     export interface CTXMSubMenu extends CTXMInteractive {
         /** The menu definition for the nested menu */
-        subMenu: CTXMenu;
+        subMenu: ValueOrFunction<CTXMenu>;
     }
     export type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
     /**
