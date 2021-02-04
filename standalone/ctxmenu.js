@@ -220,7 +220,7 @@ var ContextMenu = /*#__PURE__*/function () {
         var parentRect = parentOrEvent.getBoundingClientRect();
         pos = {
           x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-          y: parentRect.top + (this.vdir === "d" ? 4 : -8)
+          y: parentRect.top + (this.vdir === "d" ? 4 : -12)
         };
         var savePos = this.getPosition(rect, pos);
 
