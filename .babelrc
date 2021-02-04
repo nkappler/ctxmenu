@@ -1,5 +1,11 @@
 {
     "presets": [
-        "es2015-loose"
+        [
+            "@babel/preset-env",
+            {
+                "useBuiltIns": false,
+                "targets": "> 0.25%, not dead"
+            }
+        ]
     ]
 }

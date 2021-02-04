@@ -350,60 +350,62 @@ class ContextMenu implements CTXMenuSingleton {
     private static addStylesToDom() {
         const append = () => {
             //insert default styles as first css -> low priority -> user can overwrite it easily
-            const styles = document.createElement("style");
-            styles.innerHTML =
-                css`.ctxmenu {
-                        border: 1px solid #999;
-                        padding: 2px 0;
-                        box-shadow: 3px 3px 3px #aaa;
-                        background: #fff;
-                        margin: 0;
-                        font-size: 15px;
-                        font-family: Verdana, sans-serif;
-                        z-index: 9999;
-                    }
-                    .ctxmenu li {
-                        margin: 1px 0;
-                        display: block;
-                        position: relative;
-                    }
-                    .ctxmenu li span, .ctxmenu li a {
-                        display: block;
-                        padding: 2px 20px;
-                        cursor: default;
-                    }
-                    .ctxmenu li a {
-                        color: inherit;
-                        text-decoration: none;
-                    }
-                    .ctxmenu li.disabled {
-                        color: #ccc;
-                    }
-                    .ctxmenu li.divider {
-                        border-bottom: 1px solid #aaa;
-                        margin: 5px 0;
-                    }
-                    .ctxmenu li.interactive:hover {
-                        background: rgba(0,0,0,0.1);
-                    }
-                    .ctxmenu li.submenu::after {
-                        content: '>';
-                        position: absolute;
-                        display: block;
-                        top: 0;
-                        right: 0.3em;
-                        font-family: monospace;
-                        line-height: 22px;
-                    }
-                `;
-            document.head.insertBefore(styles, document.head.childNodes[0]);
+            const styles: Record<string, Partial<CSSStyleDeclaration>> = {
+                ".ctxmenu": {
+                    border: "1px solid #999",
+                    padding: "2px 0",
+                    boxShadow: "3px 3px 3px #aaa",
+                    background: "#fff",
+                    margin: "0",
+                    fontSize: "15px",
+                    fontFamily: "Verdana, sans-serif",
+                    zIndex: "9999"
+                },
+                ".ctxmenu li": {
+                    margin: "1px 0",
+                    display: "block",
+                    position: "relative"
+                },
+                ".ctxmenu li span, .ctxmenu li a": {
+                    display: "block",
+                    padding: "2px 20px",
+                    cursor: "default"
+                },
+                ".ctxmenu li a": {
+                    color: "inherit",
+                    textDecoration: "none"
+                },
+                ".ctxmenu li.disabled": {
+                    color: "#ccc"
+                },
+                ".ctxmenu li.divider": {
+                    borderBottom: "1px solid #aaa",
+                    margin: "5px 0"
+                },
+                ".ctxmenu li.interactive:hover": {
+                    background: "rgba(0,0,0,0.1)"
+                },
+                ".ctxmenu li.submenu::after": {
+                    content: "'>'",
+                    position: "absolute",
+                    display: "block",
+                    top: "0",
+                    right: "0.3em",
+                    fontFamily: "monospace",
+                    lineHeight: "22px"
+                }
+            };
+
+            const rules = Object.entries(styles).map(s => `${s[0]} { ${Object.assign(document.createElement("p").style, s[1]).cssText} }`);
+            const styleSheet = document.head.insertBefore(document.createElement("style"), document.head.childNodes[0]);
+            rules.forEach(r => styleSheet.sheet?.insertRule(r));
         };
 
-        if (document.readyState === "interactive") {
+        if (document.readyState !== "loading") {
             append();
         } else {
             document.addEventListener("readystatechange", () => {
-                if (document.readyState === "interactive") {
+                if (document.readyState !== "loading") {
                     append();
                 }
             });

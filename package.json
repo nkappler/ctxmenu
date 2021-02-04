@@ -5,14 +5,14 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "compileTypescript": "npx tsc",
-    "compileRootDeclaration": "npx tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly",
-    "babelRoot": "npx babel compile/root -d compile/babel --plugins=css-template && npx babel compile/root/ctxmenu.js --out-file index.js --plugins=css-template",
+    "compileTypescript": "tsc",
+    "compileRootDeclaration": "tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly --lib \"dom, esnext\"",
+    "babelRoot": "babel compile/root -d compile/babel && babel compile/root/ctxmenu.js --out-file index.js",
     "build_root": "npm run compileTypescript && npm run compileRootDeclaration && npm run babelRoot",
-    "compileStandaloneDeclaration": "npx tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly",
+    "compileStandaloneDeclaration": "tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly --lib \"dom, esnext\"",
     "makeStandalone": "browserify --no-install compile/babel/standalone.js > standalone/ctxmenu.js",
-    "minifyStandalone": "npx babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
-    "minifyToDocs": "npx babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
+    "minifyStandalone": "babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
+    "minifyToDocs": "babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
     "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run minifyToDocs",
     "build": "npm run build_root && npm run build_standalone",
     "prepublishOnly": "npm run build"
@@ -28,15 +28,13 @@
   },
   "homepage": "https://nkappler.github.io/ctxmenu",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-plugin-css-template": "^1.0.4",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2015-loose": "^8.0.0",
+    "@babel/cli": "^7.12.13",
+    "@babel/core": "^7.12.13",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/preset-env": "^7.12.13",
     "babel-preset-minify": "^0.5.0",
-    "babelify": "^8.0.0",
     "browserify": "^16.2.3",
-    "typescript": "^3.3.3333"
+    "typescript": "^4.1.3"
   },
   "dependencies": {},
   "files": [
