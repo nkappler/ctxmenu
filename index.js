@@ -176,7 +176,20 @@ var ContextMenu = /*#__PURE__*/function () {
               if (ContextMenu.itemIsAction(item)) {
                 li.addEventListener("click", item.action);
               } else if (ContextMenu.itemIsAnchor(item)) {
-                li.innerHTML = "<a href=\"".concat(ContextMenu.getProp(item.href), "\" ").concat(item.target ? 'target="' + ContextMenu.getProp(item.target) + '"' : "", ">").concat(ContextMenu.getProp(item.text), "</a>");
+                var a = document.createElement("a");
+                a.innerText = ContextMenu.getProp(item.text);
+                a.href = ContextMenu.getProp(item.href);
+
+                if (item.hasOwnProperty("download")) {
+                  a.download = ContextMenu.getProp(item.download);
+                }
+
+                if (item.hasOwnProperty("target")) {
+                  a.target = ContextMenu.getProp(item.target);
+                }
+
+                li.innerHTML = "";
+                li.append(a);
               } else {
                 if (ContextMenu.getProp(item.subMenu).length === 0) {
                   li.className = "disabled submenu";

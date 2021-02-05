@@ -117,11 +117,13 @@ document.addEventListener("readystatechange", function (event) {
                 subMenu: [
                     {
                         text: "ctxmenu.js",
-                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxmenu.js"
+                        href: "ctxmenu.js",
+                        download: ""
                     },
                     {
                         text: "ctxmenu.min.js",
-                        href: "https://raw.githubusercontent.com/nkappler/ctxmenu/master/standalone/ctxmenu.min.js"
+                        href: "ctxmenu.min.js",
+                        download: ""
                     }
                 ]
             },

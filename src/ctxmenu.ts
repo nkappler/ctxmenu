@@ -36,6 +36,10 @@ export interface CTXMAnchor extends CTXMInteractive {
     href: ValueOrFunction<string>;
     /** Specifies where to display the linked URL. (e.g. `"_blank"` to open it in a new tab) */
     target?: ValueOrFunction<string>;
+    /** Prompts the user to save the linked URL instead of navigating to it. The specified value will be the filename, use empty string to inherit filename from target url. 
+     * 
+     * __Note:__ works only with same-origin URLs */
+    download?: ValueOrFunction<string>;
 }
 
 /** This is an interactive item which holds a menu definition. You can create infinitely deep nested submenus. */
@@ -238,8 +242,13 @@ class ContextMenu implements CTXMenuSingleton {
                             li.addEventListener("click", item.action);
                         }
                         else if (ContextMenu.itemIsAnchor(item)) {
-                            li.innerHTML = `<a href="${ContextMenu.getProp(item.href)}" ${item.target ? 'target="' +
-                                ContextMenu.getProp(item.target) + '"' : ""}>${ContextMenu.getProp(item.text)}</a>`;
+                            const a = document.createElement("a");
+                            a.innerText = ContextMenu.getProp(item.text);
+                            a.href = ContextMenu.getProp(item.href);
+                            if (item.hasOwnProperty("download")) { a.download = ContextMenu.getProp(item.download!) }
+                            if (item.hasOwnProperty("target")) { a.target = ContextMenu.getProp(item.target!) }
+                            li.innerHTML = "";
+                            li.append(a);
                         }
                         else {
                             if (ContextMenu.getProp(item.subMenu).length === 0) {
