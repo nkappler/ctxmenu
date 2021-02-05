@@ -5,6 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
+    "test": "tsc -w test/demo.ts --outDir docs --module none",
     "compileTypescript": "tsc",
     "compileRootDeclaration": "tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly --lib \"dom, esnext\"",
     "babelRoot": "babel compile/root -d compile/babel && babel compile/root/ctxmenu.js --out-file index.js",

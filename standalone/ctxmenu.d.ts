@@ -12,9 +12,13 @@ declare module "ctxmenu" {
      */
     export interface CTXMHeading {
         /** The text of the Context Menu Item */
-        text: ValueOrFunction<string>;
+        text?: ValueOrFunction<string>;
         /** The tooltip of the Context Menu Item */
         tooltip?: ValueOrFunction<string>;
+        /** Define custom html content instead of text for the Context Menu Item */
+        html?: ValueOrFunction<string>;
+        /** Define a custom HTMLElement as content of the Context Menu Item  */
+        element?: ValueOrFunction<HTMLElement>;
     }
     export interface CTXMInteractive extends CTXMHeading {
         /** Whether the Context Menu Item is disabled or not. Defaults to `false` */

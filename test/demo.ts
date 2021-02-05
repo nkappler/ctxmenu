@@ -1,27 +1,28 @@
-"use strict";
-exports.__esModule = true;
-require("../standalone/ctxmenu.d");
-var ctxmenu = window.ctxmenu;
+import "../standalone/ctxmenu.d";
+
+const ctxmenu = window.ctxmenu;
 if ("") {
     ctxmenu.attach("body", [
         // @ts-expect-error
         {
             text: "",
             href: "",
-            action: function () { },
+            action: () => {/** */ },
             isDivider: false
         }
     ]);
 }
+
 document.addEventListener("readystatechange", function (event) {
     if (document.readyState === "complete") {
+
         ctxmenu.attach("html", [
             {
                 text: "Actions",
                 tooltip: "JS Functions"
             },
             {
-                action: function () { alert("Clicked action item"); },
+                action: function () { alert("Clicked action item") },
                 text: "click me"
             },
             { isDivider: true },
@@ -48,22 +49,22 @@ document.addEventListener("readystatechange", function (event) {
             },
             { isDivider: true },
             {
-                text: function () { return "Callbacks"; },
-                tooltip: function () { return "Properties can also be defined by a tooltip"; }
+                text: () => "Callbacks",
+                tooltip: () => "Properties can also be defined by a tooltip"
             },
             {
-                href: function () { return ""; },
-                text: function () { return "Every property can be defined in a callback"; },
-                tooltip: function () { return "Disabled items can also have a tooltip"; },
-                disabled: function () { return true; }
+                href: () => "",
+                text: () => "Every property can be defined in a callback",
+                tooltip: () => "Disabled items can also have a tooltip",
+                disabled: () => true
             },
             {
-                text: function () { return "Submenus can also be defined in a callback."; },
-                subMenu: function () { return [{
-                        href: function () { return ""; },
-                        text: function () { return "empty"; },
-                        disabled: function () { return true; }
-                    }]; }
+                text: () => "Submenus can also be defined in a callback.",
+                subMenu: () => [{
+                    href: () => "",
+                    text: () => "empty",
+                    disabled: () => true
+                }]
             },
             { isDivider: true },
             { text: "Custom Elements" },
@@ -72,8 +73,8 @@ document.addEventListener("readystatechange", function (event) {
                 subMenu: []
             },
             {
-                element: function () {
-                    var image = document.createElement("img");
+                element: () => {
+                    const image = document.createElement("img");
                     image.src = "favicon.png";
                     return image;
                 },
@@ -125,9 +126,11 @@ document.addEventListener("readystatechange", function (event) {
             });
             return m;
         });
+
         ctxmenu.attach("#header", []);
         ctxmenu.attach("header", []);
         ctxmenu.attach("[sidebarjs]", []);
+
         ctxmenu.attach(".download", [
             {
                 text: "Downloads",
@@ -151,24 +154,26 @@ document.addEventListener("readystatechange", function (event) {
         ]);
     }
 });
+
+
 function menuception(array) {
-    if (array.length === 0) {
-        return [];
-    }
+    if (array.length === 0) { return []; }
+
     return [{
-            text: array.shift(),
-            subMenu: menuception(array)
-        }];
+        text: array.shift(),
+        subMenu: menuception(array)
+    }];
 }
+
 function toggleDarkMode() {
-    var darkCss = document.querySelector("#darkTheme");
-    var toggle = document.querySelector("#switch");
+    const darkCss = document.querySelector("#darkTheme");
+    const toggle = document.querySelector("#switch");
     if (darkCss) {
         document.head.removeChild(darkCss);
         toggle.innerHTML = "Fancy dark mode?";
     }
     else {
-        var link = document.createElement("link");
+        const link = document.createElement("link");
         link.id = "darkTheme";
         link.rel = "stylesheet";
         link.type = "text/css";

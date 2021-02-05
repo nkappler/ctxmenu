@@ -33,8 +33,12 @@ var ContextMenu = /*#__PURE__*/function () {
     this.cache = {};
     this.hdir = "r";
     this.vdir = "d";
-    window.addEventListener("click", function () {
-      return _this.closeMenu();
+    window.addEventListener("click", function (ev) {
+      var item = ev.target && ev.target.parentElement;
+
+      if (item && item.className !== "interactive") {
+        _this.closeMenu();
+      }
     });
     window.addEventListener("resize", function () {
       return _this.closeMenu();
@@ -166,7 +170,10 @@ var ContextMenu = /*#__PURE__*/function () {
         if (ContextMenu.itemIsDivider(item)) {
           li.className = "divider";
         } else {
-          li.innerHTML = "<span>".concat(ContextMenu.getProp(item.text), "</span>");
+          var html = ContextMenu.getProp(item.html);
+          var text = "<span>".concat(ContextMenu.getProp(item.text), "</span>");
+          var elem = ContextMenu.getProp(item.element);
+          elem ? li.append(elem) : li.innerHTML = html ? html : text;
           li.title = ContextMenu.getProp(item.tooltip) || "";
 
           if (ContextMenu.itemIsInteractive(item)) {
@@ -177,7 +184,7 @@ var ContextMenu = /*#__PURE__*/function () {
                 li.addEventListener("click", item.action);
               } else if (ContextMenu.itemIsAnchor(item)) {
                 var a = document.createElement("a");
-                a.innerText = ContextMenu.getProp(item.text);
+                elem ? a.append(elem) : a.innerHTML = html ? html : text;
                 a.href = ContextMenu.getProp(item.href);
 
                 if (item.hasOwnProperty("download")) {
@@ -188,9 +195,11 @@ var ContextMenu = /*#__PURE__*/function () {
                   a.target = ContextMenu.getProp(item.target);
                 }
 
-                li.innerHTML = "";
+                li.childNodes.forEach(function (n) {
+                  return n.remove();
+                });
                 li.append(a);
-              } else {
+              } else if (ContextMenu.itemIsSubMenu(item)) {
                 if (ContextMenu.getProp(item.subMenu).length === 0) {
                   li.className = "disabled submenu";
                 } else {
@@ -315,7 +324,7 @@ var ContextMenu = /*#__PURE__*/function () {
   }, {
     key: "itemIsInteractive",
     value: function itemIsInteractive(item) {
-      return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item);
+      return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item) || this.itemIsCustom(item);
     }
   }, {
     key: "itemIsAction",
@@ -336,6 +345,11 @@ var ContextMenu = /*#__PURE__*/function () {
     key: "itemIsSubMenu",
     value: function itemIsSubMenu(item) {
       return item.hasOwnProperty("subMenu");
+    }
+  }, {
+    key: "itemIsCustom",
+    value: function itemIsCustom(item) {
+      return item.hasOwnProperty("html") || item.hasOwnProperty("element");
     }
   }, {
     key: "addStylesToDom",
@@ -377,13 +391,16 @@ var ContextMenu = /*#__PURE__*/function () {
             background: "rgba(0,0,0,0.1)"
           },
           ".ctxmenu li.submenu::after": {
-            content: "'>'",
+            content: "'⯈'",
             position: "absolute",
             display: "block",
             top: "0",
+            bottom: "0",
             right: "0.3em",
             fontFamily: "monospace",
-            lineHeight: "22px"
+            lineHeight: "2px",
+            margin: "auto",
+            height: "0"
           }
         };
         var rules = Object.entries(styles).map(function (s) {

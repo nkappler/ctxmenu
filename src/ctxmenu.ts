@@ -14,9 +14,13 @@ export interface CTXMDivider {
  */
 export interface CTXMHeading {
     /** The text of the Context Menu Item */
-    text: ValueOrFunction<string>;
+    text?: ValueOrFunction<string>;
     /** The tooltip of the Context Menu Item */
     tooltip?: ValueOrFunction<string>;
+    /** Define custom html content instead of text for the Context Menu Item */
+    html?: ValueOrFunction<string>;
+    /** Define a custom HTMLElement as content of the Context Menu Item  */
+    element?: ValueOrFunction<HTMLElement>;
 }
 
 export interface CTXMInteractive extends CTXMHeading {
@@ -117,7 +121,12 @@ class ContextMenu implements CTXMenuSingleton {
     private hdir: "r" | "l" = "r";
     private vdir: "u" | "d" = "d";
     private constructor() {
-        window.addEventListener("click", () => this.closeMenu());
+        window.addEventListener("click", ev => {
+            const item = ev.target && (ev.target as Element).parentElement;
+            if (item && item.className !== "interactive") {
+                this.closeMenu();
+            }
+        });
         window.addEventListener("resize", () => this.closeMenu());
         window.addEventListener("scroll", () => this.closeMenu());
         ContextMenu.addStylesToDom();
@@ -233,7 +242,12 @@ class ContextMenu implements CTXMenuSingleton {
             if (ContextMenu.itemIsDivider(item)) {
                 li.className = "divider";
             } else {
-                li.innerHTML = `<span>${ContextMenu.getProp(item.text)}</span>`;
+                const html = ContextMenu.getProp(item.html);
+                const text = `<span>${ContextMenu.getProp(item.text)}</span>`;
+                const elem = ContextMenu.getProp(item.element);
+                elem
+                    ? li.append(elem)
+                    : li.innerHTML = html ? html : text;
                 li.title = ContextMenu.getProp(item.tooltip) || "";
                 if (ContextMenu.itemIsInteractive(item)) {
                     if (!ContextMenu.getProp(item.disabled)) {
@@ -243,14 +257,16 @@ class ContextMenu implements CTXMenuSingleton {
                         }
                         else if (ContextMenu.itemIsAnchor(item)) {
                             const a = document.createElement("a");
-                            a.innerText = ContextMenu.getProp(item.text);
+                            elem
+                                ? a.append(elem)
+                                : a.innerHTML = html ? html : text;
                             a.href = ContextMenu.getProp(item.href);
                             if (item.hasOwnProperty("download")) { a.download = ContextMenu.getProp(item.download!) }
                             if (item.hasOwnProperty("target")) { a.target = ContextMenu.getProp(item.target!) }
-                            li.innerHTML = "";
+                            li.childNodes.forEach(n => n.remove());
                             li.append(a);
                         }
-                        else {
+                        else if (ContextMenu.itemIsSubMenu(item)) {
                             if (ContextMenu.getProp(item.subMenu).length === 0) {
                                 li.className = "disabled submenu";
                             } else {
@@ -284,7 +300,7 @@ class ContextMenu implements CTXMenuSingleton {
         let pos = { x: 0, y: 0 };
         if (parentOrEvent instanceof Element) {
             const parentRect = parentOrEvent.getBoundingClientRect();
-            pos = {                     //const rightOfParent = rightofParent
+            pos = {
                 x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
                 y: parentRect.top + (this.vdir === "d" ? 4 : -12) //-4px means no vertical movement with default styles
             };
@@ -353,7 +369,10 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor | CTXMSubMenu) {
-        return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item);
+        return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item)
+            || this.itemIsCustom(item); /* <-- not really an interactive item,
+          since it might miss the 'disabled' prop but doesn't matter since it is optionial anyway.
+          using this check for styling reasons mainly, so that custom elements don't get header styling */
     }
 
     private static itemIsAction(item: CTXMItem): item is CTXMAction {
@@ -370,6 +389,10 @@ class ContextMenu implements CTXMenuSingleton {
 
     private static itemIsSubMenu(item: CTXMItem): item is CTXMSubMenu {
         return item.hasOwnProperty("subMenu");
+    }
+
+    private static itemIsCustom(item: CTXMItem): item is CTXMHeading {
+        return item.hasOwnProperty("html") || item.hasOwnProperty("element");
     }
 
     private static addStylesToDom() {
@@ -411,13 +434,16 @@ class ContextMenu implements CTXMenuSingleton {
                     background: "rgba(0,0,0,0.1)"
                 },
                 ".ctxmenu li.submenu::after": {
-                    content: "'>'",
+                    content: "'⯈'",
                     position: "absolute",
                     display: "block",
                     top: "0",
+                    bottom: "0",
                     right: "0.3em",
                     fontFamily: "monospace",
-                    lineHeight: "22px"
+                    lineHeight: "2px",
+                    margin: "auto",
+                    height: "0"
                 }
             };
 
