@@ -35,7 +35,7 @@
 })()({
   1: [function (require, module, exports) {
     "use strict";
-    /*! ctxMenu v1.1.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+    /*! ctxMenu v1.2.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
     function _toConsumableArray(arr) {
       return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
