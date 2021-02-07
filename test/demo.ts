@@ -69,13 +69,14 @@ document.addEventListener("readystatechange", function (event) {
             { isDivider: true },
             { text: "Custom Elements" },
             {
-                html: "<select><option>Option1</option><option>Option2</option></select>",
+                html: '<select style="margin: 2px 20px"><option>Option1</option><option>Option2</option></select>',
                 subMenu: []
             },
             {
                 element: () => {
                     const image = document.createElement("img");
                     image.src = "favicon.png";
+                    image.style.margin = "2px 20px";
                     return image;
                 },
                 subMenu: []
