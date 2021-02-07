@@ -103,11 +103,12 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 
 ```typescript
 {
+    href: string | () => string,        // URL
+    
     text?: string | () => string,
     html?: string | () => string,
     element?: HTMLElement | () => HTMLElement,
     icon?: string | () => string,
-    href: string | () => string,        // URL
     target?: string | () => string,     // eg. "_blank" to open link in new tab
     tooltip?: string | () => string,
     disabled?: boolean | () => boolean  // default false
