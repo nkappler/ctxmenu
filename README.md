@@ -1,6 +1,6 @@
 # ctxmenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/index.d.ts)
 
-## Tiny _(~2.2kB minified and gzipped)_ and customizable context menu generator.
+## Tiny _(<4kB minified and gzipped)_ and customizable context menu generator.
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
@@ -83,16 +83,19 @@ var menuDefinition = [
 
 ### Heading Item
 
-This is a heading item which displays a text and optionally shows a tooltip when hovering over it.
+This is a heading item which displays a `text` and optionally shows a `tooltip` when hovering over it. If you need finer control over the content of the menu item, you can supply your own HTML string by using the `html` property instead of `text`. Alternatively you can also supply an HTMLElement JavaScript Object. For all properties you can supply the value directly or a factory function which will be called just before the menu is opened (i.e. on right click). You can also supply a URL or Data URL to an image used as icon for the menu item. Recommended resolution is 18×18px. 
 
 ```typescript
 {
-    text: string,
-    tooltip?: string
+    text?: string | () => string,
+    tooltip?: string | () => string,
+    html?: string | () => string,
+    element?: HTMLElement | () => HTMLElement,
+    icon?: string | () => string,
 }
 ```
 
-NOTE: _All other menu items (except the divider item) derive from this and have at least these two properties_
+NOTE: _All other menu items (except the divider item) derive from this and can have at least these properties_
 
 ### Anchor Item
 
@@ -100,11 +103,14 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 
 ```typescript
 {
-    text: string,
-    href: string,       // URL
-    target?: string,    // eg. "_blank" to open link in new tab
-    tooltip?: string,
-    disabled?: boolean  // default false
+    text?: string | () => string,
+    html?: string | () => string,
+    element?: HTMLElement | () => HTMLElement,
+    icon?: string | () => string,
+    href: string | () => string,        // URL
+    target?: string | () => string,     // eg. "_blank" to open link in new tab
+    tooltip?: string | () => string,
+    disabled?: boolean | () => boolean  // default false
 }
 ```
 
@@ -114,10 +120,14 @@ This is an interactive item which will execute a given javascript function when 
 
 ```typescript
 {
-    text: string,
     action: Function,
-    tooltip?: string,
-    disabled?: boolean  // default false
+
+    text?: string | () => string,
+    html?: string | () => string,
+    element?: HTMLElement | () => HTMLElement,
+    icon?: string | () => string,
+    tooltip?: string | () => string,
+    disabled?: boolean | () => boolean  // default false
 }
 ```
 
@@ -127,10 +137,14 @@ This is an interactive item which holds another [menu definition](#Menu-Definiti
 
 ```typescript
 {
-    text: string,
-    subMenu: Array,     // A menu definition
-    tooltip?: string,
-    disabled?: boolean  // default false
+    subMenu: Array | () => Array,       // A menu definition
+
+    text?: string | () => string,
+    html?: string | () => string,
+    element?: HTMLElement | () => HTMLElement,
+    icon?: string | () => string,
+    tooltip?: string | () => string,
+    disabled?: boolean | () => boolean  // default false
 }
 ```
 
