@@ -74,8 +74,6 @@ var ContextMenu = /*#__PURE__*/function () {
 
         _this2.closeMenu();
 
-        _this2.hdir = "r";
-        _this2.vdir = "d";
         var newMenu = beforeRender(_toConsumableArray(ctxMenu), e);
         _this2.menu = _this2.generateDOM(newMenu, e);
         document.body.appendChild(_this2.menu);
@@ -122,6 +120,8 @@ var ContextMenu = /*#__PURE__*/function () {
     key: "closeMenu",
     value: function closeMenu() {
       var menu = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.menu;
+      this.hdir = "r";
+      this.vdir = "d";
 
       if (menu) {
         if (menu === this.menu) {

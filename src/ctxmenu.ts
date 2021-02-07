@@ -154,10 +154,6 @@ class ContextMenu implements CTXMenuSingleton {
             //close any open menu
             this.closeMenu();
 
-            //reset directions
-            this.hdir = "r";
-            this.vdir = "d";
-
             const newMenu = beforeRender([...ctxMenu], e);
             this.menu = this.generateDOM(newMenu, e);
             document.body.appendChild(this.menu);
@@ -197,6 +193,10 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     private closeMenu(menu: Element | undefined = this.menu) {
+        //reset directions
+        this.hdir = "r";
+        this.vdir = "d";
+
         if (menu) {
             if (menu === this.menu) {
                 delete this.menu;
