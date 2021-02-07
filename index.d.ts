@@ -19,6 +19,8 @@ declare module "ctxmenu" {
         html?: ValueOrFunction<string>;
         /** Define a custom HTMLElement as content of the Context Menu Item  */
         element?: ValueOrFunction<HTMLElement>;
+        /** URL or :data URL to an image, used as icon */
+        icon?: ValueOrFunction<string>;
     }
     export interface CTXMInteractive extends CTXMHeading {
         /** Whether the Context Menu Item is disabled or not. Defaults to `false` */

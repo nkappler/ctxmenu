@@ -253,13 +253,22 @@
 
               if (ContextMenu.itemIsInteractive(item)) {
                 if (!ContextMenu.getProp(item.disabled)) {
-                  li.className = "interactive";
+                  li.classList.add("interactive");
 
                   if (ContextMenu.itemIsAction(item)) {
-                    li.addEventListener("click", item.action);
+                    li.addEventListener("click", function (e) {
+                      item.action(e);
+
+                      _this3.closeMenu();
+                    });
                   } else if (ContextMenu.itemIsAnchor(item)) {
                     var a = document.createElement("a");
                     elem ? a.append(elem) : a.innerHTML = html ? html : text;
+
+                    a.onclick = function () {
+                      return _this3.closeMenu();
+                    };
+
                     a.href = ContextMenu.getProp(item.href);
 
                     if (item.hasOwnProperty("download")) {
@@ -276,9 +285,9 @@
                     li.append(a);
                   } else if (ContextMenu.itemIsSubMenu(item)) {
                     if (ContextMenu.getProp(item.subMenu).length === 0) {
-                      li.className = "disabled submenu";
+                      li.classList.add("disabled");
                     } else {
-                      li.className = "interactive submenu";
+                      li.classList.add("submenu");
 
                       _this3.debounce(li, function (ev) {
                         var subMenu = li.querySelector("ul");
@@ -290,15 +299,20 @@
                     }
                   }
                 } else {
-                  li.className = "disabled";
+                  li.classList.add("disabled");
 
                   if (ContextMenu.itemIsSubMenu(item)) {
-                    li.className = "disabled submenu";
+                    li.classList.add("submenu");
                   }
                 }
               } else {
                 li.style.fontWeight = "bold";
                 li.style.marginLeft = "-5px";
+              }
+
+              if (ContextMenu.getProp(item.icon)) {
+                li.classList.add("icon");
+                li.innerHTML += "<img class=\"icon\" src=\"".concat(ContextMenu.getProp(item.icon), "\" />");
               }
             }
 
@@ -429,7 +443,7 @@
       }, {
         key: "addStylesToDom",
         value: function addStylesToDom() {
-          var append = function append() {
+          var _append = function append() {
             var styles = {
               ".ctxmenu": {
                 border: "1px solid #999",
@@ -446,7 +460,7 @@
                 display: "block",
                 position: "relative"
               },
-              ".ctxmenu li span, .ctxmenu li a": {
+              ".ctxmenu li span": {
                 display: "block",
                 padding: "2px 20px",
                 cursor: "default"
@@ -454,6 +468,15 @@
               ".ctxmenu li a": {
                 color: "inherit",
                 textDecoration: "none"
+              },
+              ".ctxmenu li.icon": {
+                paddingLeft: "15px"
+              },
+              ".ctxmenu img.icon": {
+                position: "absolute",
+                width: "18px",
+                left: "10px",
+                top: "2px"
               },
               ".ctxmenu li.disabled": {
                 color: "#ccc"
@@ -487,14 +510,16 @@
 
               return (_a = styleSheet.sheet) === null || _a === void 0 ? void 0 : _a.insertRule(r);
             });
+
+            _append = function append() {};
           };
 
           if (document.readyState !== "loading") {
-            append();
+            _append();
           } else {
             document.addEventListener("readystatechange", function () {
               if (document.readyState !== "loading") {
-                append();
+                _append();
               }
             });
           }

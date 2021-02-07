@@ -21,6 +21,8 @@ export interface CTXMHeading {
     html?: ValueOrFunction<string>;
     /** Define a custom HTMLElement as content of the Context Menu Item  */
     element?: ValueOrFunction<HTMLElement>;
+    /** URL or :data URL to an image, used as icon */
+    icon?: ValueOrFunction<string>;
 }
 
 export interface CTXMInteractive extends CTXMHeading {
@@ -224,6 +226,8 @@ class ContextMenu implements CTXMenuSingleton {
     private generateDOM(ctxMenu: CTXMenu, event: MouseEvent): HTMLUListElement;
     private generateDOM(ctxMenu: CTXMenu, parentElement: HTMLLIElement): HTMLUListElement;
     private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLLIElement | MouseEvent): HTMLUListElement {
+        //This has grown pretty messy and could use a rework
+
         const container = document.createElement("ul");
         if (ctxMenu.length === 0) {
             container.style.display = "none";
@@ -251,15 +255,20 @@ class ContextMenu implements CTXMenuSingleton {
                 li.title = ContextMenu.getProp(item.tooltip) || "";
                 if (ContextMenu.itemIsInteractive(item)) {
                     if (!ContextMenu.getProp(item.disabled)) {
-                        li.className = "interactive";
+                        li.classList.add("interactive");
                         if (ContextMenu.itemIsAction(item)) {
-                            li.addEventListener("click", item.action);
+                            li.addEventListener("click", (e) => {
+                                item.action(e);
+                                this.closeMenu();
+                            }
+                            );
                         }
                         else if (ContextMenu.itemIsAnchor(item)) {
                             const a = document.createElement("a");
                             elem
                                 ? a.append(elem)
                                 : a.innerHTML = html ? html : text;
+                            a.onclick = () => this.closeMenu();
                             a.href = ContextMenu.getProp(item.href);
                             if (item.hasOwnProperty("download")) { a.download = ContextMenu.getProp(item.download!) }
                             if (item.hasOwnProperty("target")) { a.target = ContextMenu.getProp(item.target!) }
@@ -268,9 +277,9 @@ class ContextMenu implements CTXMenuSingleton {
                         }
                         else if (ContextMenu.itemIsSubMenu(item)) {
                             if (ContextMenu.getProp(item.subMenu).length === 0) {
-                                li.className = "disabled submenu";
+                                li.classList.add("disabled");
                             } else {
-                                li.className = "interactive submenu";
+                                li.classList.add("submenu");
                                 this.debounce(li, (ev) => {
                                     const subMenu = li.querySelector("ul");
                                     if (!subMenu) { //if it's already open, do nothing
@@ -280,15 +289,20 @@ class ContextMenu implements CTXMenuSingleton {
                             }
                         }
                     } else {
-                        li.className = "disabled";
+                        li.classList.add("disabled");
                         if (ContextMenu.itemIsSubMenu(item)) {
-                            li.className = "disabled submenu";
+                            li.classList.add("submenu");
                         }
                     }
                 } else {
                     //Heading
                     li.style.fontWeight = "bold";
                     li.style.marginLeft = "-5px";
+                }
+
+                if (ContextMenu.getProp(item.icon)) {
+                    li.classList.add("icon");
+                    li.innerHTML += `<img class="icon" src="${ContextMenu.getProp(item.icon)}" />`;
                 }
             }
             container.appendChild(li);
@@ -396,7 +410,7 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     private static addStylesToDom() {
-        const append = () => {
+        let append = () => {
             //insert default styles as first css -> low priority -> user can overwrite it easily
             const styles: Record<string, Partial<CSSStyleDeclaration>> = {
                 ".ctxmenu": {
@@ -414,7 +428,7 @@ class ContextMenu implements CTXMenuSingleton {
                     display: "block",
                     position: "relative"
                 },
-                ".ctxmenu li span, .ctxmenu li a": {
+                ".ctxmenu li span": {
                     display: "block",
                     padding: "2px 20px",
                     cursor: "default"
@@ -422,6 +436,15 @@ class ContextMenu implements CTXMenuSingleton {
                 ".ctxmenu li a": {
                     color: "inherit",
                     textDecoration: "none"
+                },
+                ".ctxmenu li.icon": {
+                    paddingLeft: "15px"
+                },
+                ".ctxmenu img.icon": {
+                    position: "absolute",
+                    width: "18px",
+                    left: "10px",
+                    top: "2px"
                 },
                 ".ctxmenu li.disabled": {
                     color: "#ccc"
@@ -450,6 +473,7 @@ class ContextMenu implements CTXMenuSingleton {
             const rules = Object.entries(styles).map(s => `${s[0]} { ${Object.assign(document.createElement("p").style, s[1]).cssText} }`);
             const styleSheet = document.head.insertBefore(document.createElement("style"), document.head.childNodes[0]);
             rules.forEach(r => styleSheet.sheet?.insertRule(r));
+            append = () => { };
         };
 
         if (document.readyState !== "loading") {
