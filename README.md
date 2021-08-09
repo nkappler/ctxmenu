@@ -117,11 +117,12 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 
 ### Action Item
 
-This is an interactive item which will execute a given javascript function when clicked.
+This is an interactive item which will execute a given callback function when clicked.
+The callback receives the event as parameter, so you can access the Action Item List Element via `e.currentTarget`. 
 
 ```typescript
 {
-    action: Function,
+    action: (event: MouseEvent) => void,
 
     text?: string | () => string,
     html?: string | () => string,
