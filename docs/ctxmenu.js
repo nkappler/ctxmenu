@@ -466,7 +466,9 @@
               ".ctxmenu li": {
                 margin: "1px 0",
                 display: "block",
-                position: "relative"
+                position: "relative",
+                userSelect: "none",
+                webkitUserSelect: "none"
               },
               ".ctxmenu li span": {
                 display: "block",
