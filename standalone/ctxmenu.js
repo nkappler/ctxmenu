@@ -95,9 +95,9 @@ var ContextMenu = /*#__PURE__*/function () {
     value: function update(target, ctxMenu, beforeRender) {
       var o = this.cache[target];
       var t = document.querySelector(target);
-      o && t && t.removeEventListener("contextmenu", o.handler);
+      o && (t === null || t === void 0 ? void 0 : t.removeEventListener("contextmenu", o.handler));
       delete this.cache[target];
-      this.attach(target, ctxMenu || o && o.ctxmenu || [], beforeRender || o && o.beforeRender);
+      this.attach(target, ctxMenu || (o === null || o === void 0 ? void 0 : o.ctxmenu) || [], beforeRender || (o === null || o === void 0 ? void 0 : o.beforeRender));
     }
   }, {
     key: "delete",
@@ -123,6 +123,9 @@ var ContextMenu = /*#__PURE__*/function () {
     key: "closeMenu",
     value: function closeMenu() {
       var menu = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.menu;
+
+      var _a;
+
       this.hdir = "r";
       this.vdir = "d";
 
@@ -131,8 +134,7 @@ var ContextMenu = /*#__PURE__*/function () {
           delete this.menu;
         }
 
-        var p = menu.parentElement;
-        p && p.removeChild(menu);
+        (_a = menu.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(menu);
       }
     }
   }, {
@@ -163,7 +165,9 @@ var ContextMenu = /*#__PURE__*/function () {
         var li = document.createElement("li");
 
         _this3.debounce(li, function () {
-          var subMenu = li.parentElement && li.parentElement.querySelector("ul");
+          var _a;
+
+          var subMenu = (_a = li.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("ul");
 
           if (subMenu && subMenu.parentElement !== li) {
             _this3.closeMenu(subMenu);
@@ -287,7 +291,7 @@ var ContextMenu = /*#__PURE__*/function () {
         ev.preventDefault();
       });
       container.addEventListener("click", function (ev) {
-        var item = ev.target && ev.target.parentElement;
+        var item = ev.target instanceof Element && ev.target.parentElement;
 
         if (item && item.className !== "interactive") {
           ev.stopPropagation();
@@ -298,7 +302,9 @@ var ContextMenu = /*#__PURE__*/function () {
   }, {
     key: "openSubMenu",
     value: function openSubMenu(e, ctxMenu, listElement) {
-      var subMenu = listElement.parentElement && listElement.parentElement.querySelector("li > ul");
+      var _a;
+
+      var subMenu = (_a = listElement.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("li > ul");
 
       if (subMenu && subMenu.parentElement !== listElement) {
         this.closeMenu(subMenu);

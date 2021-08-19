@@ -175,9 +175,9 @@ class ContextMenu implements CTXMenuSingleton {
     public update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN) {
         const o = this.cache[target];
         const t = document.querySelector<HTMLElement>(target);
-        o && t && t.removeEventListener("contextmenu", o.handler);
+        o && t?.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
-        this.attach(target, ctxMenu || o && o.ctxmenu || [], beforeRender || o && o.beforeRender);
+        this.attach(target, ctxMenu || o?.ctxmenu || [], beforeRender || o?.beforeRender);
     }
 
     public delete(target: string) {
@@ -204,8 +204,7 @@ class ContextMenu implements CTXMenuSingleton {
             if (menu === this.menu) {
                 delete this.menu;
             }
-            const p = menu.parentElement;
-            p && p.removeChild(menu);
+            menu.parentElement?.removeChild(menu);
         }
     }
 
@@ -237,7 +236,7 @@ class ContextMenu implements CTXMenuSingleton {
             const li = document.createElement("li");
             //all items shoud have a handler to close submenus on hover (except if its their own)
             this.debounce(li, () => {
-                const subMenu = li.parentElement && li.parentElement.querySelector("ul");
+                const subMenu = li.parentElement?.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) {
                     this.closeMenu(subMenu);
                 }
@@ -351,7 +350,7 @@ class ContextMenu implements CTXMenuSingleton {
 
     private openSubMenu(e: MouseEvent, ctxMenu: CTXMenu, listElement: HTMLLIElement) {
         // check if other submenus on this level are open and close them
-        const subMenu = listElement.parentElement && listElement.parentElement.querySelector("li > ul");
+        const subMenu = listElement.parentElement?.querySelector("li > ul");
         if (subMenu && subMenu.parentElement !== listElement) {
             this.closeMenu(subMenu);
         }
