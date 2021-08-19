@@ -457,16 +457,22 @@ class ContextMenu implements CTXMenuSingleton {
                     background: "rgba(0,0,0,0.1)"
                 },
                 ".ctxmenu li.submenu::after": {
-                    content: "'⯈'",
+                    content: "''",
                     position: "absolute",
                     display: "block",
                     top: "0",
                     bottom: "0",
-                    right: "0.3em",
-                    fontFamily: "monospace",
-                    lineHeight: "2px",
+                    right: "0.4em",
                     margin: "auto",
-                    height: "0"
+                    borderRight: "1px solid #000",
+                    borderTop: "1px solid #000",
+                    transform: "rotate(45deg)",
+                    width: "0.3rem",
+                    height: "0.3rem",
+                    marginRight: "0.1rem"
+                },
+                ".ctxmenu li.submenu.disabled::after": {
+                    borderColor: "#ccc"
                 }
             };
 
@@ -489,5 +495,3 @@ class ContextMenu implements CTXMenuSingleton {
 }
 
 export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
-
-

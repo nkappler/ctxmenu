@@ -113,7 +113,7 @@ document.addEventListener("readystatechange", function (event) {
                     // { text: "Spacer", href: "", disabled: true },
                     {
                         text: "more",
-                        subMenu: menuception("what's\u2800this? deeper and deeper into the rabbit hole ... will it ever end? nobody knows ....... it is still going .... man, this is a deeply nested menu .... almost there .... I\u2800promise ... You did it ... Well done.".split(" "))
+                        subMenu: menuception("what's\u2800this? deeper and deeper into the rabbit hole ... will it ever end? nobody knows ....... it is still going .... man, this is a deeply nested menu .... almost there .... I\u2800promise ... You did it ... Congrats!".split(" "))
                     }
                 ]
             },
