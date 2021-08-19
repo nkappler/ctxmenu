@@ -19,3 +19,11 @@ h1 {
 .ctxmenu li.disabled {
     color: #666;
 }
+
+.ctxmenu li.submenu::after {
+    border-color: #fff;
+}
+
+.ctxmenu li.disabled.submenu::after {
+    border-color: #666;
+}
