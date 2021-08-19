@@ -124,10 +124,11 @@ class ContextMenu implements CTXMenuSingleton {
     private vdir: "u" | "d" = "d";
     private constructor() {
         window.addEventListener("click", ev => {
-            const item = ev.target && (ev.target as Element).parentElement;
-            if (item && item.className !== "interactive") {
-                this.closeMenu();
+            const item = ev.target instanceof Element && ev.target.parentElement;
+            if (item && item.className === "interactive") {
+                return;
             }
+            this.closeMenu();
         });
         window.addEventListener("resize", () => this.closeMenu());
         window.addEventListener("scroll", () => this.closeMenu());
@@ -340,7 +341,7 @@ class ContextMenu implements CTXMenuSingleton {
             ev.preventDefault();
         });
         container.addEventListener("click", ev => {
-            const item = ev.target && (ev.target as Element).parentElement;
+            const item = ev.target instanceof Element && ev.target.parentElement;
             if (item && item.className !== "interactive") {
                 ev.stopPropagation();
             }

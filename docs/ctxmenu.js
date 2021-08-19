@@ -109,11 +109,13 @@
         this.hdir = "r";
         this.vdir = "d";
         window.addEventListener("click", function (ev) {
-          var item = ev.target && ev.target.parentElement;
+          var item = ev.target instanceof Element && ev.target.parentElement;
 
-          if (item && item.className !== "interactive") {
-            _this.closeMenu();
+          if (item && item.className === "interactive") {
+            return;
           }
+
+          _this.closeMenu();
         });
         window.addEventListener("resize", function () {
           return _this.closeMenu();
