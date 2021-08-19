@@ -1,5 +1,5 @@
 declare module "ctxmenu" {
-    /*! ctxMenu v1.2.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+    /*! ctxMenu v1.3.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
     export type ValueOrFunction<T> = T | (() => T);
     /** This is a Divider Menu Item */
     export interface CTXMDivider {
