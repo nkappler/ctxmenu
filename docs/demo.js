@@ -76,6 +76,7 @@ document.addEventListener("readystatechange", function (event) {
                     var image = document.createElement("img");
                     image.src = "favicon.png";
                     image.style.margin = "2px 20px";
+                    image.style.height = "32px";
                     return image;
                 },
                 subMenu: []
