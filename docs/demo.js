@@ -81,6 +81,12 @@ document.addEventListener("readystatechange", function (event) {
                 subMenu: []
             },
             { isDivider: true },
+            { text: "Styling" },
+            {
+                text: "Items can be individually styled", style: "font-style: italic; font-weight: normal; text-decoration: underline; transform: skewY(1.5deg); transform-origin: left; color: #ee9900; letter-spacing: 2px; margin-bottom: 10px;",
+                tooltip: "No need to provide a completely custom element"
+            },
+            { isDivider: true },
             {
                 text: "Menuception"
             },

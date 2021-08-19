@@ -10,7 +10,7 @@ export interface CTXMDivider {
 /**
  * This is a heading item which displays a text and optionally shows a tooltip when hovering over it.
  *
- * NOTE: _All other menu items (except the divider item) derive from this and have at least these two properties_
+ * NOTE: _All other menu items (except the divider item) derive from this and have at least these properties_
  */
 export interface CTXMHeading {
     /** The text of the Context Menu Item */
@@ -23,6 +23,8 @@ export interface CTXMHeading {
     element?: ValueOrFunction<HTMLElement>;
     /** URL or :data URL to an image, used as icon */
     icon?: ValueOrFunction<string>;
+    /** inline attribute appended to the `<li>` Element */
+    style?: ValueOrFunction<string>;
 }
 
 export interface CTXMInteractive extends CTXMHeading {
@@ -253,6 +255,7 @@ class ContextMenu implements CTXMenuSingleton {
                     ? li.append(elem)
                     : li.innerHTML = html ? html : text;
                 li.title = ContextMenu.getProp(item.tooltip) || "";
+                if (item.style) { li.setAttribute("style", ContextMenu.getProp(item.style)) }
                 if (ContextMenu.itemIsInteractive(item)) {
                     if (!ContextMenu.getProp(item.disabled)) {
                         li.classList.add("interactive");
@@ -296,8 +299,7 @@ class ContextMenu implements CTXMenuSingleton {
                     }
                 } else {
                     //Heading
-                    li.style.fontWeight = "bold";
-                    li.style.marginLeft = "-5px";
+                    li.setAttribute("style", "font-weight: bold; margin-left: -5px;" + li.getAttribute("style"));
                 }
 
                 if (ContextMenu.getProp(item.icon)) {

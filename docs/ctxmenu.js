@@ -257,6 +257,10 @@
               elem ? li.append(elem) : li.innerHTML = html ? html : text;
               li.title = ContextMenu.getProp(item.tooltip) || "";
 
+              if (item.style) {
+                li.setAttribute("style", ContextMenu.getProp(item.style));
+              }
+
               if (ContextMenu.itemIsInteractive(item)) {
                 if (!ContextMenu.getProp(item.disabled)) {
                   li.classList.add("interactive");
@@ -312,8 +316,7 @@
                   }
                 }
               } else {
-                li.style.fontWeight = "bold";
-                li.style.marginLeft = "-5px";
+                li.setAttribute("style", "font-weight: bold; margin-left: -5px;" + li.getAttribute("style"));
               }
 
               if (ContextMenu.getProp(item.icon)) {
