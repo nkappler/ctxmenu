@@ -12,6 +12,9 @@
 [API](#API) \
 [Customize](#Customize)
 
+## Screenshot
+![Screenshot](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/features.png)
+
 ## Features
 
 - Create custom context menus for every browser.
@@ -92,10 +95,11 @@ This is a heading item which displays a `text` and optionally shows a `tooltip` 
     html?: string | () => string,
     element?: HTMLElement | () => HTMLElement,
     icon?: string | () => string,
+    style?: string | () => string,
 }
 ```
 
-NOTE: _All other menu items (except the divider item) derive from this and can have at least these properties_
+⚠ NOTE: _All other menu items (except the divider item) derive from this and can have at least these properties_
 
 ### Anchor Item
 
@@ -103,15 +107,16 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 
 ```typescript
 {
-    href: string | () => string,        // URL
-    
-    text?: string | () => string,
-    html?: string | () => string,
-    element?: HTMLElement | () => HTMLElement,
-    icon?: string | () => string,
-    target?: string | () => string,     // eg. "_blank" to open link in new tab
-    tooltip?: string | () => string,
-    disabled?: boolean | () => boolean  // default false
+    /*...Standard Props */
+
+    /** URL */
+    href: string | () => string,
+
+    /** https://www.w3schools.com/tags/att_a_target.asp */
+    target?: string | () => string,
+
+    /** defaults to false */
+    disabled?: boolean | () => boolean
 }
 ```
 
@@ -122,14 +127,13 @@ The callback receives the event as parameter, so you can access the Action Item 
 
 ```typescript
 {
+    /*...Standard Props */
+
+    /** callback fired when the item is clicked */
     action: (event: MouseEvent) => void,
 
-    text?: string | () => string,
-    html?: string | () => string,
-    element?: HTMLElement | () => HTMLElement,
-    icon?: string | () => string,
-    tooltip?: string | () => string,
-    disabled?: boolean | () => boolean  // default false
+    /** defaults to false */
+    disabled?: boolean | () => boolean
 }
 ```
 
@@ -139,13 +143,10 @@ This is an interactive item which holds another [menu definition](#Menu-Definiti
 
 ```typescript
 {
+    /** Submenu Definition, */
     subMenu: Array | () => Array,       // A menu definition
 
-    text?: string | () => string,
-    html?: string | () => string,
-    element?: HTMLElement | () => HTMLElement,
-    icon?: string | () => string,
-    tooltip?: string | () => string,
+    /** defaults to false */
     disabled?: boolean | () => boolean  // default false
 }
 ```
