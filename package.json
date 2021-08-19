@@ -16,8 +16,8 @@
     "copyToDocs": "babel standalone/ctxmenu.js --out-file docs/ctxmenu.js && babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
     "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run copyToDocs",
     "build": "npm run build_root && npm run build_standalone",
-    "prepublishOnly": "npm run build",
-    "preversion": "npm run build"
+    "prepublishOnly": "npm run version",
+    "version": "node util/copyrightHeader.js && npm run build && git add *"
   },
   "repository": {
     "type": "git",
