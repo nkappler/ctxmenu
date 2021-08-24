@@ -143,6 +143,8 @@ This is an interactive item which holds another [menu definition](#Menu-Definiti
 
 ```typescript
 {
+    /*...Standard Props */
+
     /** Submenu Definition, */
     subMenu: Array | () => Array,       // A menu definition
 
