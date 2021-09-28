@@ -91,6 +91,17 @@ declare module "ctxmenu" {
          * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
          */
         delete(target: string): void;
+        /**
+         * Create & show a context menu without attaching it to a specific element, based on the passed event.
+         * This might be useful, when integrating with other libraries / components that already provide a contextmenu handler.
+         * @param ctxMenu An array of objects defining the menu layout.
+         * @param e The original contextmenu event, used to position the tooltip
+         */
+        show(ctxMenu: CTXMenu, e: MouseEvent): void;
+        /**
+         * Close any contextmenu that might be open at the moment
+         */
+        hide(): void;
     }
     export const ctxmenu: CTXMenuSingleton;
 }

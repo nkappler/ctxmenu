@@ -165,11 +165,13 @@ This is a divider item which draws a horizontal line.
 
 This library exports a singleton object `ctxmenu`.
 In the standalone version the singleton is a global variable (`window.ctxmenu`).
-It has the following three APIs:
+It has the following five APIs:
 
 [attach](#ctxmenuattach)\
 [update](#ctxmenuupdate)\
-[delete](#ctxmenudelete)
+[delete](#ctxmenudelete)\
+[show](#ctxmenushow)\
+[hide](#ctxmenuhide)
 
 ### `ctxmenu.attach`
 ```typescript
@@ -198,6 +200,20 @@ The update method is used to update an existing context menu. You can update eac
 ctxmenu.delete(target: string)
 ```
 The delete method is used to delete a context menu and only takes the `target` selector string.
+
+### `ctxmenu.show`
+```typescript
+ctxmenu.show(ctxmenu: Array, e: MouseEvent)
+```
+The `show` method can be used to show a context menu without using the `attach` method to set up a contextmenu for specific elements first. 
+
+This may be useful when integrating with other libraries or frameworks that already provide a contextmenu handler or when trying to show a context menu on a different user interaction (for example showing a context menu when left-clicking a button).
+
+### `ctxmenu.hide`
+```typescript
+ctxmenu.hide()
+```
+The `hide` method can be used to hide any open context menu. 
 
 ## Customize
 
