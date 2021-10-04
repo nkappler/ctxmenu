@@ -190,3 +190,34 @@ function toggleDarkMode() {
         toggle.innerHTML = "Back to normal!";
     }
 }
+
+
+const menuExample = [
+  {
+    text: "Downloads",
+    subMenu: [
+      {
+        text: "ctxmenu.js",
+        href: "ctxmenu.js",
+        download: ""
+      },
+      {
+        text: "ctxmenu.min.js",
+        href: "ctxmenu.min.js",
+        download: ""
+      }
+    ]
+  },
+  {
+    text: "Documentation (github)",
+    href: "https://www.github.com/nkappler/ctxmenu"
+  }
+];
+
+function showContextMenuForEvent(e: MouseEvent){
+  ctxmenu.show( menuExample, e);
+}
+function showContextMenuForElement(element: HTMLElement, e: MouseEvent){
+  e.stopPropagation();
+  ctxmenu.show( menuExample, element);
+}

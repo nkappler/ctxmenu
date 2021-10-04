@@ -91,6 +91,12 @@
             height: 149px;
         }
 
+        .clickable-div {
+            background-color: #ccc;
+            display: inline;
+            cursor: pointer;
+        }
+
         /* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
         @media screen and (max-width: 600px) {
             h1 {
@@ -168,6 +174,14 @@
                 run any arbitrary javascript function</li>
             <li>Fully customizable! <span id="switch" style="cursor: pointer;" class="bold"
                     onclick="toggleDarkMode()">Fancy dark mode?</span></li>
+            <li>Show a context menu "on demand" for
+              <ul>
+                <li>any mouse event
+                <button type="button" onclick="showContextMenuForEvent(event)">Click me!</button></li>
+                <li>any element
+                  <div class="clickable-div" onclick="showContextMenuForElement(this, event)">Click me!</div></li>
+              </ul>
+
             <li>Mobile support</li>
         </ul>
         </p>
