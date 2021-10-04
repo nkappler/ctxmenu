@@ -5,12 +5,12 @@
 [DEMO](https://nkappler.github.io/ctxmenu)
 
 #### Table of contents
-[Features](#Features)\
-[Installation](#Installation)\
-[Menu Definition](#Menu-Definition)\
+[Features](#features)\
+[Installation](#installation)\
+[Menu Definition](#menu-definition)\
 [Item Types](#item-types) \
-[API](#API) \
-[Customize](#Customize)
+[API](#api) \
+[Customize](#customize)
 
 ## Screenshot
 ![Screenshot](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/features.png)
@@ -139,7 +139,7 @@ The callback receives the event as parameter, so you can access the Action Item 
 
 ### Submenu Item
 
-This is an interactive item which holds another [menu definition](#Menu-Definition). You can create infinitely deep nested submenus.
+This is an interactive item which holds another [menu definition](#menu-definition). You can create infinitely deep nested submenus.
 
 ```typescript
 {
@@ -180,7 +180,7 @@ ctxmenu.attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, even
 
 The `attach` method is used to bind a context menu to any DOM Node and takes the following arguments:
 - `target`: A selector string to define the target node (eg `'body'`, or `'#someID'`)
-- `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#Menu-Definition).
+- `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#menu-definition).
 - `beforeRender?`: An optional callback function that is called before the context menu is opened. It is passed two arguments: `menu` - the menu definition, `event` - the MouseEvent and needs to return a new menu definition which will be used.
 
 ### `ctxmenu.update`
@@ -188,7 +188,7 @@ The `attach` method is used to bind a context menu to any DOM Node and takes the
 ctxmenu.update(target: string, ctxmenu?: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
 ```
 
-The update method is used to update an existing context menu. You can update each the menu definition or beforeRender function only by passing undefined for the other argument. If you try to update a menu which does not exist, it will silently be [attached](#attach) instead.
+The update method is used to update an existing context menu. You can update each the menu definition or beforeRender function only by passing undefined for the other argument. If you try to update a menu which does not exist, it will silently be [attached](#ctxmenuattach) instead.
 
 `update` takes two or three arguments: 
 - `target` - the selector string to define the target element
@@ -205,14 +205,14 @@ The delete method is used to delete a context menu and only takes the `target` s
 ```typescript
 ctxmenu.show(ctxmenu: Array, e: MouseEvent | HTMLElement)
 ```
-The `show` method can be used to show a context menu without using the [`attach`](#attach) method to set up a contextmenu for specific elements first. You need to pass the original event or a target element, which will be used to calculate the menu's position.
+The `show` method can be used to show a context menu without using the [`attach`](#ctxmenuattach) method to set up a contextmenu for specific elements first. You need to pass the original event or a target element, which will be used to calculate the menu's position.
 
 This may be useful when integrating with other libraries or frameworks that already provide a contextmenu handler or when trying to show a context menu on a different user interaction (for example showing a context menu when left-clicking a button).
 
 When passing a target element, you will need to stop the propagation of the event to prevent the context menu from being immediately closed again:
 
 ```typescript
-function clickHandler(e: MouseEvent) {
+clickHandler(e: MouseEvent) {
   e.stopPropagation();
   ctxmenu.show([ ... /* menu definition */ ], e.target);
 }
