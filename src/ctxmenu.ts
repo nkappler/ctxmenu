@@ -199,10 +199,10 @@ class ContextMenu implements CTXMenuSingleton {
         t.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
     }
-    
+
     public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent) {
-        if(eventOrElement instanceof MouseEvent) {
-          eventOrElement.stopImmediatePropagation();
+        if (eventOrElement instanceof MouseEvent) {
+            eventOrElement.stopImmediatePropagation();
         }
         //close any open menu
         this.hide();
@@ -210,22 +210,22 @@ class ContextMenu implements CTXMenuSingleton {
         this.menu = this.generateDOM([...ctxMenu], eventOrElement);
         document.body.appendChild(this.menu);
 
-        if(eventOrElement instanceof MouseEvent) {
-          eventOrElement.preventDefault();
+        if (eventOrElement instanceof MouseEvent) {
+            eventOrElement.preventDefault();
         }
     }
 
     public hide(menu: Element | undefined = this.menu) {
-      //reset directions
-      this.hdir = "r";
-      this.vdir = "d";
+        //reset directions
+        this.hdir = "r";
+        this.vdir = "d";
 
-      if (menu) {
-        if (menu === this.menu) {
-          delete this.menu;
+        if (menu) {
+            if (menu === this.menu) {
+                delete this.menu;
+            }
+            menu.parentElement?.removeChild(menu);
         }
-        menu.parentElement?.removeChild(menu);
-      }
     }
 
     /**
