@@ -165,14 +165,8 @@ class ContextMenu implements CTXMenuSingleton {
             return;
         }
         const handler: CTXHandler = e => {
-            e.stopImmediatePropagation();
-            //close any open menu
-            this.hide();
-
             const newMenu = beforeRender([...ctxMenu], e);
-            this.openMenu(newMenu, e);
-
-            e.preventDefault();
+            this.show(newMenu, e);
         };
 
         this.cache[target] = {
@@ -211,7 +205,8 @@ class ContextMenu implements CTXMenuSingleton {
         //close any open menu
         this.hide();
 
-        this.openMenu([...ctxMenu], e);
+        this.menu = this.generateDOM([...ctxMenu], e);
+        document.body.appendChild(this.menu);
 
         e.preventDefault();
     }
@@ -227,11 +222,6 @@ class ContextMenu implements CTXMenuSingleton {
         }
         menu.parentElement?.removeChild(menu);
       }
-    }
-
-    private openMenu(ctxMenu: CTXMenu, e: MouseEvent) {
-        this.menu = this.generateDOM([...ctxMenu], e);
-        document.body.appendChild(this.menu);
     }
 
     /**

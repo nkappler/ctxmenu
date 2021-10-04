@@ -73,13 +73,9 @@ var ContextMenu = /*#__PURE__*/function () {
       }
 
       var handler = function handler(e) {
-        e.stopImmediatePropagation();
-
-        _this2.hide();
-
         var newMenu = beforeRender(_toConsumableArray(ctxMenu), e);
 
-        _this2.openMenu(newMenu, e);
+        _this2.show(newMenu, e);
 
         e.preventDefault();
       };
@@ -125,7 +121,8 @@ var ContextMenu = /*#__PURE__*/function () {
     value: function show(ctxMenu, e) {
       e.stopImmediatePropagation();
       this.hide();
-      this.openMenu(_toConsumableArray(ctxMenu), e);
+      this.menu = this.generateDOM(_toConsumableArray(ctxMenu), e);
+      document.body.appendChild(this.menu);
       e.preventDefault();
     }
   }, {
@@ -145,12 +142,6 @@ var ContextMenu = /*#__PURE__*/function () {
 
         (_a = menu.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(menu);
       }
-    }
-  }, {
-    key: "openMenu",
-    value: function openMenu(ctxMenu, e) {
-      this.menu = this.generateDOM(_toConsumableArray(ctxMenu), e);
-      document.body.appendChild(this.menu);
     }
   }, {
     key: "debounce",
