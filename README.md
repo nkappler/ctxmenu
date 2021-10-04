@@ -203,11 +203,14 @@ The delete method is used to delete a context menu and only takes the `target` s
 
 ### `ctxmenu.show`
 ```typescript
-ctxmenu.show(ctxmenu: Array, e: MouseEvent)
+ctxmenu.show(ctxmenu: Array, e: MouseEvent | HTMLElement)
 ```
 The `show` method can be used to show a context menu without using the `attach` method to set up a contextmenu for specific elements first. 
 
 This may be useful when integrating with other libraries or frameworks that already provide a contextmenu handler or when trying to show a context menu on a different user interaction (for example showing a context menu when left-clicking a button).
+
+When passing in an element as reference to open the context menu, you still need to stop the propagation of click events
+in your custom code, otherwise the context menu may be directly closed.
 
 ### `ctxmenu.hide`
 ```typescript

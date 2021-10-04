@@ -104,9 +104,9 @@ export interface CTXMenuSingleton {
     /**
      * Create & show a context menu without attaching it to a specific element, based on the passed mouse event.
      * @param ctxMenu An array of objects defining the menu layout.
-     * @param e The original mouse event, used to position the tooltip
+     * @param e Either a MouseEvent or an HTMLElement, defining where the context menu should be opened.
      */
-    show(ctxMenu: CTXMenu, e: MouseEvent): void;    
+    show(ctxMenu: CTXMenu, e: MouseEvent | HTMLElement): void;
     /**
      * Close any contextmenu that might be open at the moment
      */
@@ -200,15 +200,19 @@ class ContextMenu implements CTXMenuSingleton {
         delete this.cache[target];
     }
     
-    public show(ctxMenu: CTXMenu, e: MouseEvent) {
-        e.stopImmediatePropagation();
+    public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent) {
+        if(eventOrElement instanceof MouseEvent) {
+          eventOrElement.stopImmediatePropagation();
+        }
         //close any open menu
         this.hide();
 
-        this.menu = this.generateDOM([...ctxMenu], e);
+        this.menu = this.generateDOM([...ctxMenu], eventOrElement);
         document.body.appendChild(this.menu);
 
-        e.preventDefault();
+        if(eventOrElement instanceof MouseEvent) {
+          eventOrElement.preventDefault();
+        }
     }
 
     public hide(menu: Element | undefined = this.menu) {
@@ -239,9 +243,7 @@ class ContextMenu implements CTXMenuSingleton {
         target.addEventListener("mouseleave", () => clearTimeout(timeout));
     }
 
-    private generateDOM(ctxMenu: CTXMenu, event: MouseEvent): HTMLUListElement;
-    private generateDOM(ctxMenu: CTXMenu, parentElement: HTMLLIElement): HTMLUListElement;
-    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLLIElement | MouseEvent): HTMLUListElement {
+    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent): HTMLUListElement {
         //This has grown pretty messy and could use a rework
 
         const container = document.createElement("ul");

@@ -76,8 +76,6 @@ var ContextMenu = /*#__PURE__*/function () {
         var newMenu = beforeRender(_toConsumableArray(ctxMenu), e);
 
         _this2.show(newMenu, e);
-
-        e.preventDefault();
       };
 
       this.cache[target] = {
@@ -118,12 +116,18 @@ var ContextMenu = /*#__PURE__*/function () {
     }
   }, {
     key: "show",
-    value: function show(ctxMenu, e) {
-      e.stopImmediatePropagation();
+    value: function show(ctxMenu, eventOrElement) {
+      if (eventOrElement instanceof MouseEvent) {
+        eventOrElement.stopImmediatePropagation();
+      }
+
       this.hide();
-      this.menu = this.generateDOM(_toConsumableArray(ctxMenu), e);
+      this.menu = this.generateDOM(_toConsumableArray(ctxMenu), eventOrElement);
       document.body.appendChild(this.menu);
-      e.preventDefault();
+
+      if (eventOrElement instanceof MouseEvent) {
+        eventOrElement.preventDefault();
+      }
     }
   }, {
     key: "hide",

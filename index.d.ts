@@ -94,9 +94,9 @@ declare module "ctxmenu" {
         /**
          * Create & show a context menu without attaching it to a specific element, based on the passed mouse event.
          * @param ctxMenu An array of objects defining the menu layout.
-         * @param e The original mouse event, used to position the tooltip
+         * @param e Either a MouseEvent or an HTMLElement, defining where the context menu should be opened.
          */
-        show(ctxMenu: CTXMenu, e: MouseEvent): void;
+        show(ctxMenu: CTXMenu, e: MouseEvent | HTMLElement): void;
         /**
          * Close any contextmenu that might be open at the moment
          */
