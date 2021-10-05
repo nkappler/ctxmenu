@@ -33,6 +33,7 @@ var ContextMenu = /*#__PURE__*/function () {
     this.cache = {};
     this.hdir = "r";
     this.vdir = "d";
+    this.preventCloseOnScroll = false;
     window.addEventListener("click", function (ev) {
       var item = ev.target instanceof Element && ev.target.parentElement;
 
@@ -45,8 +46,19 @@ var ContextMenu = /*#__PURE__*/function () {
     window.addEventListener("resize", function () {
       return _this.hide();
     });
-    window.addEventListener("scroll", function () {
-      return _this.hide();
+    var timeout = 0;
+    window.addEventListener("wheel", function () {
+      clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        if (_this.preventCloseOnScroll) {
+          _this.preventCloseOnScroll = false;
+          return;
+        }
+
+        _this.hide();
+      });
+    }, {
+      passive: true
     });
     ContextMenu.addStylesToDom();
   }
@@ -78,7 +90,7 @@ var ContextMenu = /*#__PURE__*/function () {
       };
 
       this.cache[target] = {
-        ctxmenu: ctxMenu,
+        ctxMenu: ctxMenu,
         handler: handler,
         beforeRender: beforeRender
       };
@@ -91,7 +103,7 @@ var ContextMenu = /*#__PURE__*/function () {
       var t = document.querySelector(target);
       o && (t === null || t === void 0 ? void 0 : t.removeEventListener("contextmenu", o.handler));
       delete this.cache[target];
-      this.attach(target, ctxMenu || (o === null || o === void 0 ? void 0 : o.ctxmenu) || [], beforeRender || (o === null || o === void 0 ? void 0 : o.beforeRender));
+      this.attach(target, ctxMenu || (o === null || o === void 0 ? void 0 : o.ctxMenu) || [], beforeRender || (o === null || o === void 0 ? void 0 : o.beforeRender));
     }
   }, {
     key: "delete",
@@ -116,6 +128,8 @@ var ContextMenu = /*#__PURE__*/function () {
   }, {
     key: "show",
     value: function show(ctxMenu, eventOrElement) {
+      var _this3 = this;
+
       if (eventOrElement instanceof MouseEvent) {
         eventOrElement.stopImmediatePropagation();
       }
@@ -123,6 +137,11 @@ var ContextMenu = /*#__PURE__*/function () {
       this.hide();
       this.menu = this.generateDOM(_toConsumableArray(ctxMenu), eventOrElement);
       document.body.appendChild(this.menu);
+      this.menu.addEventListener("wheel", function () {
+        return _this3.preventCloseOnScroll = true;
+      }, {
+        passive: true
+      });
 
       if (eventOrElement instanceof MouseEvent) {
         eventOrElement.preventDefault();
@@ -162,7 +181,7 @@ var ContextMenu = /*#__PURE__*/function () {
   }, {
     key: "generateDOM",
     value: function generateDOM(ctxMenu, parentOrEvent) {
-      var _this3 = this;
+      var _this4 = this;
 
       var container = document.createElement("ul");
 
@@ -173,13 +192,13 @@ var ContextMenu = /*#__PURE__*/function () {
       ctxMenu.forEach(function (item) {
         var li = document.createElement("li");
 
-        _this3.debounce(li, function () {
+        _this4.debounce(li, function () {
           var _a;
 
           var subMenu = (_a = li.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("ul");
 
           if (subMenu && subMenu.parentElement !== li) {
-            _this3.hide(subMenu);
+            _this4.hide(subMenu);
           }
         });
 
@@ -204,14 +223,14 @@ var ContextMenu = /*#__PURE__*/function () {
                 li.addEventListener("click", function (e) {
                   item.action(e);
 
-                  _this3.hide();
+                  _this4.hide();
                 });
               } else if (ContextMenu.itemIsAnchor(item)) {
                 var a = document.createElement("a");
                 elem ? a.append(elem) : a.innerHTML = html ? html : text;
 
                 a.onclick = function () {
-                  return _this3.hide();
+                  return _this4.hide();
                 };
 
                 a.href = ContextMenu.getProp(item.href);
@@ -234,11 +253,11 @@ var ContextMenu = /*#__PURE__*/function () {
                 } else {
                   li.classList.add("submenu");
 
-                  _this3.debounce(li, function (ev) {
+                  _this4.debounce(li, function (ev) {
                     var subMenu = li.querySelector("ul");
 
                     if (!subMenu) {
-                      _this3.openSubMenu(ev, ContextMenu.getProp(item.subMenu), li);
+                      _this4.openSubMenu(ev, ContextMenu.getProp(item.subMenu), li);
                     }
                   });
                 }
@@ -392,6 +411,7 @@ var ContextMenu = /*#__PURE__*/function () {
       var _append = function append() {
         var styles = {
           ".ctxmenu": {
+            maxHeight: "100vh",
             border: "1px solid #999",
             padding: "2px 0",
             boxShadow: "3px 3px 3px #aaa",
@@ -399,7 +419,8 @@ var ContextMenu = /*#__PURE__*/function () {
             margin: "0",
             fontSize: "15px",
             fontFamily: "Verdana, sans-serif",
-            zIndex: "9999"
+            zIndex: "9999",
+            overflowY: "auto"
           },
           ".ctxmenu li": {
             margin: "1px 0",

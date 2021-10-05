@@ -117,7 +117,7 @@ type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
 
 interface CTXCache {
     [key: string]: {
-        ctxmenu: CTXMenu,
+        ctxMenu: CTXMenu,
         handler: CTXHandler,
         beforeRender: BeforeRenderFN
     } | undefined;
@@ -134,6 +134,11 @@ class ContextMenu implements CTXMenuSingleton {
     private cache: CTXCache = {};
     private hdir: "r" | "l" = "r";
     private vdir: "u" | "d" = "d";
+    /** 
+     * used to track if wheel events originated from the ctx menu.
+     * in that case we don't want to close the menu. (#28)
+     */
+    private preventCloseOnScroll = false;
     private constructor() {
         window.addEventListener("click", ev => {
             const item = ev.target instanceof Element && ev.target.parentElement;
@@ -143,7 +148,18 @@ class ContextMenu implements CTXMenuSingleton {
             this.hide();
         });
         window.addEventListener("resize", () => this.hide());
-        window.addEventListener("scroll", () => this.hide());
+        let timeout = 0;
+        window.addEventListener("wheel", () => {
+            clearTimeout(timeout);
+            // use a timeout to make sure this handler is always executed after the flag has been set
+            timeout = setTimeout(() => {
+                if (this.preventCloseOnScroll) {
+                    this.preventCloseOnScroll = false;
+                    return;
+                }
+                this.hide();
+            });
+        }, { passive: true });
         ContextMenu.addStylesToDom();
     }
 
@@ -170,7 +186,7 @@ class ContextMenu implements CTXMenuSingleton {
         };
 
         this.cache[target] = {
-            ctxmenu: ctxMenu,
+            ctxMenu,
             handler,
             beforeRender
         };
@@ -182,7 +198,7 @@ class ContextMenu implements CTXMenuSingleton {
         const t = document.querySelector<HTMLElement>(target);
         o && t?.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
-        this.attach(target, ctxMenu || o?.ctxmenu || [], beforeRender || o?.beforeRender);
+        this.attach(target, ctxMenu || o?.ctxMenu || [], beforeRender || o?.beforeRender);
     }
 
     public delete(target: string) {
@@ -209,6 +225,7 @@ class ContextMenu implements CTXMenuSingleton {
 
         this.menu = this.generateDOM([...ctxMenu], eventOrElement);
         document.body.appendChild(this.menu);
+        this.menu.addEventListener("wheel", () => this.preventCloseOnScroll = true, { passive: true });
 
         if (eventOrElement instanceof MouseEvent) {
             eventOrElement.preventDefault();
@@ -432,6 +449,7 @@ class ContextMenu implements CTXMenuSingleton {
             //insert default styles as first css -> low priority -> user can overwrite it easily
             const styles: Record<string, Partial<CSSStyleDeclaration>> = {
                 ".ctxmenu": {
+                    maxHeight: "100vh",
                     border: "1px solid #999",
                     padding: "2px 0",
                     boxShadow: "3px 3px 3px #aaa",
@@ -439,7 +457,8 @@ class ContextMenu implements CTXMenuSingleton {
                     margin: "0",
                     fontSize: "15px",
                     fontFamily: "Verdana, sans-serif",
-                    zIndex: "9999"
+                    zIndex: "9999",
+                    overflowY: "auto"
                 },
                 ".ctxmenu li": {
                     margin: "1px 0",
