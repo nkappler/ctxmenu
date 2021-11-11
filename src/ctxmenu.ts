@@ -342,7 +342,6 @@ class ContextMenu implements CTXMenuSingleton {
             }
             container.appendChild(li);
         });
-        container.style.position = "fixed";
         container.className = "ctxmenu";
 
         const rect = ContextMenu.getBounding(container);
@@ -449,6 +448,7 @@ class ContextMenu implements CTXMenuSingleton {
             //insert default styles as first css -> low priority -> user can overwrite it easily
             const styles: Record<string, Partial<CSSStyleDeclaration>> = {
                 ".ctxmenu": {
+                    position: "fixed",
                     maxHeight: "100vh",
                     border: "1px solid #999",
                     padding: "2px 0",

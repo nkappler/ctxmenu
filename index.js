@@ -281,7 +281,6 @@ var ContextMenu = /*#__PURE__*/function () {
 
         container.appendChild(li);
       });
-      container.style.position = "fixed";
       container.className = "ctxmenu";
       var rect = ContextMenu.getBounding(container);
       var pos = {
@@ -411,6 +410,7 @@ var ContextMenu = /*#__PURE__*/function () {
       var _append = function append() {
         var styles = {
           ".ctxmenu": {
+            position: "fixed",
             maxHeight: "100vh",
             border: "1px solid #999",
             padding: "2px 0",
