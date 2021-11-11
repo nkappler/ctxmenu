@@ -392,7 +392,7 @@ class ContextMenu implements CTXMenuSingleton {
         listElement.appendChild(this.generateDOM(ctxMenu, listElement));
     }
 
-    private static getBounding(elem: HTMLElement): ClientRect | DOMRect {
+    private static getBounding(elem: HTMLElement): DOMRect {
         const container = elem.cloneNode(true) as HTMLElement;
         container.style.visibility = "hidden";
         document.body.appendChild(container);
@@ -402,7 +402,7 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     /** gets a save position inside the screen */
-    private getPosition(rect: DOMRect | ClientRect, pos: Pos): Pos {
+    private getPosition(rect: DOMRect, pos: Pos): Pos {
         return {
             x: this.hdir === "r"
                 ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x
