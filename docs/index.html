@@ -91,10 +91,22 @@
             height: 149px;
         }
 
+        li li>span {
+            display: flex;
+            align-items: center;
+        }
+
+        button {
+            margin: 0 5px;
+        }
+
         .clickable-div {
+            margin: 0 5px;
             background-color: #ccc;
             display: inline;
             cursor: pointer;
+            font-size: 0.6rem;
+            padding: 0.2rem;
         }
 
         /* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
@@ -160,28 +172,39 @@
                 website. <br />
                 <span class="hint">(The header on this page for example does not have a context menu, but prevents
                     the default browser
-                    context menu from appearing)</span></li>
+                    context menu from appearing)</span>
+            </li>
             <li>Use JavaScript functions or HTML Anchors for interactive items</li>
             <li>Infinite nested submenus. <br />
-                <span class="hint">
+                <span class="hint" style="display: flex; align-items: center;">
                     (Try
-                    <ul class="ctxmenu" style="display: inline-block; box-shadow: none; font-style: normal;">
+                    <ul class="ctxmenu"
+                        style="display: inline-block; box-shadow: none; font-style: normal; position: relative; margin: 0 5px;">
                         <li class="submenu"><span>even more actions</span></li>
                     </ul>
-                    in this page's context menu)</span>
+                    in this page's context menu)
+                </span>
             </li>
             <li>Update the menu before it appears to include event specific items, such as the cursor position or
                 run any arbitrary javascript function</li>
             <li>Fully customizable! <span id="switch" style="cursor: pointer;" class="bold"
-                    onclick="toggleDarkMode()">Fancy dark mode?</span></li>
-            <li>Show a context menu "on demand" for
-              <ul>
-                <li>any mouse event
-                <button type="button" onclick="showContextMenuForEvent(event)">Click me!</button></li>
-                <li>any element
-                  <div class="clickable-div" onclick="showContextMenuForElement(this, event)">Click me!</div></li>
-              </ul>
-
+                    onclick="toggleDarkMode()">Click here to toggle dark mode</span></li>
+            <li>Show a context menu <i>on demand</i> for
+                <ul>
+                    <li>
+                        <span>any mouse event
+                            <button type="button" onclick="showContextMenuForEvent(event)">Click this
+                                Button!</button>
+                        </span>
+                    </li>
+                    <li>
+                        <span>any element
+                            <div class="clickable-div" onclick="showContextMenuForElement(this, event)">Click
+                                this
+                                Element!</div>
+                        </span>
+                    </li>
+                </ul>
             <li>Mobile support</li>
         </ul>
         </p>
