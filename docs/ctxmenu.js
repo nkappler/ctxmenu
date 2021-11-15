@@ -367,8 +367,13 @@
             var parentRect = parentOrEvent.getBoundingClientRect();
             pos = {
               x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-              y: parentRect.top + (this.vdir === "d" ? 4 : -12)
+              y: parentRect.top
             };
+
+            if (parentOrEvent.className.includes("submenu")) {
+              pos.y += this.vdir === "d" ? 4 : -12;
+            }
+
             var savePos = this.getPosition(rect, pos);
 
             if (pos.x !== savePos.x) {
@@ -381,7 +386,7 @@
               pos.y = savePos.y;
             }
 
-            pos = this.getPosition(rect, pos);
+            pos = this.getPosition(rect, pos, false);
           } else {
             pos = this.getPosition(rect, {
               x: parentOrEvent.clientX,
@@ -420,9 +425,23 @@
       }, {
         key: "getPosition",
         value: function getPosition(rect, pos) {
+          var addScrollOffset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          var hasTransform = document.body.style.transform !== "";
+          var minX = hasTransform ? window.scrollX : 0;
+          var minY = hasTransform ? window.scrollY : 0;
+          var maxX = hasTransform ? width + window.scrollX : width;
+          var maxY = hasTransform ? height + window.scrollY : height;
+
+          if (hasTransform && addScrollOffset) {
+            pos.x += window.scrollX;
+            pos.y += window.scrollY;
+          }
+
           return {
-            x: this.hdir === "r" ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x : pos.x < 0 ? 0 : pos.x,
-            y: this.vdir === "d" ? pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y : pos.y < 0 ? 0 : pos.y
+            x: this.hdir === "r" ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
+            y: this.vdir === "d" ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
           };
         }
       }], [{

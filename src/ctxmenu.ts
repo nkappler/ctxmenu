@@ -350,8 +350,11 @@ class ContextMenu implements CTXMenuSingleton {
             const parentRect = parentOrEvent.getBoundingClientRect();
             pos = {
                 x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-                y: parentRect.top + (this.vdir === "d" ? 4 : -12) //-4px means no vertical movement with default styles
+                y: parentRect.top
             };
+            if (/* is submenu */ parentOrEvent.className.includes("submenu")) {
+                pos.y += (this.vdir === "d" ? 4 : -12) // add 8px vertical submenu offset: -4px means no vertical movement with default styles
+            }
             const savePos = this.getPosition(rect, pos);
             // change direction when reaching edge of screen
             if (pos.x !== savePos.x) {
@@ -362,7 +365,9 @@ class ContextMenu implements CTXMenuSingleton {
                 this.vdir = this.vdir === "u" ? "d" : "u";
                 pos.y = savePos.y
             }
-            pos = this.getPosition(rect, pos); //on very tiny screens, the submenu may overlap the parent menu
+            /* on very tiny screens, the submenu may overlap the parent menu,
+             * so we recalculate the position again, but without adding the offset again */
+            pos = this.getPosition(rect, pos, false);
         } else {
             pos = this.getPosition(rect, { x: parentOrEvent.clientX, y: parentOrEvent.clientY });
         }
@@ -400,15 +405,31 @@ class ContextMenu implements CTXMenuSingleton {
         return result;
     }
 
-    /** gets a save position inside the screen */
-    private getPosition(rect: DOMRect, pos: Pos): Pos {
+    /** returns a save position inside the viewport, given the desired position */
+    private getPosition(rect: DOMRect, pos: Pos, addScrollOffset: boolean = true): Pos {
+        /* https://github.com/nkappler/ctxmenu/issues/31
+         * When body has a transform applied, `position: fixed` behaves differently.
+         * We can fix it by adding the scroll offset of the window to the viewport dimensions
+         * and to the desired position */
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const hasTransform = document.body.style.transform !== "";
+        const minX = hasTransform ? window.scrollX : 0;
+        const minY = hasTransform ? window.scrollY : 0;
+        const maxX = hasTransform ? width + window.scrollX : width;
+        const maxY = hasTransform ? height + window.scrollY : height;
+        if (hasTransform && addScrollOffset) {
+            pos.x += window.scrollX;
+            pos.y += window.scrollY;
+        }
+
         return {
             x: this.hdir === "r"
-                ? pos.x + rect.width > window.innerWidth ? window.innerWidth - rect.width : pos.x
-                : pos.x < 0 ? 0 : pos.x,
+                ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x
+                : pos.x < minX ? minX : pos.x,
             y: this.vdir === "d"
-                ? pos.y + rect.height > window.innerHeight ? window.innerHeight - rect.height : pos.y
-                : pos.y < 0 ? 0 : pos.y
+                ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y
+                : pos.y < minY ? minY : pos.y
         };
     }
 
