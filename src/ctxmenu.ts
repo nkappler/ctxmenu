@@ -1,4 +1,4 @@
-/*! ctxMenu v1.4.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.4.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 export type ValueOrFunction<T> = T | (() => T);
 
