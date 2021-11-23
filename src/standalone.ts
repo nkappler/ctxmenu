@@ -1,4 +1,5 @@
-import { ctxmenu, CTXMenuSingleton } from "./ctxmenu";
+import { ctxmenu } from "./ctxmenu";
+import type { CTXMenuSingleton } from "./types";
 
 declare global {
     interface Window {
@@ -7,3 +8,5 @@ declare global {
 }
 
 window.ctxmenu = ctxmenu;
+
+export * from "./types";

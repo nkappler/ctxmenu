@@ -5,19 +5,10 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "tsc -w test/demo.ts --outDir docs --module none",
-    "compileTypescript": "tsc",
-    "compileRootDeclaration": "tsc src/ctxmenu.ts --outFile index.js -d --emitDeclarationOnly --lib \"dom, esnext\"",
-    "babelRoot": "babel compile/root -d compile/babel && babel compile/root/ctxmenu.js --out-file index.js",
-    "build_root": "npm run compileTypescript && npm run compileRootDeclaration && npm run babelRoot",
-    "compileStandaloneDeclaration": "tsc src/standalone.ts --outFile standalone/ctxmenu.js -d --emitDeclarationOnly --lib \"dom, esnext\"",
-    "makeStandalone": "browserify --no-install compile/babel/standalone.js > standalone/ctxmenu.js",
-    "minifyStandalone": "babel standalone/ctxmenu.js --out-file standalone/ctxmenu.min.js --presets=minify ",
-    "copyToDocs": "babel standalone/ctxmenu.js --out-file docs/ctxmenu.js && babel standalone/ctxmenu.js --out-file docs/ctxmenu.min.js --presets=minify ",
-    "build_standalone": "npm run compileStandaloneDeclaration && npm run makeStandalone && npm run minifyStandalone && npm run copyToDocs",
-    "build": "npm run build_root && npm run build_standalone",
+    "test": "tsc -w test/demo.ts --outDir docs --removeComments",
     "prepublishOnly": "npm run version",
-    "version": "node util/copyrightHeader.js && npm run build && git add *"
+    "version": "node util/copyrightHeader.js && npm run build && npm run test && git add *",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -30,12 +21,11 @@
   },
   "homepage": "https://nkappler.github.io/ctxmenu",
   "devDependencies": {
-    "@babel/cli": "^7.12.13",
-    "@babel/core": "^7.12.13",
-    "@babel/polyfill": "^7.12.1",
-    "@babel/preset-env": "^7.12.13",
-    "babel-preset-minify": "^0.5.0",
-    "browserify": "^16.2.3",
+    "@rollup/plugin-typescript": "^8.3.0",
+    "rollup": "^2.60.1",
+    "rollup-plugin-dts": "^4.0.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "tslib": "^2.3.1",
     "typescript": "^4.1.3"
   },
   "dependencies": {},
@@ -43,7 +33,10 @@
     "README.md",
     "LICENSE",
     "index.js",
-    "index.d.ts"
+    "index.min.js",
+    "index.d.ts",
+    "standalone/ctxmenu.js",
+    "standalone/ctxmenu.min.js"
   ],
   "keywords": [
     "context menu"

@@ -1,20 +1,24 @@
-"use strict";
-exports.__esModule = true;
-require("../standalone/ctxmenu.d");
-var ctxmenu = window.ctxmenu;
-if ("") {
-    ctxmenu.attach("body", [
-        // @ts-expect-error
-        {
-            text: "",
-            href: "",
-            action: function () { },
-            isDivider: false
-        }
-    ]);
-}
-document.addEventListener("readystatechange", function (event) {
-    if (document.readyState === "complete") {
+(function () {
+    var ctxmenu;
+    var script = document.createElement("script");
+    if (["localhost", "file:///"].findIndex(function (s) { return document.location.href.includes(s); }) > -1) {
+        script.src = "../standalone/ctxmenu.js";
+        script.onload = function () {
+            ctxmenu = window.ctxmenu;
+            setup();
+        };
+    }
+    else {
+        script.src = "https://unpkg.com/ctxmenu";
+        script.type = "module";
+        exports = {};
+        script.onload = function () {
+            ctxmenu = exports.ctxmenu;
+            setup();
+        };
+    }
+    document.head.append(script);
+    var setup = function () {
         ctxmenu.attach("html", [
             {
                 text: "Actions",
@@ -109,14 +113,6 @@ document.addEventListener("readystatechange", function (event) {
             {
                 text: "even more actions",
                 subMenu: [
-                    // only for testing
-                    // { text: "Spacer", icon: "favicon_nc.png" },
-                    // { text: "Spacer", href: "", disabled: true, icon: "favicon_nc.png" },
-                    // { text: "Spacer", href: "", disabled: true },
-                    // { text: "Spacer", href: "", disabled: true, icon: "favicon_nc.png" },
-                    // { text: "Spacer", href: "", disabled: true },
-                    // { text: "Spacer", href: "", disabled: true },
-                    // { text: "Spacer", href: "", disabled: true },
                     {
                         text: "more",
                         subMenu: menuception("what's\u2800this? deeper and deeper into the rabbit hole ... will it ever end? nobody knows ....... it is still going .... man, this is a deeply nested menu .... almost there .... I\u2800promise ... You did it ... Congrats!".split(" "))
@@ -157,59 +153,61 @@ document.addEventListener("readystatechange", function (event) {
                 href: "https://www.github.com/nkappler/ctxmenu"
             }
         ]);
-    }
-});
-function menuception(array) {
-    if (array.length === 0) {
-        return [];
-    }
-    return [{
-            text: array.shift(),
-            subMenu: menuception(array)
-        }];
-}
-function toggleDarkMode() {
-    var darkCss = document.querySelector("#darkTheme");
-    var toggle = document.querySelector("#switch");
-    if (darkCss) {
-        document.head.removeChild(darkCss);
-        toggle.innerHTML = "Fancy dark mode?";
-    }
-    else {
-        var link = document.createElement("link");
-        link.id = "darkTheme";
-        link.rel = "stylesheet";
-        link.type = "text/css";
-        link.href = "./darkTheme.css";
-        document.head.appendChild(link);
-        toggle.innerHTML = "Back to normal!";
-    }
-}
-var menuExample = [
-    {
-        text: "Downloads",
-        subMenu: [
-            {
-                text: "ctxmenu.js",
-                href: "ctxmenu.js",
-                download: ""
-            },
-            {
-                text: "ctxmenu.min.js",
-                href: "ctxmenu.min.js",
-                download: ""
+    };
+    var menuception = function (array) {
+        if (array.length === 0) {
+            return [];
+        }
+        return [{
+                text: array.shift(),
+                subMenu: menuception(array)
+            }];
+    };
+    var menuExample = [
+        {
+            text: "Downloads",
+            subMenu: [
+                {
+                    text: "ctxmenu.js",
+                    href: "ctxmenu.js",
+                    download: ""
+                },
+                {
+                    text: "ctxmenu.min.js",
+                    href: "ctxmenu.min.js",
+                    download: ""
+                }
+            ]
+        },
+        {
+            text: "Documentation (github)",
+            href: "https://www.github.com/nkappler/ctxmenu"
+        }
+    ];
+    Object.assign(window, {
+        showContextMenuForEvent: function (e) {
+            ctxmenu.show(menuExample, e);
+        },
+        showContextMenuForElement: function (element, e) {
+            e.stopPropagation();
+            ctxmenu.show(menuExample, element);
+        },
+        toggleDarkMode: function () {
+            var darkCss = document.querySelector("#darkTheme");
+            var toggle = document.querySelector("#switch");
+            if (darkCss) {
+                document.head.removeChild(darkCss);
+                toggle.innerHTML = "Fancy dark mode?";
             }
-        ]
-    },
-    {
-        text: "Documentation (github)",
-        href: "https://www.github.com/nkappler/ctxmenu"
-    }
-];
-function showContextMenuForEvent(e) {
-    ctxmenu.show(menuExample, e);
-}
-function showContextMenuForElement(element, e) {
-    e.stopPropagation();
-    ctxmenu.show(menuExample, element);
-}
+            else {
+                var link = document.createElement("link");
+                link.id = "darkTheme";
+                link.rel = "stylesheet";
+                link.type = "text/css";
+                link.href = "./darkTheme.css";
+                document.head.appendChild(link);
+                toggle.innerHTML = "Back to normal!";
+            }
+        }
+    });
+})();
