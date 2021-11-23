@@ -11,74 +11,7 @@ function __spreadArrays() {
     return r;
 }
 
-var styles = {
-    ".ctxmenu": {
-        position: "fixed",
-        maxHeight: "100vh",
-        border: "1px solid #999",
-        padding: "2px 0",
-        boxShadow: "3px 3px 3px #aaa",
-        background: "#fff",
-        margin: "0",
-        fontSize: "15px",
-        fontFamily: "Verdana, sans-serif",
-        zIndex: "9999",
-        overflowY: "auto"
-    },
-    ".ctxmenu li": {
-        margin: "1px 0",
-        display: "block",
-        position: "relative",
-        userSelect: "none",
-        webkitUserSelect: "none"
-    },
-    ".ctxmenu li span": {
-        display: "block",
-        padding: "2px 20px",
-        cursor: "default"
-    },
-    ".ctxmenu li a": {
-        color: "inherit",
-        textDecoration: "none"
-    },
-    ".ctxmenu li.icon": {
-        paddingLeft: "15px"
-    },
-    ".ctxmenu img.icon": {
-        position: "absolute",
-        width: "18px",
-        left: "10px",
-        top: "2px"
-    },
-    ".ctxmenu li.disabled": {
-        color: "#ccc"
-    },
-    ".ctxmenu li.divider": {
-        borderBottom: "1px solid #aaa",
-        margin: "5px 0"
-    },
-    ".ctxmenu li.interactive:hover": {
-        background: "rgba(0,0,0,0.1)"
-    },
-    ".ctxmenu li.submenu::after": {
-        content: "''",
-        position: "absolute",
-        display: "block",
-        top: "0",
-        bottom: "0",
-        right: "0.4em",
-        margin: "auto",
-        borderRight: "1px solid #000",
-        borderTop: "1px solid #000",
-        transform: "rotate(45deg)",
-        width: "0.3rem",
-        height: "0.3rem",
-        marginRight: "0.1rem"
-    },
-    ".ctxmenu li.submenu.disabled::after": {
-        borderColor: "#ccc"
-    }
-};
+var styles = '.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, 0.1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
 
 /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/ var ContextMenu = function() {
     function ContextMenu() {
@@ -349,19 +282,13 @@ var styles = {
     };
     ContextMenu.addStylesToDom = function() {
         var append = function() {
-            var rules = Object.entries(styles).map((function(s) {
-                return s[0] + " { " + Object.assign(document.createElement("p").style, s[1]).cssText + " }";
-            }));
-            var styleSheet = document.head.insertBefore(document.createElement("style"), document.head.childNodes[0]);
-            rules.forEach((function(r) {
-                var _a;
-                return null === (_a = styleSheet.sheet) || void 0 === _a ? void 0 : _a.insertRule(r);
-            }));
+            if ("loading" === document.readyState) return document.addEventListener("readystatechange", append);
+            var style = document.createElement("style");
+            style.innerHTML = styles;
+            document.head.insertBefore(style, document.head.childNodes[0]);
             append = function() {};
         };
-        if ("loading" !== document.readyState) append(); else document.addEventListener("readystatechange", (function() {
-            if ("loading" !== document.readyState) append();
-        }));
+        append();
     };
     return ContextMenu;
 }();
