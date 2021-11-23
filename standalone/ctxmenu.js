@@ -74,7 +74,7 @@
             borderColor: "#ccc"
         }
     };
-    /*! ctxMenu v1.4.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/    var ContextMenu = function() {
+    /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/    var ContextMenu = function() {
         function ContextMenu() {
             var _this = this;
             this.cache = {};
