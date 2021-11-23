@@ -1,20 +1,26 @@
-import "../standalone/ctxmenu.d";
+/// <reference types="../standalone/ctxmenu" />
+(() => {
+    let ctxmenu: typeof window.ctxmenu;
 
-const ctxmenu = window.ctxmenu;
-if ("") {
-    ctxmenu.attach("body", [
-        // @ts-expect-error
-        {
-            text: "",
-            href: "",
-            action: () => {/** */ },
-            isDivider: false
-        }
-    ]);
-}
+    const script = document.createElement("script");
+    if (["localhost", "file:///"].findIndex(s => document.location.href.includes(s)) > -1) {
+        script.src = "../standalone/ctxmenu.js";
+        script.onload = () => {
+            ctxmenu = window.ctxmenu;
+            setup();
+        };
+    } else {
+        script.src = "https://unpkg.com/ctxmenu";
+        script.type = "module";
+        exports = {};
+        script.onload = () => {
+            ctxmenu = exports.ctxmenu;
+            setup();
+        };
+    }
+    document.head.append(script);
 
-document.addEventListener("readystatechange", function (event) {
-    if (document.readyState === "complete") {
+    const setup = () => {
 
         ctxmenu.attach("html", [
             {
@@ -161,63 +167,64 @@ document.addEventListener("readystatechange", function (event) {
             }
         ]);
     }
-});
 
+    const menuception = (array) => {
+        if (array.length === 0) { return []; }
 
-function menuception(array) {
-    if (array.length === 0) { return []; }
-
-    return [{
-        text: array.shift(),
-        subMenu: menuception(array)
-    }];
-}
-
-function toggleDarkMode() {
-    const darkCss = document.querySelector("#darkTheme");
-    const toggle = document.querySelector("#switch");
-    if (darkCss) {
-        document.head.removeChild(darkCss);
-        toggle.innerHTML = "Fancy dark mode?";
+        return [{
+            text: array.shift(),
+            subMenu: menuception(array)
+        }];
     }
-    else {
-        const link = document.createElement("link");
-        link.id = "darkTheme";
-        link.rel = "stylesheet";
-        link.type = "text/css";
-        link.href = "./darkTheme.css";
-        document.head.appendChild(link);
-        toggle.innerHTML = "Back to normal!";
-    }
-}
 
+    const menuExample = [
+        {
+            text: "Downloads",
+            subMenu: [
+                {
+                    text: "ctxmenu.js",
+                    href: "ctxmenu.js",
+                    download: ""
+                },
+                {
+                    text: "ctxmenu.min.js",
+                    href: "ctxmenu.min.js",
+                    download: ""
+                }
+            ]
+        },
+        {
+            text: "Documentation (github)",
+            href: "https://www.github.com/nkappler/ctxmenu"
+        }
+    ];
 
-const menuExample = [
-  {
-    text: "Downloads",
-    subMenu: [
-      {
-        text: "ctxmenu.js",
-        href: "ctxmenu.js",
-        download: ""
-      },
-      {
-        text: "ctxmenu.min.js",
-        href: "ctxmenu.min.js",
-        download: ""
-      }
-    ]
-  },
-  {
-    text: "Documentation (github)",
-    href: "https://www.github.com/nkappler/ctxmenu"
-  }
-];
+    Object.assign(window, {
+        // functions used in html file
+        showContextMenuForEvent: (e: MouseEvent) => {
+            ctxmenu.show(menuExample, e);
+        },
+        showContextMenuForElement: (element: HTMLElement, e: MouseEvent) => {
+            e.stopPropagation();
+            ctxmenu.show(menuExample, element);
+        },
+        toggleDarkMode: () => {
+            const darkCss = document.querySelector("#darkTheme");
+            const toggle = document.querySelector("#switch");
+            if (darkCss) {
+                document.head.removeChild(darkCss);
+                toggle.innerHTML = "Fancy dark mode?";
+            }
+            else {
+                const link = document.createElement("link");
+                link.id = "darkTheme";
+                link.rel = "stylesheet";
+                link.type = "text/css";
+                link.href = "./darkTheme.css";
+                document.head.appendChild(link);
+                toggle.innerHTML = "Back to normal!";
+            }
+        }
+    });
 
-function showContextMenuForEvent(e: MouseEvent){
-  ctxmenu.show( menuExample, e);
-}
-function showContextMenuForElement(element: HTMLElement, e: MouseEvent){
-  e.stopPropagation();
-  ctxmenu.show( menuExample, element);
-}
+})();
