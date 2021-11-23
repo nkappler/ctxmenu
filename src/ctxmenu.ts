@@ -1,5 +1,6 @@
 /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
+//@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
 import type { BeforeRenderFN, CTXMAction, CTXMAnchor, CTXMDivider, CTXMenu, CTXMenuSingleton, CTXMHeading, CTXMItem, CTXMSubMenu, ValueOrFunction } from "./types";
 

@@ -7,8 +7,8 @@
   "scripts": {
     "test": "tsc test/demo.ts --outDir docs --removeComments",
     "prepublishOnly": "npm run version",
-    "version": "node util/copyrightHeader.js && node util/converStyles.js && npm run build && npm run test && git add *",
-    "build": "rollup -c"
+    "version": "node util/copyrightHeader.js && npm run build && npm run test && git add *",
+    "build": "node util/convertStyles.js && rollup -c"
   },
   "repository": {
     "type": "git",
