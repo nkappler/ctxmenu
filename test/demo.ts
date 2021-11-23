@@ -10,7 +10,7 @@
             setup();
         };
     } else {
-        script.src = "https://unpkg.com/ctxmenu";
+        script.src = "https://unpkg.com/ctxmenu/index.min.js";
         script.type = "module";
         exports = {};
         script.onload = () => {
@@ -151,12 +151,12 @@
                 subMenu: [
                     {
                         text: "ctxmenu.js",
-                        href: "ctxmenu.js",
+                        href: "https://unpkg.com/ctxmenu/standalone/ctxmenu.js",
                         download: ""
                     },
                     {
                         text: "ctxmenu.min.js",
-                        href: "ctxmenu.min.js",
+                        href: "https://unpkg.com/ctxmenu/standalone/ctxmenu.min.js",
                         download: ""
                     }
                 ]

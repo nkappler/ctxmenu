@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "tsc -w test/demo.ts --outDir docs --removeComments",
+    "test": "tsc test/demo.ts --outDir docs --removeComments",
     "prepublishOnly": "npm run version",
     "version": "node util/copyrightHeader.js && npm run build && npm run test && git add *",
     "build": "rollup -c"
