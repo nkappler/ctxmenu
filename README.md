@@ -1,6 +1,7 @@
 # ctxmenu.js ![Icon](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/favicon.png)[![npm](https://img.shields.io/npm/v/ctxmenu.svg)](https://www.npmjs.com/package/ctxmenu) [![npm](https://img.shields.io/npm/types/ctxmenu.svg)](https://raw.githubusercontent.com/nkappler/ctxmenu/master/index.d.ts)
 
-## Tiny _(<4kB minified and gzipped)_ and customizable context menu generator.
+## Tiny* and customizable context menu generator.
+<sup>* 3kB minified and gzipped</sup>
 
 [DEMO](https://nkappler.github.io/ctxmenu)
 
