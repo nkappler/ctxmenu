@@ -13,6 +13,34 @@ function __spreadArrays() {
 
 var styles = '.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, 0.1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
 
+function getProp(prop) {
+    return "function" === typeof prop ? prop() : prop;
+}
+
+function itemIsInteractive(item) {
+    return itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item) || itemIsCustom(item);
+}
+
+function itemIsAction(item) {
+    return item.hasOwnProperty("action");
+}
+
+function itemIsAnchor(item) {
+    return item.hasOwnProperty("href");
+}
+
+function itemIsDivider(item) {
+    return item.hasOwnProperty("isDivider");
+}
+
+function itemIsSubMenu(item) {
+    return item.hasOwnProperty("subMenu");
+}
+
+function itemIsCustom(item) {
+    return item.hasOwnProperty("html") || item.hasOwnProperty("element");
+}
+
 /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/ var ContextMenu = function() {
     function ContextMenu() {
         var _this = this;
@@ -145,45 +173,45 @@ var styles = '.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;pad
                 var subMenu = null === (_a = li.parentElement) || void 0 === _a ? void 0 : _a.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) _this.hide(subMenu);
             }));
-            if (ContextMenu.itemIsDivider(item)) li.className = "divider"; else {
-                var html = ContextMenu.getProp(item.html);
-                var text = "<span>" + ContextMenu.getProp(item.text) + "</span>";
-                var elem = ContextMenu.getProp(item.element);
+            if (itemIsDivider(item)) li.className = "divider"; else {
+                var html = getProp(item.html);
+                var text = "<span>" + getProp(item.text) + "</span>";
+                var elem = getProp(item.element);
                 elem ? li.append(elem) : li.innerHTML = html ? html : text;
-                li.title = ContextMenu.getProp(item.tooltip) || "";
-                if (item.style) li.setAttribute("style", ContextMenu.getProp(item.style));
-                if (ContextMenu.itemIsInteractive(item)) if (!ContextMenu.getProp(item.disabled)) {
+                li.title = getProp(item.tooltip) || "";
+                if (item.style) li.setAttribute("style", getProp(item.style));
+                if (itemIsInteractive(item)) if (!getProp(item.disabled)) {
                     li.classList.add("interactive");
-                    if (ContextMenu.itemIsAction(item)) li.addEventListener("click", (function(e) {
+                    if (itemIsAction(item)) li.addEventListener("click", (function(e) {
                         item.action(e);
                         _this.hide();
-                    })); else if (ContextMenu.itemIsAnchor(item)) {
+                    })); else if (itemIsAnchor(item)) {
                         var a = document.createElement("a");
                         elem ? a.append(elem) : a.innerHTML = html ? html : text;
                         a.onclick = function() {
                             return _this.hide();
                         };
-                        a.href = ContextMenu.getProp(item.href);
-                        if (item.hasOwnProperty("download")) a.download = ContextMenu.getProp(item.download);
-                        if (item.hasOwnProperty("target")) a.target = ContextMenu.getProp(item.target);
+                        a.href = getProp(item.href);
+                        if (item.hasOwnProperty("download")) a.download = getProp(item.download);
+                        if (item.hasOwnProperty("target")) a.target = getProp(item.target);
                         li.childNodes.forEach((function(n) {
                             return n.remove();
                         }));
                         li.append(a);
-                    } else if (ContextMenu.itemIsSubMenu(item)) if (0 === ContextMenu.getProp(item.subMenu).length) li.classList.add("disabled"); else {
+                    } else if (itemIsSubMenu(item)) if (0 === getProp(item.subMenu).length) li.classList.add("disabled"); else {
                         li.classList.add("submenu");
                         _this.debounce(li, (function(ev) {
                             var subMenu = li.querySelector("ul");
-                            if (!subMenu) _this.openSubMenu(ev, ContextMenu.getProp(item.subMenu), li);
+                            if (!subMenu) _this.openSubMenu(ev, getProp(item.subMenu), li);
                         }));
                     }
                 } else {
                     li.classList.add("disabled");
-                    if (ContextMenu.itemIsSubMenu(item)) li.classList.add("submenu");
+                    if (itemIsSubMenu(item)) li.classList.add("submenu");
                 } else li.setAttribute("style", "font-weight: bold; margin-left: -5px;" + li.getAttribute("style"));
-                if (ContextMenu.getProp(item.icon)) {
+                if (getProp(item.icon)) {
                     li.classList.add("icon");
-                    li.innerHTML += '<img class="icon" src="' + ContextMenu.getProp(item.icon) + '" />';
+                    li.innerHTML += '<img class="icon" src="' + getProp(item.icon) + '" />';
                 }
             }
             container.appendChild(li);
@@ -258,27 +286,6 @@ var styles = '.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;pad
             x: "r" === this.hdir ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
             y: "d" === this.vdir ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
         };
-    };
-    ContextMenu.getProp = function(prop) {
-        return "function" === typeof prop ? prop() : prop;
-    };
-    ContextMenu.itemIsInteractive = function(item) {
-        return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item) || this.itemIsCustom(item);
-    };
-    ContextMenu.itemIsAction = function(item) {
-        return item.hasOwnProperty("action");
-    };
-    ContextMenu.itemIsAnchor = function(item) {
-        return item.hasOwnProperty("href");
-    };
-    ContextMenu.itemIsDivider = function(item) {
-        return item.hasOwnProperty("isDivider");
-    };
-    ContextMenu.itemIsSubMenu = function(item) {
-        return item.hasOwnProperty("subMenu");
-    };
-    ContextMenu.itemIsCustom = function(item) {
-        return item.hasOwnProperty("html") || item.hasOwnProperty("element");
     };
     ContextMenu.addStylesToDom = function() {
         var append = function() {

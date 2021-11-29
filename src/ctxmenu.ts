@@ -1,9 +1,9 @@
 /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
+import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
-import type { BeforeRenderFN, CTXMAction, CTXMAnchor, CTXMDivider, CTXMenu, CTXMenuSingleton, CTXMHeading, CTXMItem, CTXMSubMenu, ValueOrFunction } from "./types";
-
+import { getProp, itemIsAction, itemIsAnchor, itemIsDivider, itemIsInteractive, itemIsSubMenu } from "./typeguards";
 
 type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
 
@@ -178,55 +178,55 @@ class ContextMenu implements CTXMenuSingleton {
             });
 
             //Item type specific stuff
-            if (ContextMenu.itemIsDivider(item)) {
+            if (itemIsDivider(item)) {
                 li.className = "divider";
             } else {
-                const html = ContextMenu.getProp(item.html);
-                const text = `<span>${ContextMenu.getProp(item.text)}</span>`;
-                const elem = ContextMenu.getProp(item.element);
+                const html = getProp(item.html);
+                const text = `<span>${getProp(item.text)}</span>`;
+                const elem = getProp(item.element);
                 elem
                     ? li.append(elem)
                     : li.innerHTML = html ? html : text;
-                li.title = ContextMenu.getProp(item.tooltip) || "";
-                if (item.style) { li.setAttribute("style", ContextMenu.getProp(item.style)) }
-                if (ContextMenu.itemIsInteractive(item)) {
-                    if (!ContextMenu.getProp(item.disabled)) {
+                li.title = getProp(item.tooltip) || "";
+                if (item.style) { li.setAttribute("style", getProp(item.style)) }
+                if (itemIsInteractive(item)) {
+                    if (!getProp(item.disabled)) {
                         li.classList.add("interactive");
-                        if (ContextMenu.itemIsAction(item)) {
+                        if (itemIsAction(item)) {
                             li.addEventListener("click", (e) => {
                                 item.action(e);
                                 this.hide();
                             }
                             );
                         }
-                        else if (ContextMenu.itemIsAnchor(item)) {
+                        else if (itemIsAnchor(item)) {
                             const a = document.createElement("a");
                             elem
                                 ? a.append(elem)
                                 : a.innerHTML = html ? html : text;
                             a.onclick = () => this.hide();
-                            a.href = ContextMenu.getProp(item.href);
-                            if (item.hasOwnProperty("download")) { a.download = ContextMenu.getProp(item.download!) }
-                            if (item.hasOwnProperty("target")) { a.target = ContextMenu.getProp(item.target!) }
+                            a.href = getProp(item.href);
+                            if (item.hasOwnProperty("download")) { a.download = getProp(item.download!) }
+                            if (item.hasOwnProperty("target")) { a.target = getProp(item.target!) }
                             li.childNodes.forEach(n => n.remove());
                             li.append(a);
                         }
-                        else if (ContextMenu.itemIsSubMenu(item)) {
-                            if (ContextMenu.getProp(item.subMenu).length === 0) {
+                        else if (itemIsSubMenu(item)) {
+                            if (getProp(item.subMenu).length === 0) {
                                 li.classList.add("disabled");
                             } else {
                                 li.classList.add("submenu");
                                 this.debounce(li, (ev) => {
                                     const subMenu = li.querySelector("ul");
                                     if (!subMenu) { //if it's already open, do nothing
-                                        this.openSubMenu(ev, ContextMenu.getProp(item.subMenu), li);
+                                        this.openSubMenu(ev, getProp(item.subMenu), li);
                                     }
                                 });
                             }
                         }
                     } else {
                         li.classList.add("disabled");
-                        if (ContextMenu.itemIsSubMenu(item)) {
+                        if (itemIsSubMenu(item)) {
                             li.classList.add("submenu");
                         }
                     }
@@ -235,9 +235,9 @@ class ContextMenu implements CTXMenuSingleton {
                     li.setAttribute("style", "font-weight: bold; margin-left: -5px;" + li.getAttribute("style"));
                 }
 
-                if (ContextMenu.getProp(item.icon)) {
+                if (getProp(item.icon)) {
                     li.classList.add("icon");
-                    li.innerHTML += `<img class="icon" src="${ContextMenu.getProp(item.icon)}" />`;
+                    li.innerHTML += `<img class="icon" src="${getProp(item.icon)}" />`;
                 }
             }
             container.appendChild(li);
@@ -333,37 +333,6 @@ class ContextMenu implements CTXMenuSingleton {
         };
     }
 
-    private static getProp<T>(prop: ValueOrFunction<T>): T {
-        return typeof prop === "function" ? (prop as () => T)() : prop;
-    }
-
-    private static itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor | CTXMSubMenu) {
-        return this.itemIsAction(item) || this.itemIsAnchor(item) || this.itemIsSubMenu(item)
-            || this.itemIsCustom(item); /* <-- not really an interactive item,
-          since it might miss the 'disabled' prop but doesn't matter since it is optionial anyway.
-          using this check for styling reasons mainly, so that custom elements don't get header styling */
-    }
-
-    private static itemIsAction(item: CTXMItem): item is CTXMAction {
-        return item.hasOwnProperty("action");
-    }
-
-    private static itemIsAnchor(item: CTXMItem): item is CTXMAnchor {
-        return item.hasOwnProperty("href");
-    }
-
-    private static itemIsDivider(item: CTXMItem): item is CTXMDivider {
-        return item.hasOwnProperty("isDivider");
-    }
-
-    private static itemIsSubMenu(item: CTXMItem): item is CTXMSubMenu {
-        return item.hasOwnProperty("subMenu");
-    }
-
-    private static itemIsCustom(item: CTXMItem): item is CTXMHeading {
-        return item.hasOwnProperty("html") || item.hasOwnProperty("element");
-    }
-
     private static addStylesToDom() {
         let append = () => {
             if (document.readyState === "loading") {
@@ -381,5 +350,5 @@ class ContextMenu implements CTXMenuSingleton {
 }
 
 export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
-export * from "./types";
+export * from "./interfaces";
 
