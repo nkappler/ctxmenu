@@ -6,7 +6,6 @@
         k++) r[k] = a[j];
         return r;
     }
-    var styles = '.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, 0.1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
     function getProp(prop) {
         return "function" === typeof prop ? prop() : prop;
     }
@@ -28,6 +27,74 @@
     function itemIsCustom(item) {
         return item.hasOwnProperty("html") || item.hasOwnProperty("element");
     }
+    function onHoverDebounced(target, action) {
+        var timeout;
+        target.addEventListener("mouseenter", (function(e) {
+            timeout = setTimeout((function() {
+                return action(e);
+            }), 150);
+        }));
+        target.addEventListener("mouseleave", (function() {
+            return clearTimeout(timeout);
+        }));
+    }
+    function getBounding(elem) {
+        var container = elem.cloneNode(true);
+        container.style.visibility = "hidden";
+        document.body.appendChild(container);
+        var result = container.getBoundingClientRect();
+        document.body.removeChild(container);
+        return result;
+    }
+    function isDisabled(item) {
+        return getProp(item.disabled) || itemIsSubMenu(item) && 0 === item.subMenu.length;
+    }
+    function generateMenuItem(item) {
+        var li = document.createElement("li");
+        if (itemIsDivider(item)) {
+            li.className = "divider";
+            return li;
+        }
+        generateBaseItemContent(item, li);
+        if (!itemIsInteractive(item)) {
+            li.classList.add("heading");
+            return li;
+        }
+        if (isDisabled(item)) {
+            li.classList.add("disabled");
+            if (itemIsSubMenu(item)) li.classList.add("submenu");
+            return li;
+        }
+        li.classList.add("interactive");
+        if (itemIsAnchor(item)) {
+            var a = document.createElement("a");
+            a.append.apply(a, Array.from(li.childNodes));
+            a.href = getProp(item.href);
+            if (item.hasOwnProperty("download")) a.download = getProp(item.download);
+            if (item.hasOwnProperty("target")) a.target = getProp(item.target);
+            li.append(a);
+            return li;
+        }
+        if (itemIsAction(item)) {
+            li.addEventListener("click", item.action);
+            return li;
+        }
+        li.classList.add("submenu");
+        return li;
+    }
+    function generateBaseItemContent(item, li) {
+        var html = getProp(item.html);
+        var text = "<span>" + getProp(item.text) + "</span>";
+        var elem = getProp(item.element);
+        elem ? li.append(elem) : li.innerHTML = html ? html : text;
+        li.title = getProp(item.tooltip) || "";
+        if (item.style) li.setAttribute("style", getProp(item.style));
+        if (item.icon) {
+            li.classList.add("icon");
+            li.innerHTML += '<img class="icon" src="' + getProp(item.icon) + '" />';
+        }
+    }
+    var styles = '.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li.heading{font-weight:bold;margin-left:-5px;}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, 0.1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
     /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/    var ContextMenu = function() {
         function ContextMenu() {
             var _this = this;
@@ -138,88 +205,42 @@
                 null === (_a = menu.parentElement) || void 0 === _a ? void 0 : _a.removeChild(menu);
             }
         };
-        ContextMenu.prototype.debounce = function(target, action) {
-            var timeout;
-            target.addEventListener("mouseenter", (function(e) {
-                timeout = setTimeout((function() {
-                    return action(e);
-                }), 150);
-            }));
-            target.addEventListener("mouseleave", (function() {
-                return clearTimeout(timeout);
-            }));
-        };
         ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent) {
             var _this = this;
             var container = document.createElement("ul");
             if (0 === ctxMenu.length) container.style.display = "none";
             ctxMenu.forEach((function(item) {
-                var li = document.createElement("li");
-                _this.debounce(li, (function() {
+                var li = generateMenuItem(item);
+                onHoverDebounced(li, (function() {
                     var _a;
                     var subMenu = null === (_a = li.parentElement) || void 0 === _a ? void 0 : _a.querySelector("ul");
                     if (subMenu && subMenu.parentElement !== li) _this.hide(subMenu);
                 }));
-                if (itemIsDivider(item)) li.className = "divider"; else {
-                    var html = getProp(item.html);
-                    var text = "<span>" + getProp(item.text) + "</span>";
-                    var elem = getProp(item.element);
-                    elem ? li.append(elem) : li.innerHTML = html ? html : text;
-                    li.title = getProp(item.tooltip) || "";
-                    if (item.style) li.setAttribute("style", getProp(item.style));
-                    if (itemIsInteractive(item)) if (!getProp(item.disabled)) {
-                        li.classList.add("interactive");
-                        if (itemIsAction(item)) li.addEventListener("click", (function(e) {
-                            item.action(e);
-                            _this.hide();
-                        })); else if (itemIsAnchor(item)) {
-                            var a = document.createElement("a");
-                            elem ? a.append(elem) : a.innerHTML = html ? html : text;
-                            a.onclick = function() {
-                                return _this.hide();
-                            };
-                            a.href = getProp(item.href);
-                            if (item.hasOwnProperty("download")) a.download = getProp(item.download);
-                            if (item.hasOwnProperty("target")) a.target = getProp(item.target);
-                            li.childNodes.forEach((function(n) {
-                                return n.remove();
-                            }));
-                            li.append(a);
-                        } else if (itemIsSubMenu(item)) if (0 === getProp(item.subMenu).length) li.classList.add("disabled"); else {
-                            li.classList.add("submenu");
-                            _this.debounce(li, (function(ev) {
-                                var subMenu = li.querySelector("ul");
-                                if (!subMenu) _this.openSubMenu(ev, getProp(item.subMenu), li);
-                            }));
-                        }
-                    } else {
-                        li.classList.add("disabled");
-                        if (itemIsSubMenu(item)) li.classList.add("submenu");
-                    } else li.setAttribute("style", "font-weight: bold; margin-left: -5px;" + li.getAttribute("style"));
-                    if (getProp(item.icon)) {
-                        li.classList.add("icon");
-                        li.innerHTML += '<img class="icon" src="' + getProp(item.icon) + '" />';
-                    }
-                }
+                if (itemIsInteractive(item) && !isDisabled(item)) if (itemIsSubMenu(item)) onHoverDebounced(li, (function(ev) {
+                    var subMenu = li.querySelector("ul");
+                    if (!subMenu) _this.openSubMenu(ev, getProp(item.subMenu), li);
+                })); else li.addEventListener("click", (function() {
+                    return _this.hide();
+                }));
                 container.appendChild(li);
             }));
             container.className = "ctxmenu";
-            var rect = ContextMenu.getBounding(container);
+            var rect = getBounding(container);
             var pos = {
                 x: 0,
                 y: 0
             };
             if (parentOrEvent instanceof Element) {
-                var parentRect = parentOrEvent.getBoundingClientRect();
+                var _a = parentOrEvent.getBoundingClientRect(), left = _a.left, width = _a.width, top_1 = _a.top;
                 pos = {
-                    x: "r" === this.hdir ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-                    y: parentRect.top
+                    x: "r" === this.hdir ? left + width : left - rect.width,
+                    y: top_1
                 };
                 if (parentOrEvent.className.includes("submenu")) pos.y += "d" === this.vdir ? 4 : -12;
                 var savePos = this.getPosition(rect, pos);
                 if (pos.x !== savePos.x) {
                     this.hdir = "r" === this.hdir ? "l" : "r";
-                    pos.x = "r" === this.hdir ? parentRect.left + parentRect.width : parentRect.left - rect.width;
+                    pos.x = "r" === this.hdir ? left + width : left - rect.width;
                 }
                 if (pos.y !== savePos.y) {
                     this.vdir = "u" === this.vdir ? "d" : "u";
@@ -247,14 +268,6 @@
             var subMenu = null === (_a = listElement.parentElement) || void 0 === _a ? void 0 : _a.querySelector("li > ul");
             if (subMenu && subMenu.parentElement !== listElement) this.hide(subMenu);
             listElement.appendChild(this.generateDOM(ctxMenu, listElement));
-        };
-        ContextMenu.getBounding = function(elem) {
-            var container = elem.cloneNode(true);
-            container.style.visibility = "hidden";
-            document.body.appendChild(container);
-            var result = container.getBoundingClientRect();
-            document.body.removeChild(container);
-            return result;
         };
         ContextMenu.prototype.getPosition = function(rect, pos, addScrollOffset) {
             if (void 0 === addScrollOffset) addScrollOffset = true;

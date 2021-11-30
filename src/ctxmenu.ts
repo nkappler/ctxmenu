@@ -1,9 +1,10 @@
 /*! ctxMenu v1.4.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
+import { generateMenuItem, getBounding, isDisabled, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
-import { getProp, itemIsAction, itemIsAnchor, itemIsDivider, itemIsInteractive, itemIsSubMenu } from "./typeguards";
+import { getProp, itemIsInteractive, itemIsSubMenu } from "./typeguards";
 
 type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
 
@@ -145,21 +146,6 @@ class ContextMenu implements CTXMenuSingleton {
         }
     }
 
-    /**
-     * assigns an eventhandler to a list item, that gets triggered after a short timeout,
-     * but only if the cursor is still targeting that list item after the timeout. when
-     * hovering fast over different list items, the actions do not get triggered.
-     * @param target the target list item
-     * @param action the event that should trigger after the timeout
-     */
-    private debounce(target: HTMLLIElement, action: (e: MouseEvent) => void) {
-        let timeout: number;
-        target.addEventListener("mouseenter", (e) => {
-            timeout = setTimeout(() => action(e), 150);
-        });
-        target.addEventListener("mouseleave", () => clearTimeout(timeout));
-    }
-
     private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent): HTMLUListElement {
         //This has grown pretty messy and could use a rework
 
@@ -168,89 +154,38 @@ class ContextMenu implements CTXMenuSingleton {
             container.style.display = "none";
         }
         ctxMenu.forEach(item => {
-            const li = document.createElement("li");
+            const li = generateMenuItem(item);
             //all items shoud have a handler to close submenus on hover (except if its their own)
-            this.debounce(li, () => {
+            onHoverDebounced(li, () => {
                 const subMenu = li.parentElement?.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) {
                     this.hide(subMenu);
                 }
             });
 
-            //Item type specific stuff
-            if (itemIsDivider(item)) {
-                li.className = "divider";
-            } else {
-                const html = getProp(item.html);
-                const text = `<span>${getProp(item.text)}</span>`;
-                const elem = getProp(item.element);
-                elem
-                    ? li.append(elem)
-                    : li.innerHTML = html ? html : text;
-                li.title = getProp(item.tooltip) || "";
-                if (item.style) { li.setAttribute("style", getProp(item.style)) }
-                if (itemIsInteractive(item)) {
-                    if (!getProp(item.disabled)) {
-                        li.classList.add("interactive");
-                        if (itemIsAction(item)) {
-                            li.addEventListener("click", (e) => {
-                                item.action(e);
-                                this.hide();
-                            }
-                            );
+            if (itemIsInteractive(item) && !isDisabled(item)) {
+                if (itemIsSubMenu(item)) {
+                    onHoverDebounced(li, (ev) => {
+                        const subMenu = li.querySelector("ul");
+                        if (!subMenu) { //if it's already open, do nothing
+                            this.openSubMenu(ev, getProp(item.subMenu), li);
                         }
-                        else if (itemIsAnchor(item)) {
-                            const a = document.createElement("a");
-                            elem
-                                ? a.append(elem)
-                                : a.innerHTML = html ? html : text;
-                            a.onclick = () => this.hide();
-                            a.href = getProp(item.href);
-                            if (item.hasOwnProperty("download")) { a.download = getProp(item.download!) }
-                            if (item.hasOwnProperty("target")) { a.target = getProp(item.target!) }
-                            li.childNodes.forEach(n => n.remove());
-                            li.append(a);
-                        }
-                        else if (itemIsSubMenu(item)) {
-                            if (getProp(item.subMenu).length === 0) {
-                                li.classList.add("disabled");
-                            } else {
-                                li.classList.add("submenu");
-                                this.debounce(li, (ev) => {
-                                    const subMenu = li.querySelector("ul");
-                                    if (!subMenu) { //if it's already open, do nothing
-                                        this.openSubMenu(ev, getProp(item.subMenu), li);
-                                    }
-                                });
-                            }
-                        }
-                    } else {
-                        li.classList.add("disabled");
-                        if (itemIsSubMenu(item)) {
-                            li.classList.add("submenu");
-                        }
-                    }
+                    });
                 } else {
-                    //Heading
-                    li.setAttribute("style", "font-weight: bold; margin-left: -5px;" + li.getAttribute("style"));
-                }
-
-                if (getProp(item.icon)) {
-                    li.classList.add("icon");
-                    li.innerHTML += `<img class="icon" src="${getProp(item.icon)}" />`;
+                    li.addEventListener("click", () => this.hide());
                 }
             }
             container.appendChild(li);
         });
         container.className = "ctxmenu";
 
-        const rect = ContextMenu.getBounding(container);
+        const rect = getBounding(container);
         let pos = { x: 0, y: 0 };
         if (parentOrEvent instanceof Element) {
-            const parentRect = parentOrEvent.getBoundingClientRect();
+            const { left, width, top } = parentOrEvent.getBoundingClientRect();
             pos = {
-                x: this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width,
-                y: parentRect.top
+                x: this.hdir === "r" ? left + width : left - rect.width,
+                y: top
             };
             if (/* is submenu */ parentOrEvent.className.includes("submenu")) {
                 pos.y += (this.vdir === "d" ? 4 : -12) // add 8px vertical submenu offset: -4px means no vertical movement with default styles
@@ -259,7 +194,7 @@ class ContextMenu implements CTXMenuSingleton {
             // change direction when reaching edge of screen
             if (pos.x !== savePos.x) {
                 this.hdir = this.hdir === "r" ? "l" : "r";
-                pos.x = this.hdir === "r" ? parentRect.left + parentRect.width : parentRect.left - rect.width;
+                pos.x = this.hdir === "r" ? left + width : left - rect.width;
             }
             if (pos.y !== savePos.y) {
                 this.vdir = this.vdir === "u" ? "d" : "u";
@@ -294,15 +229,6 @@ class ContextMenu implements CTXMenuSingleton {
             this.hide(subMenu);
         }
         listElement.appendChild(this.generateDOM(ctxMenu, listElement));
-    }
-
-    private static getBounding(elem: HTMLElement): DOMRect {
-        const container = elem.cloneNode(true) as HTMLElement;
-        container.style.visibility = "hidden";
-        document.body.appendChild(container);
-        const result = container.getBoundingClientRect();
-        document.body.removeChild(container);
-        return result;
     }
 
     /** returns a save position inside the viewport, given the desired position */
