@@ -237,8 +237,9 @@ class ContextMenu implements CTXMenuSingleton {
          * When body has a transform applied, `position: fixed` behaves differently.
          * We can fix it by adding the scroll offset of the window to the viewport dimensions
          * and to the desired position */
-        const width = window.innerWidth;
-        const height = window.innerHeight;
+        const html = document.documentElement;
+        const width = html.clientWidth;
+        const height = html.clientHeight;
         const hasTransform = document.body.style.transform !== "";
         const minX = hasTransform ? window.scrollX : 0;
         const minY = hasTransform ? window.scrollY : 0;
