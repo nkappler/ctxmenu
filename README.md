@@ -210,8 +210,10 @@ ctxmenu.show(ctxmenu: Array, e: MouseEvent | HTMLElement)
 The `show` method can be used to show a context menu without using the [`attach`](#ctxmenuattach) method to set up a contextmenu for specific elements first. You need to pass the original event or a target element, which will be used to calculate the menu's position.
 
 This may be useful when integrating with other libraries or frameworks that already provide a contextmenu handler or when trying to show a context menu on a different user interaction (for example showing a context menu when left-clicking a button).
+    
+⚠️**Positioning of the menu:** If the second parameter you pass is of type `MouseEvent`, the menu will appear at the cursors position, if it is of type `HTMLElement` it will appear next to the element. See [#36](https://github.com/nkappler/ctxmenu/issues/36)
 
-When passing a target element, you will need to stop the propagation of the event to prevent the context menu from being immediately closed again:
+⚠️ **Event propagation:** When passing a target element, you will need to stop the propagation of the event to prevent the context menu from being immediately closed again:
 
 ```typescript
 clickHandler(e: MouseEvent) {
