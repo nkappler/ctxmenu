@@ -53,6 +53,9 @@ class ContextMenu implements CTXMenuSingleton {
                 this.hide();
             });
         }, { passive: true });
+        window.addEventListener("keydown", e => {
+            if (e.key === "Escape") this.hide();
+        });
         ContextMenu.addStylesToDom();
     }
 

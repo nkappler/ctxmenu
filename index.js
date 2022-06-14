@@ -141,6 +141,9 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
         }), {
             passive: true
         });
+        window.addEventListener("keydown", (function(e) {
+            if ("Escape" === e.key) _this.hide();
+        }));
         ContextMenu.addStylesToDom();
     }
     ContextMenu.getInstance = function() {

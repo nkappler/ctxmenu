@@ -123,6 +123,9 @@
             }), {
                 passive: true
             });
+            window.addEventListener("keydown", (function(e) {
+                if ("Escape" === e.key) _this.hide();
+            }));
             ContextMenu.addStylesToDom();
         }
         ContextMenu.getInstance = function() {
