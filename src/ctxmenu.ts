@@ -1,7 +1,8 @@
 /*! ctxMenu v1.4.5 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
-import { generateMenuItem, getBounding, isDisabled, onHoverDebounced } from "./elementFactory";
+import { generateMenuItem, isDisabled, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
+import { getPos, resetDirections } from "./position";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
 import { getProp, itemIsInteractive, itemIsSubMenu } from "./typeguards";
@@ -16,17 +17,10 @@ interface CTXCache {
     } | undefined;
 }
 
-interface Pos {
-    x: number;
-    y: number;
-}
-
 class ContextMenu implements CTXMenuSingleton {
     private static instance: ContextMenu;
     private menu: HTMLUListElement | undefined;
     private cache: CTXCache = {};
-    private hdir: "r" | "l" = "r";
-    private vdir: "u" | "d" = "d";
     /** 
      * used to track if wheel events originated from the ctx menu.
      * in that case we don't want to close the menu. (#28)
@@ -137,9 +131,7 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     public hide(menu: Element | undefined = this.menu) {
-        //reset directions
-        this.hdir = "r";
-        this.vdir = "d";
+        resetDirections();
 
         if (menu) {
             if (menu === this.menu) {
@@ -182,36 +174,9 @@ class ContextMenu implements CTXMenuSingleton {
         });
         container.className = "ctxmenu";
 
-        const rect = getBounding(container);
-        let pos = { x: 0, y: 0 };
-        if (parentOrEvent instanceof Element) {
-            const { left, width, top } = parentOrEvent.getBoundingClientRect();
-            pos = {
-                x: this.hdir === "r" ? left + width : left - rect.width,
-                y: top
-            };
-            if (/* is submenu */ parentOrEvent.className.includes("submenu")) {
-                pos.y += (this.vdir === "d" ? 4 : -12) // add 8px vertical submenu offset: -4px means no vertical movement with default styles
-            }
-            const savePos = this.getPosition(rect, pos);
-            // change direction when reaching edge of screen
-            if (pos.x !== savePos.x) {
-                this.hdir = this.hdir === "r" ? "l" : "r";
-                pos.x = this.hdir === "r" ? left + width : left - rect.width;
-            }
-            if (pos.y !== savePos.y) {
-                this.vdir = this.vdir === "u" ? "d" : "u";
-                pos.y = savePos.y
-            }
-            /* on very tiny screens, the submenu may overlap the parent menu,
-             * so we recalculate the position again, but without adding the offset again */
-            pos = this.getPosition(rect, pos, false);
-        } else {
-            pos = this.getPosition(rect, { x: parentOrEvent.clientX, y: parentOrEvent.clientY });
-        }
-
-        container.style.left = pos.x + "px";
-        container.style.top = pos.y + "px";
+        const { x, y } = getPos(container, parentOrEvent);
+        container.style.left = x + "px";
+        container.style.top = y + "px";
         container.addEventListener("contextmenu", ev => {
             ev.stopPropagation();
             ev.preventDefault();
@@ -234,35 +199,6 @@ class ContextMenu implements CTXMenuSingleton {
         listElement.appendChild(this.generateDOM(ctxMenu, listElement));
     }
 
-    /** returns a save position inside the viewport, given the desired position */
-    private getPosition(rect: DOMRect, pos: Pos, addScrollOffset: boolean = true): Pos {
-        /* https://github.com/nkappler/ctxmenu/issues/31
-         * When body has a transform applied, `position: fixed` behaves differently.
-         * We can fix it by adding the scroll offset of the window to the viewport dimensions
-         * and to the desired position */
-        const html = document.documentElement;
-        const width = html.clientWidth;
-        const height = html.clientHeight;
-        const hasTransform = document.body.style.transform !== "";
-        const minX = hasTransform ? window.scrollX : 0;
-        const minY = hasTransform ? window.scrollY : 0;
-        const maxX = hasTransform ? width + window.scrollX : width;
-        const maxY = hasTransform ? height + window.scrollY : height;
-        if (hasTransform && addScrollOffset) {
-            pos.x += window.scrollX;
-            pos.y += window.scrollY;
-        }
-
-        return {
-            x: this.hdir === "r"
-                ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x
-                : pos.x < minX ? minX : pos.x,
-            y: this.vdir === "d"
-                ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y
-                : pos.y < minY ? minY : pos.y
-        };
-    }
-
     private static addStylesToDom() {
         let append = () => {
             if (document.readyState === "loading") {
@@ -281,4 +217,3 @@ class ContextMenu implements CTXMenuSingleton {
 
 export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
 export * from "./interfaces";
-
