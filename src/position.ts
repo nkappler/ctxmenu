@@ -83,7 +83,16 @@ export function getUnmountedBoundingRect(elem: HTMLElement): Rect {
 
 export function getBoundingRect(elem: HTMLElement): Rect {
     const { offsetLeft: x, offsetTop: y, offsetHeight: height, offsetWidth: width } = elem;
-    console.log({ x, y, width, height })
+    if (elem.offsetParent instanceof HTMLElement) {
+        // This isn't too bad for performance, but it would be nice if we could get rid of the recursiveness
+        const parent = getBoundingRect(elem.offsetParent);
+        return {
+            x: x + parent.x,
+            y: y + parent.y,
+            width: width,
+            height: height
+        }
+    }
     return {
         x,
         y,
