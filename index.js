@@ -51,15 +51,6 @@ function onHoverDebounced(target, action) {
     }));
 }
 
-function getBounding(elem) {
-    var container = elem.cloneNode(true);
-    container.style.visibility = "hidden";
-    document.body.appendChild(container);
-    var result = container.getBoundingClientRect();
-    document.body.removeChild(container);
-    return result;
-}
-
 function isDisabled(item) {
     return getProp(item.disabled) || itemIsSubMenu(item) && 0 === item.subMenu.length;
 }
@@ -111,14 +102,111 @@ function generateBaseItemContent(item, li) {
     }
 }
 
+var hdir = "r";
+
+var vdir = "d";
+
+function resetDirections() {
+    hdir = "r";
+    vdir = "d";
+}
+
+function setPosition(container, parentOrEvent) {
+    var rect = getUnmountedBoundingRect(container);
+    rect.width = Math.trunc(rect.width) + 1;
+    container.style.width = rect.width + "px";
+    rect.height = Math.trunc(rect.height) + 1;
+    container.style.height = rect.height + "px";
+    var pos = {
+        x: 0,
+        y: 0
+    };
+    if (parentOrEvent instanceof Element) {
+        var _a = getBoundingRect(parentOrEvent), x = _a.x, width = _a.width, y = _a.y;
+        pos = {
+            x: "r" === hdir ? x + width : x - rect.width,
+            y: y
+        };
+        if (parentOrEvent.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
+        var savePos = getPosition(rect, pos);
+        if (pos.x !== savePos.x) {
+            hdir = "r" === hdir ? "l" : "r";
+            pos.x = "r" === hdir ? x + width : x - rect.width;
+        }
+        if (pos.y !== savePos.y) {
+            vdir = "u" === vdir ? "d" : "u";
+            pos.y = savePos.y;
+        }
+        pos = getPosition(rect, pos);
+    } else {
+        var scale = getScale();
+        var body = document.body.getBoundingClientRect();
+        pos = getPosition(rect, {
+            x: (parentOrEvent.clientX - body.x) / scale.x,
+            y: (parentOrEvent.clientY - body.y) / scale.y
+        });
+    }
+    container.style.left = pos.x + "px";
+    container.style.top = pos.y + "px";
+}
+
+function getPosition(rect, pos) {
+    var _a = window.visualViewport, width = _a.width, height = _a.height, pageLeft = _a.pageLeft, pageTop = _a.pageTop;
+    var _b = document.body.getBoundingClientRect(), left = _b.left, top = _b.top;
+    var scale = getScale();
+    var minX = (pageLeft - left) / scale.x;
+    var minY = (pageTop - top) / scale.y;
+    var maxX = (width - left) / scale.x;
+    var maxY = (height - top) / scale.y;
+    return {
+        x: "r" === hdir ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
+        y: "d" === vdir ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
+    };
+}
+
+function getUnmountedBoundingRect(elem) {
+    var container = elem.cloneNode(true);
+    container.style.visibility = "hidden";
+    document.body.appendChild(container);
+    var result = getBoundingRect(container);
+    document.body.removeChild(container);
+    return result;
+}
+
+function getBoundingRect(elem) {
+    var x = elem.offsetLeft, y = elem.offsetTop, height = elem.offsetHeight, width = elem.offsetWidth;
+    if (elem.offsetParent instanceof HTMLElement) {
+        var parent_1 = getBoundingRect(elem.offsetParent);
+        return {
+            x: x + parent_1.x,
+            y: y + parent_1.y,
+            width: width,
+            height: height
+        };
+    }
+    return {
+        x: x,
+        y: y,
+        width: width,
+        height: height
+    };
+}
+
+function getScale() {
+    var body = document.body.getBoundingClientRect();
+    var viewport = window.visualViewport;
+    return {
+        x: body.width / viewport.width,
+        y: body.height / viewport.height
+    };
+}
+
 var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li.heading{font-weight:bold;margin-left:-5px}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, .1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
 
 /*! ctxMenu v1.4.5 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/ var ContextMenu = function() {
     function ContextMenu() {
         var _this = this;
         this.cache = {};
-        this.hdir = "r";
-        this.vdir = "d";
         this.preventCloseOnScroll = false;
         window.addEventListener("click", (function(ev) {
             var item = ev.target instanceof Element && ev.target.parentElement;
@@ -219,8 +307,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
     ContextMenu.prototype.hide = function(menu) {
         var _a;
         if (void 0 === menu) menu = this.menu;
-        this.hdir = "r";
-        this.vdir = "d";
+        resetDirections();
         if (menu) {
             if (menu === this.menu) delete this.menu;
             null === (_a = menu.parentElement) || void 0 === _a ? void 0 : _a.removeChild(menu);
@@ -246,34 +333,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
             container.appendChild(li);
         }));
         container.className = "ctxmenu";
-        var rect = getBounding(container);
-        var pos = {
-            x: 0,
-            y: 0
-        };
-        if (parentOrEvent instanceof Element) {
-            var _a = parentOrEvent.getBoundingClientRect(), left = _a.left, width = _a.width, top_1 = _a.top;
-            pos = {
-                x: "r" === this.hdir ? left + width : left - rect.width,
-                y: top_1
-            };
-            if (parentOrEvent.className.includes("submenu")) pos.y += "d" === this.vdir ? 4 : -12;
-            var savePos = this.getPosition(rect, pos);
-            if (pos.x !== savePos.x) {
-                this.hdir = "r" === this.hdir ? "l" : "r";
-                pos.x = "r" === this.hdir ? left + width : left - rect.width;
-            }
-            if (pos.y !== savePos.y) {
-                this.vdir = "u" === this.vdir ? "d" : "u";
-                pos.y = savePos.y;
-            }
-            pos = this.getPosition(rect, pos, false);
-        } else pos = this.getPosition(rect, {
-            x: parentOrEvent.clientX,
-            y: parentOrEvent.clientY
-        });
-        container.style.left = pos.x + "px";
-        container.style.top = pos.y + "px";
+        setPosition(container, parentOrEvent);
         container.addEventListener("contextmenu", (function(ev) {
             ev.stopPropagation();
             ev.preventDefault();
@@ -289,25 +349,6 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
         var subMenu = null === (_a = listElement.parentElement) || void 0 === _a ? void 0 : _a.querySelector("li > ul");
         if (subMenu && subMenu.parentElement !== listElement) this.hide(subMenu);
         listElement.appendChild(this.generateDOM(ctxMenu, listElement));
-    };
-    ContextMenu.prototype.getPosition = function(rect, pos, addScrollOffset) {
-        if (void 0 === addScrollOffset) addScrollOffset = true;
-        var html = document.documentElement;
-        var width = html.clientWidth;
-        var height = html.clientHeight;
-        var hasTransform = "" !== document.body.style.transform;
-        var minX = hasTransform ? window.scrollX : 0;
-        var minY = hasTransform ? window.scrollY : 0;
-        var maxX = hasTransform ? width + window.scrollX : width;
-        var maxY = hasTransform ? height + window.scrollY : height;
-        if (hasTransform && addScrollOffset) {
-            pos.x += window.scrollX;
-            pos.y += window.scrollY;
-        }
-        return {
-            x: "r" === this.hdir ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
-            y: "d" === this.vdir ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
-        };
     };
     ContextMenu.addStylesToDom = function() {
         var append = function() {
