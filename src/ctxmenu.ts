@@ -2,7 +2,7 @@
 
 import { generateMenuItem, isDisabled, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
-import { getPos, resetDirections } from "./position";
+import { resetDirections, setPosition } from "./position";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
 import { getProp, itemIsInteractive, itemIsSubMenu } from "./typeguards";
@@ -21,7 +21,7 @@ class ContextMenu implements CTXMenuSingleton {
     private static instance: ContextMenu;
     private menu: HTMLUListElement | undefined;
     private cache: CTXCache = {};
-    /** 
+    /**
      * used to track if wheel events originated from the ctx menu.
      * in that case we don't want to close the menu. (#28)
      */
@@ -173,10 +173,8 @@ class ContextMenu implements CTXMenuSingleton {
             container.appendChild(li);
         });
         container.className = "ctxmenu";
+        setPosition(container, parentOrEvent);
 
-        const { x, y } = getPos(container, parentOrEvent);
-        container.style.left = x + "px";
-        container.style.top = y + "px";
         container.addEventListener("contextmenu", ev => {
             ev.stopPropagation();
             ev.preventDefault();

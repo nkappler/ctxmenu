@@ -1,4 +1,4 @@
-export type Rect = {
+type Rect = {
     x: number,
     y: number,
     width: number,
@@ -13,8 +13,20 @@ interface Pos {
 let hdir: "r" | "l" = "r";
 let vdir: "u" | "d" = "d";
 
-export function getPos(container: HTMLUListElement, parentOrEvent: HTMLElement | MouseEvent): Pos {
+export function resetDirections() {
+    hdir = "r";
+    vdir = "d";
+};
+
+export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElement | MouseEvent): void {
     const rect = getUnmountedBoundingRect(container);
+
+    // round up to full integer width/height for pixel perfect rendering
+    rect.width = Math.trunc(rect.width) + 1;
+    container.style.width = rect.width + "px";
+    rect.height = Math.trunc(rect.height) + 1;
+    container.style.height = rect.height + "px";
+
     let pos = { x: 0, y: 0 };
     if (parentOrEvent instanceof Element) {
         const { x, width, y } = getBoundingRect(parentOrEvent);
@@ -36,31 +48,30 @@ export function getPos(container: HTMLUListElement, parentOrEvent: HTMLElement |
             pos.y = savePos.y
         }
         /* on very tiny screens, the submenu may overlap the parent menu,
-         * so we recalculate the position again, but without adding the offset again */
-        return getPosition(rect, pos, false);
+         * so we recalculate the position again*/
+        pos = getPosition(rect, pos);
     } else {
-        return getPosition(rect, { x: parentOrEvent.clientX, y: parentOrEvent.clientY });
+        const scale = getScale();
+        const body = document.body.getBoundingClientRect();
+        pos = getPosition(rect, {
+            x: (parentOrEvent.clientX - body.x) / scale.x,
+            y: (parentOrEvent.clientY - body.y) / scale.y
+        });
     }
+
+    container.style.left = pos.x + "px";
+    container.style.top = pos.y + "px";
 }
 
 /** returns a save position inside the viewport, given the desired position */
-export function getPosition(rect: Rect, pos: Pos, addScrollOffset: boolean = true): Pos {
-    /* https://github.com/nkappler/ctxmenu/issues/31
-     * When body has a transform applied, `position: fixed` behaves differently.
-     * We can fix it by adding the scroll offset of the window to the viewport dimensions
-     * and to the desired position */
-    const html = document.documentElement;
-    const width = html.clientWidth;
-    const height = html.clientHeight;
-    const hasTransform = document.body.style.transform !== "";
-    const minX = hasTransform ? window.scrollX : 0;
-    const minY = hasTransform ? window.scrollY : 0;
-    const maxX = hasTransform ? width + window.scrollX : width;
-    const maxY = hasTransform ? height + window.scrollY : height;
-    if (hasTransform && addScrollOffset) {
-        pos.x += window.scrollX;
-        pos.y += window.scrollY;
-    }
+function getPosition(rect: Rect, pos: Pos): Pos {
+    const { width, height, pageLeft, pageTop } = window.visualViewport;
+    const { left, top } = document.body.getBoundingClientRect();
+    const scale = getScale();
+    const minX = (pageLeft - left) / scale.x;
+    const minY = (pageTop - top) / scale.y;
+    const maxX = (width - left) / scale.x;
+    const maxY = (height - top) / scale.y;
 
     return {
         x: hdir === "r"
@@ -72,7 +83,7 @@ export function getPosition(rect: Rect, pos: Pos, addScrollOffset: boolean = tru
     };
 }
 
-export function getUnmountedBoundingRect(elem: HTMLElement): Rect {
+function getUnmountedBoundingRect(elem: HTMLElement): Rect {
     const container = elem.cloneNode(true) as HTMLElement;
     container.style.visibility = "hidden";
     document.body.appendChild(container);
@@ -81,7 +92,7 @@ export function getUnmountedBoundingRect(elem: HTMLElement): Rect {
     return result;
 }
 
-export function getBoundingRect(elem: HTMLElement): Rect {
+function getBoundingRect(elem: HTMLElement): Rect {
     const { offsetLeft: x, offsetTop: y, offsetHeight: height, offsetWidth: width } = elem;
     if (elem.offsetParent instanceof HTMLElement) {
         // This isn't too bad for performance, but it would be nice if we could get rid of the recursiveness
@@ -101,7 +112,11 @@ export function getBoundingRect(elem: HTMLElement): Rect {
     };
 }
 
-export function resetDirections() {
-    hdir = "r";
-    vdir = "d";
-};
+function getScale(): Pos {
+    const body = document.body.getBoundingClientRect();
+    const viewport = window.visualViewport;
+    return {
+        x: body.width / viewport.width,
+        y: body.height / viewport.height
+    };
+}
