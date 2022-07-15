@@ -17,6 +17,14 @@ export function resetDirections() {
 };
 
 export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElement | MouseEvent): void {
+    // restrict menu size to viewport size
+    const scale = getScale();
+    const { width, height } = window.visualViewport;
+    Object.assign(container.style, {
+        maxHeight: (height / scale.y) + "px",
+        maxWidth: (width / scale.x) + "px",
+    });
+
     const rect = getUnmountedBoundingRect(container);
 
     // round up to full integer width/height for pixel perfect rendering
@@ -47,8 +55,8 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
          * so we recalculate the position again*/
         pos = getPosition(rect, pos);
     } else {
-        const scale = getScale();
-        const body = document.body.getBoundingClientRect();
+        const hasTransform = document.body.style.transform !== "";
+        const body: Point = hasTransform ? document.body.getBoundingClientRect() : { x: 0, y: 0 };
         pos = getPosition(rect, {
             x: (parentOrEvent.clientX - body.x) / scale.x,
             y: (parentOrEvent.clientY - body.y) / scale.y
@@ -66,11 +74,12 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
 
 /** returns a safe position inside the viewport, given the desired position */
 function getPosition(rect: Rect, pos: Point): Point {
-    const { width, height, pageLeft, pageTop } = window.visualViewport;
-    const { left, top } = document.body.getBoundingClientRect();
+    const { width, height } = window.visualViewport;
+    const hasTransform = document.body.style.transform !== "";
+    const { left, top } = hasTransform ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
     const scale = getScale();
-    const minX = (pageLeft - left) / scale.x;
-    const minY = (pageTop - top) / scale.y;
+    const minX = -left / scale.x;
+    const minY = -top / scale.y;
     const maxX = (width - left) / scale.x;
     const maxY = (height - top) / scale.y;
 

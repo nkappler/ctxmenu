@@ -112,6 +112,12 @@ function resetDirections() {
 }
 
 function setPosition(container, parentOrEvent) {
+    var scale = getScale();
+    var _a = window.visualViewport, width = _a.width, height = _a.height;
+    Object.assign(container.style, {
+        maxHeight: height / scale.y + "px",
+        maxWidth: width / scale.x + "px"
+    });
     var rect = getUnmountedBoundingRect(container);
     rect.width = Math.trunc(rect.width) + 1;
     rect.height = Math.trunc(rect.height) + 1;
@@ -120,16 +126,16 @@ function setPosition(container, parentOrEvent) {
         y: 0
     };
     if (parentOrEvent instanceof Element) {
-        var _a = getBoundingRect(parentOrEvent), x = _a.x, width = _a.width, y = _a.y;
+        var _b = getBoundingRect(parentOrEvent), x = _b.x, width_1 = _b.width, y = _b.y;
         pos = {
-            x: "r" === hdir ? x + width : x - rect.width,
+            x: "r" === hdir ? x + width_1 : x - rect.width,
             y: y
         };
         if (parentOrEvent.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
         var safePos = getPosition(rect, pos);
         if (pos.x !== safePos.x) {
             hdir = "r" === hdir ? "l" : "r";
-            pos.x = "r" === hdir ? x + width : x - rect.width;
+            pos.x = "r" === hdir ? x + width_1 : x - rect.width;
         }
         if (pos.y !== safePos.y) {
             vdir = "u" === vdir ? "d" : "u";
@@ -137,8 +143,11 @@ function setPosition(container, parentOrEvent) {
         }
         pos = getPosition(rect, pos);
     } else {
-        var scale = getScale();
-        var body = document.body.getBoundingClientRect();
+        var hasTransform = "" !== document.body.style.transform;
+        var body = hasTransform ? document.body.getBoundingClientRect() : {
+            x: 0,
+            y: 0
+        };
         pos = getPosition(rect, {
             x: (parentOrEvent.clientX - body.x) / scale.x,
             y: (parentOrEvent.clientY - body.y) / scale.y
@@ -153,11 +162,15 @@ function setPosition(container, parentOrEvent) {
 }
 
 function getPosition(rect, pos) {
-    var _a = window.visualViewport, width = _a.width, height = _a.height, pageLeft = _a.pageLeft, pageTop = _a.pageTop;
-    var _b = document.body.getBoundingClientRect(), left = _b.left, top = _b.top;
+    var _a = window.visualViewport, width = _a.width, height = _a.height;
+    var hasTransform = "" !== document.body.style.transform;
+    var _b = hasTransform ? document.body.getBoundingClientRect() : {
+        left: 0,
+        top: 0
+    }, left = _b.left, top = _b.top;
     var scale = getScale();
-    var minX = (pageLeft - left) / scale.x;
-    var minY = (pageTop - top) / scale.y;
+    var minX = -left / scale.x;
+    var minY = -top / scale.y;
     var maxX = (width - left) / scale.x;
     var maxY = (height - top) / scale.y;
     return {
