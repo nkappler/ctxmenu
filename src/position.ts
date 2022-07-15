@@ -114,10 +114,10 @@ function getBoundingRect(elem: HTMLElement): Rect {
 }
 
 function getScale(): Point {
-    const body = document.body.getBoundingClientRect();
-    const viewport = window.visualViewport;
+    const body = document.body;
+    const rect = body.getBoundingClientRect();
     return {
-        x: body.width / viewport.width,
-        y: body.height / viewport.height
+        x: rect.width / body.offsetWidth,
+        y: rect.height / body.offsetHeight
     };
 }

@@ -195,11 +195,11 @@ function getBoundingRect(elem) {
 }
 
 function getScale() {
-    var body = document.body.getBoundingClientRect();
-    var viewport = window.visualViewport;
+    var body = document.body;
+    var rect = body.getBoundingClientRect();
     return {
-        x: body.width / viewport.width,
-        y: body.height / viewport.height
+        x: rect.width / body.offsetWidth,
+        y: rect.height / body.offsetHeight
     };
 }
 
