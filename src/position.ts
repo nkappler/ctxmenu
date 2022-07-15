@@ -1,14 +1,12 @@
-type Rect = {
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-};
-
-interface Pos {
+interface Point {
     x: number;
     y: number;
 }
+
+interface Rect extends Point {
+    width: number,
+    height: number,
+};
 
 let hdir: "r" | "l" = "r";
 let vdir: "u" | "d" = "d";
@@ -64,7 +62,7 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
 }
 
 /** returns a safe position inside the viewport, given the desired position */
-function getPosition(rect: Rect, pos: Pos): Pos {
+function getPosition(rect: Rect, pos: Point): Point {
     const { width, height, pageLeft, pageTop } = window.visualViewport;
     const { left, top } = document.body.getBoundingClientRect();
     const scale = getScale();
@@ -112,7 +110,7 @@ function getBoundingRect(elem: HTMLElement): Rect {
     };
 }
 
-function getScale(): Pos {
+function getScale(): Point {
     const body = document.body.getBoundingClientRect();
     const viewport = window.visualViewport;
     return {
