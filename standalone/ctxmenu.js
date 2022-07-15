@@ -109,14 +109,14 @@
                 y: y
             };
             if (parentOrEvent.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
-            var savePos = getPosition(rect, pos);
-            if (pos.x !== savePos.x) {
+            var safePos = getPosition(rect, pos);
+            if (pos.x !== safePos.x) {
                 hdir = "r" === hdir ? "l" : "r";
                 pos.x = "r" === hdir ? x + width : x - rect.width;
             }
-            if (pos.y !== savePos.y) {
+            if (pos.y !== safePos.y) {
                 vdir = "u" === vdir ? "d" : "u";
-                pos.y = savePos.y;
+                pos.y = safePos.y;
             }
             pos = getPosition(rect, pos);
         } else {

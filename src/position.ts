@@ -37,15 +37,15 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
         if (/* is submenu */ parentOrEvent.className.includes("submenu")) {
             pos.y += (vdir === "d" ? 4 : -12) // add 8px vertical submenu offset: -4px means no vertical movement with default styles
         }
-        const savePos = getPosition(rect, pos);
+        const safePos = getPosition(rect, pos);
         // change direction when reaching edge of screen
-        if (pos.x !== savePos.x) {
+        if (pos.x !== safePos.x) {
             hdir = hdir === "r" ? "l" : "r";
             pos.x = hdir === "r" ? x + width : x - rect.width;
         }
-        if (pos.y !== savePos.y) {
+        if (pos.y !== safePos.y) {
             vdir = vdir === "u" ? "d" : "u";
-            pos.y = savePos.y
+            pos.y = safePos.y
         }
         /* on very tiny screens, the submenu may overlap the parent menu,
          * so we recalculate the position again*/
@@ -63,7 +63,7 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
     container.style.top = pos.y + "px";
 }
 
-/** returns a save position inside the viewport, given the desired position */
+/** returns a safe position inside the viewport, given the desired position */
 function getPosition(rect: Rect, pos: Pos): Pos {
     const { width, height, pageLeft, pageTop } = window.visualViewport;
     const { left, top } = document.body.getBoundingClientRect();
