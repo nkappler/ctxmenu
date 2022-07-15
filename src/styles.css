@@ -4,7 +4,6 @@ html {
 
 .ctxmenu {
     position: fixed;
-    max-height: 100vh;
     border: 1px solid #999;
     padding: 2px 0;
     box-shadow: #aaa 3px 3px 3px;
@@ -13,6 +12,7 @@ html {
     z-index: 9999;
     overflow-y: auto;
     font: 15px Verdana, sans-serif;
+    box-sizing: border-box;
 }
 
 .ctxmenu li {
