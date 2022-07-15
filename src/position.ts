@@ -21,9 +21,7 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
 
     // round up to full integer width/height for pixel perfect rendering
     rect.width = Math.trunc(rect.width) + 1;
-    container.style.width = rect.width + "px";
     rect.height = Math.trunc(rect.height) + 1;
-    container.style.height = rect.height + "px";
 
     let pos = { x: 0, y: 0 };
     if (parentOrEvent instanceof Element) {
@@ -45,7 +43,7 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
             vdir = vdir === "u" ? "d" : "u";
             pos.y = safePos.y
         }
-        /* on very tiny screens, the submenu may overlap the parent menu,
+        /* on very tiny screens, the submenu may need to overlap the parent menu,
          * so we recalculate the position again*/
         pos = getPosition(rect, pos);
     } else {
@@ -59,6 +57,8 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
 
     container.style.left = pos.x + "px";
     container.style.top = pos.y + "px";
+    container.style.width = rect.width + "px";
+    container.style.height = rect.height + "px";
 }
 
 /** returns a safe position inside the viewport, given the desired position */

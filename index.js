@@ -114,9 +114,7 @@ function resetDirections() {
 function setPosition(container, parentOrEvent) {
     var rect = getUnmountedBoundingRect(container);
     rect.width = Math.trunc(rect.width) + 1;
-    container.style.width = rect.width + "px";
     rect.height = Math.trunc(rect.height) + 1;
-    container.style.height = rect.height + "px";
     var pos = {
         x: 0,
         y: 0
@@ -148,6 +146,8 @@ function setPosition(container, parentOrEvent) {
     }
     container.style.left = pos.x + "px";
     container.style.top = pos.y + "px";
+    container.style.width = rect.width + "px";
+    container.style.height = rect.height + "px";
 }
 
 function getPosition(rect, pos) {
