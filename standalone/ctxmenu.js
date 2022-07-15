@@ -125,10 +125,12 @@
                 y: (parentOrEvent.clientY - body.y) / scale.y
             });
         }
-        container.style.left = pos.x + "px";
-        container.style.top = pos.y + "px";
-        container.style.width = rect.width + "px";
-        container.style.height = rect.height + "px";
+        Object.assign(container.style, {
+            left: pos.x + "px",
+            top: pos.y + "px",
+            width: rect.width + "px",
+            height: rect.height + "px"
+        });
     }
     function getPosition(rect, pos) {
         var _a = window.visualViewport, width = _a.width, height = _a.height, pageLeft = _a.pageLeft, pageTop = _a.pageTop;

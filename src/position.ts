@@ -55,10 +55,13 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
         });
     }
 
-    container.style.left = pos.x + "px";
-    container.style.top = pos.y + "px";
-    container.style.width = rect.width + "px";
-    container.style.height = rect.height + "px";
+    Object.assign(container.style, {
+        left: pos.x + "px",
+        top: pos.y + "px",
+        width: rect.width + "px",
+        height: rect.height + "px"
+    });
+
 }
 
 /** returns a safe position inside the viewport, given the desired position */
