@@ -1,4 +1,4 @@
-/*! ctxMenu v1.4.5 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.5.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 import { generateMenuItem, isDisabled, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
