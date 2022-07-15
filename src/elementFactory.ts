@@ -16,15 +16,6 @@ export function onHoverDebounced(target: HTMLLIElement, action: (e: MouseEvent) 
     target.addEventListener("mouseleave", () => clearTimeout(timeout));
 }
 
-export function getBounding(elem: HTMLElement): DOMRect {
-    const container = elem.cloneNode(true) as HTMLElement;
-    container.style.visibility = "hidden";
-    document.body.appendChild(container);
-    const result = container.getBoundingClientRect();
-    document.body.removeChild(container);
-    return result;
-}
-
 /** checks if an item is disabled
  * 
  *  will be true if disabled flag is set or it has an empty submenu

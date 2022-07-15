@@ -51,15 +51,6 @@ function onHoverDebounced(target, action) {
     }));
 }
 
-function getBounding(elem) {
-    var container = elem.cloneNode(true);
-    container.style.visibility = "hidden";
-    document.body.appendChild(container);
-    var result = container.getBoundingClientRect();
-    document.body.removeChild(container);
-    return result;
-}
-
 function isDisabled(item) {
     return getProp(item.disabled) || itemIsSubMenu(item) && 0 === item.subMenu.length;
 }
@@ -111,14 +102,126 @@ function generateBaseItemContent(item, li) {
     }
 }
 
-var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li.heading{font-weight:bold;margin-left:-5px}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, .1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
+var hdir = "r";
+
+var vdir = "d";
+
+function resetDirections() {
+    hdir = "r";
+    vdir = "d";
+}
+
+function setPosition(container, parentOrEvent) {
+    var scale = getScale();
+    var _a = window.visualViewport, width = _a.width, height = _a.height;
+    Object.assign(container.style, {
+        maxHeight: height / scale.y + "px",
+        maxWidth: width / scale.x + "px"
+    });
+    var rect = getUnmountedBoundingRect(container);
+    rect.width = Math.trunc(rect.width) + 1;
+    rect.height = Math.trunc(rect.height) + 1;
+    var pos = {
+        x: 0,
+        y: 0
+    };
+    if (parentOrEvent instanceof Element) {
+        var _b = getBoundingRect(parentOrEvent), x = _b.x, width_1 = _b.width, y = _b.y;
+        pos = {
+            x: "r" === hdir ? x + width_1 : x - rect.width,
+            y: y
+        };
+        if (parentOrEvent.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
+        var safePos = getPosition(rect, pos);
+        if (pos.x !== safePos.x) {
+            hdir = "r" === hdir ? "l" : "r";
+            pos.x = "r" === hdir ? x + width_1 : x - rect.width;
+        }
+        if (pos.y !== safePos.y) {
+            vdir = "u" === vdir ? "d" : "u";
+            pos.y = safePos.y;
+        }
+        pos = getPosition(rect, pos);
+    } else {
+        var hasTransform = "" !== document.body.style.transform;
+        var body = hasTransform ? document.body.getBoundingClientRect() : {
+            x: 0,
+            y: 0
+        };
+        pos = getPosition(rect, {
+            x: (parentOrEvent.clientX - body.x) / scale.x,
+            y: (parentOrEvent.clientY - body.y) / scale.y
+        });
+    }
+    Object.assign(container.style, {
+        left: pos.x + "px",
+        top: pos.y + "px",
+        width: rect.width + "px",
+        height: rect.height + "px"
+    });
+}
+
+function getPosition(rect, pos) {
+    var _a = window.visualViewport, width = _a.width, height = _a.height;
+    var hasTransform = "" !== document.body.style.transform;
+    var _b = hasTransform ? document.body.getBoundingClientRect() : {
+        left: 0,
+        top: 0
+    }, left = _b.left, top = _b.top;
+    var scale = getScale();
+    var minX = -left / scale.x;
+    var minY = -top / scale.y;
+    var maxX = (width - left) / scale.x;
+    var maxY = (height - top) / scale.y;
+    return {
+        x: "r" === hdir ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
+        y: "d" === vdir ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
+    };
+}
+
+function getUnmountedBoundingRect(elem) {
+    var container = elem.cloneNode(true);
+    container.style.visibility = "hidden";
+    document.body.appendChild(container);
+    var result = getBoundingRect(container);
+    document.body.removeChild(container);
+    return result;
+}
+
+function getBoundingRect(elem) {
+    var x = elem.offsetLeft, y = elem.offsetTop, height = elem.offsetHeight, width = elem.offsetWidth;
+    if (elem.offsetParent instanceof HTMLElement) {
+        var parent_1 = getBoundingRect(elem.offsetParent);
+        return {
+            x: x + parent_1.x,
+            y: y + parent_1.y,
+            width: width,
+            height: height
+        };
+    }
+    return {
+        x: x,
+        y: y,
+        width: width,
+        height: height
+    };
+}
+
+function getScale() {
+    var body = document.body;
+    var rect = body.getBoundingClientRect();
+    return {
+        x: rect.width / body.offsetWidth,
+        y: rect.height / body.offsetHeight
+    };
+}
+
+var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif;box-sizing:border-box}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li.heading{font-weight:bold;margin-left:-5px}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, .1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
 
 /*! ctxMenu v1.4.5 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/ var ContextMenu = function() {
     function ContextMenu() {
         var _this = this;
         this.cache = {};
-        this.hdir = "r";
-        this.vdir = "d";
         this.preventCloseOnScroll = false;
         window.addEventListener("click", (function(ev) {
             var item = ev.target instanceof Element && ev.target.parentElement;
@@ -219,8 +322,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
     ContextMenu.prototype.hide = function(menu) {
         var _a;
         if (void 0 === menu) menu = this.menu;
-        this.hdir = "r";
-        this.vdir = "d";
+        resetDirections();
         if (menu) {
             if (menu === this.menu) delete this.menu;
             null === (_a = menu.parentElement) || void 0 === _a ? void 0 : _a.removeChild(menu);
@@ -246,34 +348,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
             container.appendChild(li);
         }));
         container.className = "ctxmenu";
-        var rect = getBounding(container);
-        var pos = {
-            x: 0,
-            y: 0
-        };
-        if (parentOrEvent instanceof Element) {
-            var _a = parentOrEvent.getBoundingClientRect(), left = _a.left, width = _a.width, top_1 = _a.top;
-            pos = {
-                x: "r" === this.hdir ? left + width : left - rect.width,
-                y: top_1
-            };
-            if (parentOrEvent.className.includes("submenu")) pos.y += "d" === this.vdir ? 4 : -12;
-            var savePos = this.getPosition(rect, pos);
-            if (pos.x !== savePos.x) {
-                this.hdir = "r" === this.hdir ? "l" : "r";
-                pos.x = "r" === this.hdir ? left + width : left - rect.width;
-            }
-            if (pos.y !== savePos.y) {
-                this.vdir = "u" === this.vdir ? "d" : "u";
-                pos.y = savePos.y;
-            }
-            pos = this.getPosition(rect, pos, false);
-        } else pos = this.getPosition(rect, {
-            x: parentOrEvent.clientX,
-            y: parentOrEvent.clientY
-        });
-        container.style.left = pos.x + "px";
-        container.style.top = pos.y + "px";
+        setPosition(container, parentOrEvent);
         container.addEventListener("contextmenu", (function(ev) {
             ev.stopPropagation();
             ev.preventDefault();
@@ -289,25 +364,6 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;max-height:100vh;bord
         var subMenu = null === (_a = listElement.parentElement) || void 0 === _a ? void 0 : _a.querySelector("li > ul");
         if (subMenu && subMenu.parentElement !== listElement) this.hide(subMenu);
         listElement.appendChild(this.generateDOM(ctxMenu, listElement));
-    };
-    ContextMenu.prototype.getPosition = function(rect, pos, addScrollOffset) {
-        if (void 0 === addScrollOffset) addScrollOffset = true;
-        var html = document.documentElement;
-        var width = html.clientWidth;
-        var height = html.clientHeight;
-        var hasTransform = "" !== document.body.style.transform;
-        var minX = hasTransform ? window.scrollX : 0;
-        var minY = hasTransform ? window.scrollY : 0;
-        var maxX = hasTransform ? width + window.scrollX : width;
-        var maxY = hasTransform ? height + window.scrollY : height;
-        if (hasTransform && addScrollOffset) {
-            pos.x += window.scrollX;
-            pos.y += window.scrollY;
-        }
-        return {
-            x: "r" === this.hdir ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
-            y: "d" === this.vdir ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
-        };
     };
     ContextMenu.addStylesToDom = function() {
         var append = function() {
