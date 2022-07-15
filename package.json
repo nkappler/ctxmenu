@@ -7,7 +7,7 @@
   "scripts": {
     "test": "tsc test/demo.ts --outDir docs --removeComments",
     "prepublishOnly": "npm run version",
-    "postversion": "git push --tags",
+    "postversion": "git push --follow-tags",
     "version": "node util/copyrightHeader.js && npm run build && npm run test && git add *",
     "build": "node util/convertStyles.js && rollup -c"
   },
