@@ -74,8 +74,7 @@ function getPositionForElement(element: HTMLElement, rect: Rect): Point {
 }
 
 function getPositionForEvent(event: MouseEvent, rect: Rect, scale: Point): Point {
-    const hasTransform = document.body.style.transform !== "";
-    const body: Point = hasTransform ? document.body.getBoundingClientRect() : { x: 0, y: 0 };
+    const body: Point = hasTransform() ? document.body.getBoundingClientRect() : { x: 0, y: 0 };
     return getPosition(rect, {
         x: (event.clientX - body.x) / scale.x,
         y: (event.clientY - body.y) / scale.y
@@ -85,8 +84,7 @@ function getPositionForEvent(event: MouseEvent, rect: Rect, scale: Point): Point
 /** returns a safe position inside the viewport, given the desired position */
 function getPosition(rect: Rect, pos: Point): Point {
     const { width, height } = window.visualViewport;
-    const hasTransform = document.body.style.transform !== "";
-    const { left, top } = hasTransform ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
+    const { left, top } = hasTransform() ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
     const scale = getScale();
     const minX = -left / scale.x;
     const minY = -top / scale.y;
@@ -124,8 +122,7 @@ function getBoundingRect(elem: HTMLElement): Rect {
             height: height
         }
     }
-    const hasTransform = document.body.style.transform !== "";
-    const { left, top } = !hasTransform ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
+    const { left, top } = !hasTransform() ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
     return {
         x: x + left,
         y: y + top,
@@ -143,6 +140,9 @@ function getScale(): Point {
     };
 }
 
+function hasTransform() {
+    return getComputedStyle(document.body).transform !== "none";
+}
 
 function debug() {
     if (!(window as any).target) return;

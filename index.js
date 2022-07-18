@@ -154,8 +154,7 @@ function getPositionForElement(element, rect) {
 }
 
 function getPositionForEvent(event, rect, scale) {
-    var hasTransform = "" !== document.body.style.transform;
-    var body = hasTransform ? document.body.getBoundingClientRect() : {
+    var body = hasTransform() ? document.body.getBoundingClientRect() : {
         x: 0,
         y: 0
     };
@@ -167,8 +166,7 @@ function getPositionForEvent(event, rect, scale) {
 
 function getPosition(rect, pos) {
     var _a = window.visualViewport, width = _a.width, height = _a.height;
-    var hasTransform = "" !== document.body.style.transform;
-    var _b = hasTransform ? document.body.getBoundingClientRect() : {
+    var _b = hasTransform() ? document.body.getBoundingClientRect() : {
         left: 0,
         top: 0
     }, left = _b.left, top = _b.top;
@@ -203,8 +201,7 @@ function getBoundingRect(elem) {
             height: height
         };
     }
-    var hasTransform = "" !== document.body.style.transform;
-    var _a = !hasTransform ? document.body.getBoundingClientRect() : {
+    var _a = !hasTransform() ? document.body.getBoundingClientRect() : {
         left: 0,
         top: 0
     }, left = _a.left, top = _a.top;
@@ -223,6 +220,10 @@ function getScale() {
         x: rect.width / body.offsetWidth,
         y: rect.height / body.offsetHeight
     };
+}
+
+function hasTransform() {
+    return "none" !== getComputedStyle(document.body).transform;
 }
 
 function debug() {
