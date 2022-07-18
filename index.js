@@ -125,39 +125,43 @@ function setPosition(container, parentOrEvent) {
         x: 0,
         y: 0
     };
-    if (parentOrEvent instanceof Element) {
-        var _b = getBoundingRect(parentOrEvent), x = _b.x, width_1 = _b.width, y = _b.y;
-        pos = {
-            x: "r" === hdir ? x + width_1 : x - rect.width,
-            y: y
-        };
-        if (parentOrEvent.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
-        var safePos = getPosition(rect, pos);
-        if (pos.x !== safePos.x) {
-            hdir = "r" === hdir ? "l" : "r";
-            pos.x = "r" === hdir ? x + width_1 : x - rect.width;
-        }
-        if (pos.y !== safePos.y) {
-            vdir = "u" === vdir ? "d" : "u";
-            pos.y = safePos.y;
-        }
-        pos = getPosition(rect, pos);
-    } else {
-        var hasTransform = "" !== document.body.style.transform;
-        var body = hasTransform ? document.body.getBoundingClientRect() : {
-            x: 0,
-            y: 0
-        };
-        pos = getPosition(rect, {
-            x: (parentOrEvent.clientX - body.x) / scale.x,
-            y: (parentOrEvent.clientY - body.y) / scale.y
-        });
-    }
+    if (parentOrEvent instanceof Element) pos = getPositionForElement(parentOrEvent, rect); else if (0 === parentOrEvent.detail && parentOrEvent.target instanceof HTMLElement) pos = getPositionForElement(parentOrEvent.target, rect); else pos = getPositionForEvent(parentOrEvent, rect, scale);
     Object.assign(container.style, {
         left: pos.x + "px",
         top: pos.y + "px",
         width: rect.width + "px",
         height: rect.height + "px"
+    });
+}
+
+function getPositionForElement(element, rect) {
+    var _a = getBoundingRect(element), x = _a.x, width = _a.width, y = _a.y;
+    var pos = {
+        x: "r" === hdir ? x + width : x - rect.width,
+        y: y
+    };
+    if (element.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
+    var safePos = getPosition(rect, pos);
+    if (pos.x !== safePos.x) {
+        hdir = "r" === hdir ? "l" : "r";
+        pos.x = "r" === hdir ? x + width : x - rect.width;
+    }
+    if (pos.y !== safePos.y) {
+        vdir = "u" === vdir ? "d" : "u";
+        pos.y = safePos.y;
+    }
+    return getPosition(rect, pos);
+}
+
+function getPositionForEvent(event, rect, scale) {
+    var hasTransform = "" !== document.body.style.transform;
+    var body = hasTransform ? document.body.getBoundingClientRect() : {
+        x: 0,
+        y: 0
+    };
+    return getPosition(rect, {
+        x: (event.clientX - body.x) / scale.x,
+        y: (event.clientY - body.y) / scale.y
     });
 }
 
@@ -199,9 +203,14 @@ function getBoundingRect(elem) {
             height: height
         };
     }
+    var hasTransform = "" !== document.body.style.transform;
+    var _a = !hasTransform ? document.body.getBoundingClientRect() : {
+        left: 0,
+        top: 0
+    }, left = _a.left, top = _a.top;
     return {
-        x: x,
-        y: y,
+        x: x + left,
+        y: y + top,
         width: width,
         height: height
     };
@@ -215,6 +224,28 @@ function getScale() {
         y: rect.height / body.offsetHeight
     };
 }
+
+function debug() {
+    var _a;
+    if (!window.target) return;
+    var rect = getBoundingRect(window.target);
+    var div = document.createElement("div");
+    null === (_a = document.querySelector("#outline")) || void 0 === _a ? void 0 : _a.remove();
+    div.id = "outline";
+    Object.assign(div.style, {
+        position: "fixed",
+        left: rect.x + "px",
+        top: rect.y + "px",
+        width: rect.width + "px",
+        height: rect.height + "px",
+        outline: "1px solid red"
+    });
+    document.body.append(div);
+}
+
+window.addEventListener("scroll", debug);
+
+window.addEventListener("resize", debug);
 
 var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999;padding:2px 0;box-shadow:#aaa 3px 3px 3px;background:#fff;margin:0;z-index:9999;overflow-y:auto;font:15px Verdana, sans-serif;box-sizing:border-box}.ctxmenu li{margin:1px 0;display:block;position:relative;user-select:none}.ctxmenu li.heading{font-weight:bold;margin-left:-5px}.ctxmenu li span{display:block;padding:2px 20px;cursor:default}.ctxmenu li a{color:inherit;text-decoration:none}.ctxmenu li.icon{padding-left:15px}.ctxmenu img.icon{position:absolute;width:18px;left:10px;top:2px}.ctxmenu li.disabled{color:#ccc}.ctxmenu li.divider{border-bottom:1px solid #aaa;margin:5px 0}.ctxmenu li.interactive:hover{background:rgba(0, 0, 0, .1)}.ctxmenu li.submenu::after{content:"";position:absolute;display:block;top:0;bottom:0;right:.4em;margin:auto .1rem auto auto;border-right:1px solid #000;border-top:1px solid #000;transform:rotate(45deg);width:.3rem;height:.3rem}.ctxmenu li.submenu.disabled::after{border-color:#ccc}';
 

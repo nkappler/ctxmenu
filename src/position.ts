@@ -33,34 +33,11 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
 
     let pos = { x: 0, y: 0 };
     if (parentOrEvent instanceof Element) {
-        const { x, width, y } = getBoundingRect(parentOrEvent);
-        pos = {
-            x: hdir === "r" ? x + width : x - rect.width,
-            y
-        };
-        if (/* is submenu */ parentOrEvent.className.includes("submenu")) {
-            pos.y += (vdir === "d" ? 4 : -12) // add 8px vertical submenu offset: -4px means no vertical movement with default styles
-        }
-        const safePos = getPosition(rect, pos);
-        // change direction when reaching edge of screen
-        if (pos.x !== safePos.x) {
-            hdir = hdir === "r" ? "l" : "r";
-            pos.x = hdir === "r" ? x + width : x - rect.width;
-        }
-        if (pos.y !== safePos.y) {
-            vdir = vdir === "u" ? "d" : "u";
-            pos.y = safePos.y
-        }
-        /* on very tiny screens, the submenu may need to overlap the parent menu,
-         * so we recalculate the position again*/
-        pos = getPosition(rect, pos);
+        pos = getPositionForElement(parentOrEvent, rect);
+    } else if (parentOrEvent.detail === 0 && parentOrEvent.target instanceof HTMLElement) {
+        pos = getPositionForElement(parentOrEvent.target, rect);
     } else {
-        const hasTransform = document.body.style.transform !== "";
-        const body: Point = hasTransform ? document.body.getBoundingClientRect() : { x: 0, y: 0 };
-        pos = getPosition(rect, {
-            x: (parentOrEvent.clientX - body.x) / scale.x,
-            y: (parentOrEvent.clientY - body.y) / scale.y
-        });
+        pos = getPositionForEvent(parentOrEvent, rect, scale);
     }
 
     Object.assign(container.style, {
@@ -70,6 +47,39 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
         height: rect.height + "px"
     });
 
+}
+
+function getPositionForElement(element: HTMLElement, rect: Rect): Point {
+    const { x, width, y } = getBoundingRect(element);
+    const pos = {
+        x: (hdir === "r" ? x + width : x - rect.width),
+        y
+    };
+    if (/* is submenu */ element.className.includes("submenu")) {
+        pos.y += (vdir === "d" ? 4 : -12) // add 8px vertical submenu offset: -4px means no vertical movement with default styles
+    }
+    const safePos = getPosition(rect, pos);
+    // change direction when reaching edge of screen
+    if (pos.x !== safePos.x) {
+        hdir = hdir === "r" ? "l" : "r";
+        pos.x = hdir === "r" ? x + width : x - rect.width;
+    }
+    if (pos.y !== safePos.y) {
+        vdir = vdir === "u" ? "d" : "u";
+        pos.y = safePos.y
+    }
+    /* on very tiny screens, the submenu may need to overlap the parent menu,
+     * so we recalculate the position again*/
+    return getPosition(rect, pos);
+}
+
+function getPositionForEvent(event: MouseEvent, rect: Rect, scale: Point): Point {
+    const hasTransform = document.body.style.transform !== "";
+    const body: Point = hasTransform ? document.body.getBoundingClientRect() : { x: 0, y: 0 };
+    return getPosition(rect, {
+        x: (event.clientX - body.x) / scale.x,
+        y: (event.clientY - body.y) / scale.y
+    });
 }
 
 /** returns a safe position inside the viewport, given the desired position */
@@ -114,9 +124,11 @@ function getBoundingRect(elem: HTMLElement): Rect {
             height: height
         }
     }
+    const hasTransform = document.body.style.transform !== "";
+    const { left, top } = !hasTransform ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
     return {
-        x,
-        y,
+        x: x + left,
+        y: y + top,
         width,
         height
     };
@@ -130,3 +142,24 @@ function getScale(): Point {
         y: rect.height / body.offsetHeight
     };
 }
+
+
+function debug() {
+    if (!(window as any).target) return;
+    const rect = getBoundingRect((window as any).target);
+    const div = document.createElement("div");
+    document.querySelector("#outline")?.remove();
+    div.id = "outline";
+    Object.assign(div.style, {
+        position: "fixed",
+        left: rect.x + "px",
+        top: rect.y + "px",
+        width: rect.width + "px",
+        height: rect.height + "px",
+        outline: "1px solid red"
+    });
+    document.body.append(div);
+}
+
+window.addEventListener("scroll", debug);
+window.addEventListener("resize", debug);
