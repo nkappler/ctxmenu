@@ -209,8 +209,8 @@
             ctxmenu.show(menuExample, element);
         },
         toggleDarkMode: () => {
-            const darkCss = document.querySelector("#darkTheme");
-            const toggle = document.querySelector("#switch");
+            const darkCss = document.querySelector("#darkTheme")!;
+            const toggle = document.querySelector("#switch")!;
             if (darkCss) {
                 document.head.removeChild(darkCss);
                 toggle.innerHTML = "Fancy dark mode?";

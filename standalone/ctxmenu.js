@@ -7,6 +7,10 @@
         }
         return to.concat(ar || Array.prototype.slice.call(from));
     }
+    typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
+        var e = new Error(message);
+        return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+    };
     function getProp(prop) {
         return typeof prop === "function" ? prop() : prop;
     }

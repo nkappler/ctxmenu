@@ -1,4 +1,4 @@
-declare type ValueOrFunction<T> = T | (() => T);
+type ValueOrFunction<T> = T | (() => T);
 /** This is a Divider Menu Item */
 interface CTXMDivider {
     isDivider: true;
@@ -47,18 +47,18 @@ interface CTXMSubMenu extends CTXMInteractive {
     /** The menu definition for the nested menu */
     subMenu: ValueOrFunction<CTXMenu>;
 }
-declare type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
+type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
 /**
  * This is a Menu Definition. In fact, it's just an array of Context Menu Items
  */
-declare type CTXMenu = CTXMItem[];
+type CTXMenu = CTXMItem[];
 /**
  * A function that is called before the context menu is opened.
  * It is passed the menu definition and the MouseEvent.
  * Can be used to manipulate the menu based on the Event. (e.g. Cursor Position)
  * Needs to return a menu definition.
  */
-declare type BeforeRenderFN = (menu: CTXMenu, e: MouseEvent) => CTXMenu;
+type BeforeRenderFN = (menu: CTXMenu, e: MouseEvent) => CTXMenu;
 interface CTXMenuSingleton {
     /**
      * The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
