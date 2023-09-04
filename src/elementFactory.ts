@@ -17,11 +17,11 @@ export function onHoverDebounced(target: HTMLLIElement, action: (e: MouseEvent) 
 }
 
 /** checks if an item is disabled
- * 
+ *
  *  will be true if disabled flag is set or it has an empty submenu
  */
 export function isDisabled(item: CTXMInteractive) {
-    return getProp(item.disabled) || (itemIsSubMenu(item) && item.subMenu.length === 0);
+    return getProp(item.disabled) || (itemIsSubMenu(item) && typeof item.subMenu !== "function" && item.subMenu.length === 0);
 }
 
 export function generateMenuItem(item: CTXMItem) {

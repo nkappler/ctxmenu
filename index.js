@@ -4,15 +4,16 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-function __spreadArrays() {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++) for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, 
-    k++) r[k] = a[j];
-    return r;
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) if (ar || !(i in from)) {
+        if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+        ar[i] = from[i];
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
 }
 
 function getProp(prop) {
-    return "function" === typeof prop ? prop() : prop;
+    return typeof prop === "function" ? prop() : prop;
 }
 
 function itemIsInteractive(item) {
@@ -52,7 +53,7 @@ function onHoverDebounced(target, action) {
 }
 
 function isDisabled(item) {
-    return getProp(item.disabled) || itemIsSubMenu(item) && 0 === item.subMenu.length;
+    return getProp(item.disabled) || itemIsSubMenu(item) && typeof item.subMenu !== "function" && item.subMenu.length === 0;
 }
 
 function generateMenuItem(item) {
@@ -91,14 +92,14 @@ function generateMenuItem(item) {
 
 function generateBaseItemContent(item, li) {
     var html = getProp(item.html);
-    var text = "<span>" + getProp(item.text) + "</span>";
+    var text = "<span>".concat(getProp(item.text), "</span>");
     var elem = getProp(item.element);
     elem ? li.append(elem) : li.innerHTML = html ? html : text;
     li.title = getProp(item.tooltip) || "";
     if (item.style) li.setAttribute("style", getProp(item.style));
     if (item.icon) {
         li.classList.add("icon");
-        li.innerHTML += '<img class="icon" src="' + getProp(item.icon) + '" />';
+        li.innerHTML += '<img class="icon" src="'.concat(getProp(item.icon), '" />');
     }
 }
 
@@ -128,22 +129,22 @@ function setPosition(container, parentOrEvent) {
     if (parentOrEvent instanceof Element) {
         var _b = getBoundingRect(parentOrEvent), x = _b.x, width_1 = _b.width, y = _b.y;
         pos = {
-            x: "r" === hdir ? x + width_1 : x - rect.width,
+            x: hdir === "r" ? x + width_1 : x - rect.width,
             y: y
         };
-        if (parentOrEvent.className.includes("submenu")) pos.y += "d" === vdir ? 4 : -12;
+        if (parentOrEvent.className.includes("submenu")) pos.y += vdir === "d" ? 4 : -12;
         var safePos = getPosition(rect, pos);
         if (pos.x !== safePos.x) {
-            hdir = "r" === hdir ? "l" : "r";
-            pos.x = "r" === hdir ? x + width_1 : x - rect.width;
+            hdir = hdir === "r" ? "l" : "r";
+            pos.x = hdir === "r" ? x + width_1 : x - rect.width;
         }
         if (pos.y !== safePos.y) {
-            vdir = "u" === vdir ? "d" : "u";
+            vdir = vdir === "u" ? "d" : "u";
             pos.y = safePos.y;
         }
         pos = getPosition(rect, pos);
     } else {
-        var hasTransform = "" !== document.body.style.transform;
+        var hasTransform = document.body.style.transform !== "";
         var body = hasTransform ? document.body.getBoundingClientRect() : {
             x: 0,
             y: 0
@@ -163,7 +164,7 @@ function setPosition(container, parentOrEvent) {
 
 function getPosition(rect, pos) {
     var _a = window.visualViewport, width = _a.width, height = _a.height;
-    var hasTransform = "" !== document.body.style.transform;
+    var hasTransform = document.body.style.transform !== "";
     var _b = hasTransform ? document.body.getBoundingClientRect() : {
         left: 0,
         top: 0
@@ -174,8 +175,8 @@ function getPosition(rect, pos) {
     var maxX = (width - left) / scale.x;
     var maxY = (height - top) / scale.y;
     return {
-        x: "r" === hdir ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
-        y: "d" === vdir ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
+        x: hdir === "r" ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
+        y: vdir === "d" ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
     };
 }
 
@@ -225,7 +226,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         this.preventCloseOnScroll = false;
         window.addEventListener("click", (function(ev) {
             var item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && "interactive" === item.className) return;
+            if (item && item.className === "interactive") return;
             _this.hide();
         }));
         window.addEventListener("resize", (function() {
@@ -245,7 +246,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
             passive: true
         });
         window.addEventListener("keydown", (function(e) {
-            if ("Escape" === e.key) _this.hide();
+            if (e.key === "Escape") _this.hide();
         }));
         ContextMenu.addStylesToDom();
     }
@@ -262,20 +263,20 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.prototype.attach = function(target, ctxMenu, beforeRender) {
         var _this = this;
-        if (void 0 === beforeRender) beforeRender = function(m) {
+        if (beforeRender === void 0) beforeRender = function(m) {
             return m;
         };
         var t = document.querySelector(target);
-        if (void 0 !== this.cache[target]) {
-            console.error("target element " + target + " already has a context menu assigned. Use ContextMenu.update() intstead.");
+        if (this.cache[target] !== void 0) {
+            console.error("target element ".concat(target, " already has a context menu assigned. Use ContextMenu.update() intstead."));
             return;
         }
         if (!t) {
-            console.error("target element " + target + " not found");
+            console.error("target element ".concat(target, " not found"));
             return;
         }
         var handler = function(e) {
-            var newMenu = beforeRender(__spreadArrays(ctxMenu), e);
+            var newMenu = beforeRender(__spreadArray([], ctxMenu, true), e);
             _this.show(newMenu, e);
         };
         this.cache[target] = {
@@ -288,19 +289,19 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     ContextMenu.prototype.update = function(target, ctxMenu, beforeRender) {
         var o = this.cache[target];
         var t = document.querySelector(target);
-        o && (null === t || void 0 === t ? void 0 : t.removeEventListener("contextmenu", o.handler));
+        o && (t === null || t === void 0 ? void 0 : t.removeEventListener("contextmenu", o.handler));
         delete this.cache[target];
-        this.attach(target, ctxMenu || (null === o || void 0 === o ? void 0 : o.ctxMenu) || [], beforeRender || (null === o || void 0 === o ? void 0 : o.beforeRender));
+        this.attach(target, ctxMenu || (o === null || o === void 0 ? void 0 : o.ctxMenu) || [], beforeRender || (o === null || o === void 0 ? void 0 : o.beforeRender));
     };
     ContextMenu.prototype.delete = function(target) {
         var o = this.cache[target];
         if (!o) {
-            console.error("no context menu for target element " + target + " found");
+            console.error("no context menu for target element ".concat(target, " found"));
             return;
         }
         var t = document.querySelector(target);
         if (!t) {
-            console.error("target element " + target + " does not exist (anymore)");
+            console.error("target element ".concat(target, " does not exist (anymore)"));
             return;
         }
         t.removeEventListener("contextmenu", o.handler);
@@ -310,7 +311,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         var _this = this;
         if (eventOrElement instanceof MouseEvent) eventOrElement.stopImmediatePropagation();
         this.hide();
-        this.menu = this.generateDOM(__spreadArrays(ctxMenu), eventOrElement);
+        this.menu = this.generateDOM(__spreadArray([], ctxMenu, true), eventOrElement);
         document.body.appendChild(this.menu);
         this.menu.addEventListener("wheel", (function() {
             return _this.preventCloseOnScroll = true;
@@ -321,22 +322,22 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.prototype.hide = function(menu) {
         var _a;
-        if (void 0 === menu) menu = this.menu;
+        if (menu === void 0) menu = this.menu;
         resetDirections();
         if (menu) {
             if (menu === this.menu) delete this.menu;
-            null === (_a = menu.parentElement) || void 0 === _a ? void 0 : _a.removeChild(menu);
+            (_a = menu.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(menu);
         }
     };
     ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent) {
         var _this = this;
         var container = document.createElement("ul");
-        if (0 === ctxMenu.length) container.style.display = "none";
+        if (ctxMenu.length === 0) container.style.display = "none";
         ctxMenu.forEach((function(item) {
             var li = generateMenuItem(item);
             onHoverDebounced(li, (function() {
                 var _a;
-                var subMenu = null === (_a = li.parentElement) || void 0 === _a ? void 0 : _a.querySelector("ul");
+                var subMenu = (_a = li.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) _this.hide(subMenu);
             }));
             if (itemIsInteractive(item) && !isDisabled(item)) if (itemIsSubMenu(item)) onHoverDebounced(li, (function(ev) {
@@ -355,19 +356,19 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         }));
         container.addEventListener("click", (function(ev) {
             var item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && "interactive" !== item.className) ev.stopPropagation();
+            if (item && item.className !== "interactive") ev.stopPropagation();
         }));
         return container;
     };
     ContextMenu.prototype.openSubMenu = function(e, ctxMenu, listElement) {
         var _a;
-        var subMenu = null === (_a = listElement.parentElement) || void 0 === _a ? void 0 : _a.querySelector("li > ul");
+        var subMenu = (_a = listElement.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("li > ul");
         if (subMenu && subMenu.parentElement !== listElement) this.hide(subMenu);
         listElement.appendChild(this.generateDOM(ctxMenu, listElement));
     };
     ContextMenu.addStylesToDom = function() {
         var append = function() {
-            if ("loading" === document.readyState) return document.addEventListener("readystatechange", append);
+            if (document.readyState === "loading") return document.addEventListener("readystatechange", append);
             var style = document.createElement("style");
             style.innerHTML = styles;
             document.head.insertBefore(style, document.head.childNodes[0]);
