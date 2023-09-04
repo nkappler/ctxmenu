@@ -11,6 +11,7 @@
 [Menu Definition](#menu-definition)\
 [Item Types](#item-types) \
 [API](#api) \
+[Custom Events](#custom-events) \
 [Customize](#customize) \
 [Contributing](#contributing)
 
@@ -88,7 +89,8 @@ var menuDefinition = [
 
 ### Heading Item
 
-This is a heading item which displays a `text` and optionally shows a `tooltip` when hovering over it. If you need finer control over the content of the menu item, you can supply your own HTML string by using the `html` property instead of `text`. Alternatively you can also supply an HTMLElement JavaScript Object. For all properties you can supply the value directly or a factory function which will be called just before the menu is opened (i.e. on right click). You can also supply a URL or Data URL to an image used as icon for the menu item. Recommended resolution is 18×18px. 
+This is a heading item which displays a `text` and optionally shows a `tooltip` when hovering over it. If you need finer control over the content of the menu item, you can supply your own HTML string by using the `html` property instead of `text`. Alternatively you can also supply an HTMLElement JavaScript Object. For all properties you can supply the value directly or a factory function which will be called just before the menu is opened (i.e. on right click). You can also supply a URL or Data URL to an image used as icon for the menu item. Recommended resolution is 18×18px. \
+For more information about the `EventRegistry`, see [Custom Events](#custom-events).
 
 ```typescript
 {
@@ -98,6 +100,7 @@ This is a heading item which displays a `text` and optionally shows a `tooltip` 
     element?: HTMLElement | () => HTMLElement,
     icon?: string | () => string,
     style?: string | () => string,
+    events?: EventRegistry | () => EventRegistry,
 }
 ```
 
@@ -227,6 +230,32 @@ clickHandler(e: MouseEvent) {
 ctxmenu.hide()
 ```
 Hide any open context menu. 
+
+## Custom Events
+
+Every Menu Item has an optional `events` property:
+```typescript
+{
+    events?: EventRegistry | () => EventRegistry
+}
+```
+
+The `EventRegistry` is a map of event handlers. For each event you can either specify the event listener directly, or an object containing the `listener` and an optional `options` ([EventListenerOptions](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#syntax)) object:
+
+```typescript
+{
+    text: "Hover me!",
+    events: {
+        mouseenter: (e) => e.target.style.animation = "blinker 1s linear infinite",
+        mouseleave: {
+            listener: (e) => e.target.style.animation = "",
+            options: {
+                passive: true
+            }
+        }
+    }
+}
+```
 
 ## Customize
 
