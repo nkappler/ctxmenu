@@ -3,6 +3,13 @@ type ValueOrFunction<T> = T | (() => T);
 interface CTXMDivider {
     isDivider: true;
 }
+type CTXMItemEventListener<K extends keyof HTMLElementEventMap> = (this: HTMLLIElement, ev: HTMLElementEventMap[K]) => any;
+type CTXMItemEventRegistry = {
+    [K in keyof HTMLElementEventMap]?: CTXMItemEventListener<K> | {
+        listener: CTXMItemEventListener<K>;
+        options?: AddEventListenerOptions;
+    };
+};
 /**
  * This is a heading item which displays a text and optionally shows a tooltip when hovering over it.
  *
@@ -21,6 +28,8 @@ interface CTXMHeading {
     icon?: ValueOrFunction<string>;
     /** inline attribute appended to the `<li>` Element */
     style?: ValueOrFunction<string>;
+    /** A record of event listeners */
+    events?: ValueOrFunction<CTXMItemEventRegistry>;
 }
 interface CTXMInteractive extends CTXMHeading {
     /** Whether the Context Menu Item is disabled or not. Defaults to `false` */
@@ -101,8 +110,8 @@ interface CTXMenuSingleton {
     hide(): void;
 }
 
-/*! ctxMenu v1.5.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.6.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 declare const ctxmenu: CTXMenuSingleton;
 
-export { BeforeRenderFN, CTXMAction, CTXMAnchor, CTXMDivider, CTXMHeading, CTXMInteractive, CTXMItem, CTXMSubMenu, CTXMenu, CTXMenuSingleton, ValueOrFunction, ctxmenu };
+export { BeforeRenderFN, CTXMAction, CTXMAnchor, CTXMDivider, CTXMHeading, CTXMInteractive, CTXMItem, CTXMItemEventListener, CTXMItemEventRegistry, CTXMSubMenu, CTXMenu, CTXMenuSingleton, ValueOrFunction, ctxmenu };
