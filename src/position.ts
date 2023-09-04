@@ -19,7 +19,7 @@ export function resetDirections() {
 export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElement | MouseEvent): void {
     // restrict menu size to viewport size
     const scale = getScale();
-    const { width, height } = window.visualViewport;
+    const { width, height } = window.visualViewport!;
     Object.assign(container.style, {
         maxHeight: (height / scale.y) + "px",
         maxWidth: (width / scale.x) + "px",
@@ -74,7 +74,7 @@ export function setPosition(container: HTMLUListElement, parentOrEvent: HTMLElem
 
 /** returns a safe position inside the viewport, given the desired position */
 function getPosition(rect: Rect, pos: Point): Point {
-    const { width, height } = window.visualViewport;
+    const { width, height } = window.visualViewport!;
     const hasTransform = document.body.style.transform !== "";
     const { left, top } = hasTransform ? document.body.getBoundingClientRect() : { left: 0, top: 0 };
     const scale = getScale();

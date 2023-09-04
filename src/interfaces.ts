@@ -6,6 +6,15 @@ export interface CTXMDivider {
     isDivider: true;
 }
 
+export type CTXMItemEventListener<K extends keyof HTMLElementEventMap> = (this: HTMLLIElement, ev: HTMLElementEventMap[K]) => any;
+
+export type CTXMItemEventRegistry = {
+    [K in keyof HTMLElementEventMap]?: CTXMItemEventListener<K> | {
+        listener: CTXMItemEventListener<K>,
+        options?: AddEventListenerOptions
+    };
+}
+
 /**
  * This is a heading item which displays a text and optionally shows a tooltip when hovering over it.
  *
@@ -24,6 +33,8 @@ export interface CTXMHeading {
     icon?: ValueOrFunction<string>;
     /** inline attribute appended to the `<li>` Element */
     style?: ValueOrFunction<string>;
+    /** A record of event listeners */
+    events?: ValueOrFunction<CTXMItemEventRegistry>;
 }
 
 export interface CTXMInteractive extends CTXMHeading {

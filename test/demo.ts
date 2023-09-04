@@ -131,7 +131,17 @@
                 ]
             },
             { isDivider: true },
-            { text: "Event specific stuff" }
+            { text: "Event specific stuff" },
+            {
+                text: "Hover me!",
+                action: () => {/** */ },
+                events: {
+                    mouseenter: (_e) => document.querySelector("h1")!.style.animation = "blinker 1s linear infinite",
+                    mouseleave: {
+                        listener: (_e) => document.querySelector("h1")!.style.animation = "",
+                    }
+                }
+            }
         ], function (m, e) {
             m.push({
                 text: "e.g. Cursor Position: X:" + e.clientX + " / Y:" + e.clientY,

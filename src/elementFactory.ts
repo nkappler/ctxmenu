@@ -87,4 +87,8 @@ function generateBaseItemContent(item: CTXMHeading, li: HTMLLIElement) {
         li.classList.add("icon");
         li.innerHTML += `<img class="icon" src="${getProp(item.icon)}" />`;
     }
+    for (const [event, handler] of Object.entries(getProp(item.events) || {})) {
+        const { listener, options } = typeof handler === "function" ? { listener: handler, options: {} as EventListenerOptions } : handler;
+        li.addEventListener<any>(event, listener, options);
+    }
 }
