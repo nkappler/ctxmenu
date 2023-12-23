@@ -102,16 +102,15 @@ class ContextMenu implements CTXMenuSingleton {
     public delete(target: string) {
         const o = this.cache[target];
         if (!o) {
-            console.error(`no context menu for target element ${target} found`);
-            return;
+            return console.error(`no context menu for target element ${target} found`);
         }
+        delete this.cache[target];
+
         const t = document.querySelector<HTMLElement>(target);
         if (!t) {
-            console.error(`target element ${target} does not exist (anymore)`);
-            return;
+            return console.error(`target element ${target} does not exist (anymore)`);;
         }
         t.removeEventListener("contextmenu", o.handler);
-        delete this.cache[target];
     }
 
     public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent) {

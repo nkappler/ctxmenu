@@ -282,17 +282,11 @@
         };
         ContextMenu.prototype.delete = function(target) {
             var o = this.cache[target];
-            if (!o) {
-                console.error("no context menu for target element ".concat(target, " found"));
-                return;
-            }
-            var t = document.querySelector(target);
-            if (!t) {
-                console.error("target element ".concat(target, " does not exist (anymore)"));
-                return;
-            }
-            t.removeEventListener("contextmenu", o.handler);
+            if (!o) return console.error("no context menu for target element ".concat(target, " found"));
             delete this.cache[target];
+            var t = document.querySelector(target);
+            if (!t) return console.error("target element ".concat(target, " does not exist (anymore)"));
+            t.removeEventListener("contextmenu", o.handler);
         };
         ContextMenu.prototype.show = function(ctxMenu, eventOrElement) {
             var _this = this;

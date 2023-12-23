@@ -5,11 +5,16 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "tsc test/demo.ts --outDir docs --removeComments",
-    "prepublishOnly": "npm run version",
+    "build:demo": "tsc test/demo.ts --outDir docs --removeComments",
+    "build:src": "node util/convertStyles.js && rollup -c",
+    "build:test": "tsc test/index.test.ts -outDir spec/",
+    "build": "run-s build:*",
     "postversion": "git push --follow-tags",
-    "version": "node util/copyrightHeader.js && npm run build && npm run test && git add .",
-    "build": "node util/convertStyles.js && rollup -c"
+    "prepublishOnly": "npm run version",
+    "test:cli": "jasmine-browser-runner runSpecs",
+    "test:interactive": "jasmine-browser-runner serve",
+    "test": "run-p 'build:test -- -w' test:interactive",
+    "version": "node util/copyrightHeader.js && npm run build && npm run test:cli && git add ."
   },
   "repository": {
     "type": "git",
@@ -23,6 +28,10 @@
   "homepage": "https://nkappler.github.io/ctxmenu",
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.3",
+    "@types/jasmine": "^5.1.4",
+    "jasmine-browser-runner": "^2.3.0",
+    "jasmine-core": "^5.1.1",
+    "npm-run-all": "^4.1.5",
     "rollup": "^2.79.1",
     "rollup-plugin-dts": "^4.2.3",
     "rollup-plugin-terser": "^7.0.2",
