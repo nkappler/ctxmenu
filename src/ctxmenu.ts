@@ -34,7 +34,7 @@ class ContextMenu implements CTXMenuSingleton {
             }
             this.hide();
         });
-        window.addEventListener("resize", () => this.hide());
+        window.addEventListener("resize", () => void this.hide());
         let timeout = 0;
         window.addEventListener("wheel", () => {
             clearTimeout(timeout);
@@ -123,7 +123,7 @@ class ContextMenu implements CTXMenuSingleton {
 
         this.menu = this.generateDOM([...ctxMenu], eventOrElement);
         document.body.appendChild(this.menu);
-        this.menu.addEventListener("wheel", () => this.preventCloseOnScroll = true, { passive: true });
+        this.menu.addEventListener("wheel", () => void (this.preventCloseOnScroll = true), { passive: true });
 
         if (eventOrElement instanceof MouseEvent) {
             eventOrElement.preventDefault();
@@ -167,7 +167,7 @@ class ContextMenu implements CTXMenuSingleton {
                         }
                     });
                 } else {
-                    li.addEventListener("click", () => this.hide());
+                    li.addEventListener("click", () => void this.hide());
                 }
             }
             container.appendChild(li);
@@ -200,7 +200,7 @@ class ContextMenu implements CTXMenuSingleton {
     private static addStylesToDom() {
         let append = () => {
             if (document.readyState === "loading") {
-                return document.addEventListener("readystatechange", append);
+                return document.addEventListener("readystatechange", () => void append());
             }
             //insert default styles as first css -> low priority -> user can overwrite it easily
             const style = document.createElement("style");

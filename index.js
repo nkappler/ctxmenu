@@ -243,7 +243,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
             _this.hide();
         }));
         window.addEventListener("resize", (function() {
-            return _this.hide();
+            return void _this.hide();
         }));
         var timeout = 0;
         window.addEventListener("wheel", (function() {
@@ -327,7 +327,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         this.menu = this.generateDOM(__spreadArray([], ctxMenu, true), eventOrElement);
         document.body.appendChild(this.menu);
         this.menu.addEventListener("wheel", (function() {
-            return _this.preventCloseOnScroll = true;
+            return void (_this.preventCloseOnScroll = true);
         }), {
             passive: true
         });
@@ -357,7 +357,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
                 var subMenu = li.querySelector("ul");
                 if (!subMenu) _this.openSubMenu(ev, getProp(item.subMenu), li);
             })); else li.addEventListener("click", (function() {
-                return _this.hide();
+                return void _this.hide();
             }));
             container.appendChild(li);
         }));
@@ -381,7 +381,9 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.addStylesToDom = function() {
         var append = function() {
-            if (document.readyState === "loading") return document.addEventListener("readystatechange", append);
+            if (document.readyState === "loading") return document.addEventListener("readystatechange", (function() {
+                return void append();
+            }));
             var style = document.createElement("style");
             style.innerHTML = styles;
             document.head.insertBefore(style, document.head.childNodes[0]);
