@@ -1,8 +1,10 @@
 const fs = require("fs");
+const path = require("path");
 const { version, author } = require("../package.json");
 
-const lines = fs.readFileSync("./src/ctxmenu.ts", "utf-8").split("\r\n");
+const file = path.join("src", "ctxmenu.ts");
+const lines = fs.readFileSync(file, "utf-8").split("\n");
 
 lines[0] = `/*! ctxMenu v${version} | (c) ${author} | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/`;
 
-fs.writeFileSync("./src/ctxmenu.ts", lines.join("\r\n"), {});
+fs.writeFileSync(file, lines.join("\n"), {});
