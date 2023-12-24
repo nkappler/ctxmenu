@@ -1,5 +1,7 @@
 /// <reference types="../standalone/ctxmenu" />
 
+const params = new URLSearchParams(window.location.search);
+
 const defaultMenuDeclaration = [
     { text: "Heading" },
     { isDivider: true },
@@ -47,14 +49,22 @@ beforeAll(async () => new Promise<void>((resolve, reject) => {
     });
 }));
 
-beforeEach(() =>  {
+beforeEach(() => {
     expect(console.error).not.toHaveBeenCalled();
     expect(document.querySelector(".ctxmenu")).withContext("cleanup failed").toBeNull();
     getTarget().dispatchEvent(new MouseEvent("contextmenu"));
     expect(getMenu).toThrow();
 });
 
-afterEach(() =>  {
+afterEach(async () => {
+    const slow = params.get("slow");
+    if (slow !== null) {
+        await Promise.all([
+            new Promise((resolve) => setTimeout(resolve, slow ? Number(slow) : 0)),
+            new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+        ]);
+    }
+
     window.ctxmenu.hide(); // todo should deleting an attached context menu also remove it from DOM? (probably should)
     error.and.stub();
     window.ctxmenu.delete("#TARGET");
