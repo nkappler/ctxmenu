@@ -1,5 +1,5 @@
 import { CTXMHeading, CTXMInteractive, CTXMItem } from "./interfaces";
-import { getProp, itemIsAction, itemIsAnchor, itemIsDivider, itemIsInteractive, itemIsSubMenu } from "./typeguards";
+import { getProp, itemIsAction, itemIsAnchor, itemIsCustom, itemIsDivider, itemIsInteractive, itemIsSubMenu } from "./typeguards";
 
 /**
  * assigns an eventhandler to a list item, that gets triggered after a short timeout,
@@ -41,13 +41,15 @@ export function generateMenuItem(item: CTXMItem) {
 
     if (isDisabled(item)) {
         li.classList.add("disabled");
-        if (itemIsSubMenu(item)) {
+        if (itemIsSubMenu(item) && !itemIsCustom(item)) {
             li.classList.add("submenu");
         }
         return li;
     }
 
-    li.classList.add("interactive");
+    if(!itemIsCustom(item)) {
+        li.classList.add("interactive");
+    }
 
     if (itemIsAnchor(item)) {
         // wrap anchor element around li children
@@ -66,7 +68,9 @@ export function generateMenuItem(item: CTXMItem) {
         return li;
     }
 
-    li.classList.add("submenu");
+    if (!itemIsCustom(item)) {
+        li.classList.add("submenu");
+    }
     return li;
 }
 

@@ -59,10 +59,10 @@
         }
         if (isDisabled(item)) {
             li.classList.add("disabled");
-            if (itemIsSubMenu(item)) li.classList.add("submenu");
+            if (itemIsSubMenu(item) && !itemIsCustom(item)) li.classList.add("submenu");
             return li;
         }
-        li.classList.add("interactive");
+        if (!itemIsCustom(item)) li.classList.add("interactive");
         if (itemIsAnchor(item)) {
             var a = document.createElement("a");
             a.append.apply(a, Array.from(li.childNodes));
@@ -76,7 +76,7 @@
             li.addEventListener("click", item.action);
             return li;
         }
-        li.classList.add("submenu");
+        if (!itemIsCustom(item)) li.classList.add("submenu");
         return li;
     }
     function generateBaseItemContent(item, li) {
