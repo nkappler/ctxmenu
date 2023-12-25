@@ -88,7 +88,16 @@ describe("ElementFactory", () => {
                 expect(li2.style.margin).toEqual("10px");
                 expect(stringifyAttributes(li2)).toEqual([`class="heading"`, `style="margin: 10px"`, `title=""`]);
             });
-            it("icon property");
+            it("icon property generates classname icon and img element ", () => {
+                const li1 = showMenu([{ text: "Hello World", icon: "data:abcxyz" }]);
+                expect(li1.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
+                expect(stringifyAttributes(li1)).toEqual([`class="icon heading"`, `title=""`]);
+
+                const li2 = showMenu([{ text: "Hello World", icon: () => "data:abcxyz" }]);
+                expect(li2.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
+                expect(stringifyAttributes(li2)).toEqual([`class="icon heading"`, `title=""`]);
+                debugger;
+            });
             it("events property");
 
         });
