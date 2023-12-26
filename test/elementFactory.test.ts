@@ -96,43 +96,139 @@ describe("ElementFactory", () => {
                 const li2 = showMenu([{ text: "Hello World", icon: () => "data:abcxyz" }]);
                 expect(li2.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
                 expect(stringifyAttributes(li2)).toEqual([`class="icon heading"`, `title=""`]);
-                debugger;
             });
-            it("events property");
 
         });
 
-        describe("custom elements", () => {
-            const element = document.createElement("p");
-            element.innerText = "Hello Paragraph";
-
-            it("should not have any classnames", async  () => {
-                const li1 = showMenu([{ text: "Hello World", html: "Hello HTML" }]);
-                expect(stringifyAttributes(li1)).toEqual([`title=""`]);
-
-                const li2 = showMenu([{ text: "Hello World", element: () => element, tooltip: "Tooltip" }]);
-                expect(stringifyAttributes(li2)).toEqual([`title="Tooltip"`]);
-            });
-
-            it("html property overwrites text property and sets innerHTML directly", () => {
-                const li1 = showMenu([{ text: "Hello World", html: "Hello HTML" }]);
-                expect(li1.innerHTML).toEqual("Hello HTML");
-
-                const li2 = showMenu([{ text: "Hello World", html: () => "Hello HTML" }]);
-                expect(li2.innerHTML).toEqual("Hello HTML");
-            });
-
-            it("element property overwrites text property and gets attached as child", () => {
-                const li1 = showMenu([{ text: "Hello World", element }]);
-                expect(li1.innerHTML).toEqual("<p>Hello Paragraph</p>");
-
-                const li2 = showMenu([{ text: "Hello World", element: () => element }]);
-                expect(li2.innerHTML).toEqual("<p>Hello Paragraph</p>");
-            });
-        })
         it("anchor");
         it("action");
         it("devider");
         it("submenu");
+    });
+
+    describe("event registry", () => {
+        const focus = jasmine.createSpy();
+        const blur = jasmine.createSpy();
+
+        afterEach(() => {
+            focus.calls.reset();
+            blur.calls.reset();
+        });
+
+        it("basic event callback function is attached as listener", () => {
+            const li1 = showMenu([{ text: "Hello World", events: { focus } }]);
+            li1.setAttribute("tabindex", "1");
+            li1.focus();
+            expect(document.activeElement).toBe(li1);
+
+            expect(focus).toHaveBeenCalledTimes(1);
+            expect(focus.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((focus.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+        });
+
+        it("multiple event handlers are corectly attached", () => {
+            const li1 = showMenu([{ text: "Hello World", events: { focus, blur } }]);
+            li1.setAttribute("tabindex", "1");
+            li1.focus();
+            expect(document.activeElement).toBe(li1);
+
+            li1.blur();
+            expect(document.activeElement).toBe(document.body);
+
+            expect(focus).toHaveBeenCalledTimes(1);
+            expect(focus.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((focus.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+
+            expect(blur).toHaveBeenCalledTimes(1);
+            expect(blur.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((blur.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+        });
+
+        it("passing the listeners in an event config object", () => {
+            const li1 = showMenu([{
+                text: "Hello World", events: {
+                    focus: { listener: focus },
+                    blur: { listener: blur }
+                }
+            }]);
+            li1.setAttribute("tabindex", "1");
+            li1.focus();
+            expect(document.activeElement).toBe(li1);
+
+            li1.blur();
+            expect(document.activeElement).toBe(document.body);
+
+            li1.focus();
+            expect(document.activeElement).toBe(li1);
+
+            li1.blur();
+            expect(document.activeElement).toBe(document.body);
+
+            expect(focus).toHaveBeenCalledTimes(2);
+            expect(focus.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((focus.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+
+            expect(blur).toHaveBeenCalledTimes(2);
+            expect(blur.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((blur.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+        });
+
+        it("passing options to the event handler, like 'once'", () => {
+            const li1 = showMenu([{
+                text: "Hello World", events: () => ({
+                    focus: { listener: focus, options: { once: true } },
+                    blur: { listener: blur, options: { once: true } }
+                })
+            }]);
+            li1.setAttribute("tabindex", "1");
+            li1.focus();
+            expect(document.activeElement).toBe(li1);
+
+            li1.blur();
+            expect(document.activeElement).toBe(document.body);
+
+            li1.focus();
+            expect(document.activeElement).toBe(li1);
+
+            li1.blur();
+            expect(document.activeElement).toBe(document.body);
+
+            expect(focus).toHaveBeenCalledTimes(1);
+            expect(focus.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((focus.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+
+            expect(blur).toHaveBeenCalledTimes(1);
+            expect(blur.calls.mostRecent().args[0]).toBeInstanceOf(FocusEvent);
+            expect((blur.calls.mostRecent().args[0] as FocusEvent).target).toBe(li1);
+        });
+    });
+
+    describe("custom elements", () => {
+        const element = document.createElement("p");
+        element.innerText = "Hello Paragraph";
+
+        it("should not have any classnames", () => {
+            const li1 = showMenu([{ text: "Hello World", html: "Hello HTML" }]);
+            expect(stringifyAttributes(li1)).toEqual([`title=""`]);
+
+            const li2 = showMenu([{ text: "Hello World", element: () => element, tooltip: "Tooltip" }]);
+            expect(stringifyAttributes(li2)).toEqual([`title="Tooltip"`]);
+        });
+
+        it("html property overwrites text property and sets innerHTML directly", () => {
+            const li1 = showMenu([{ text: "Hello World", html: "Hello HTML" }]);
+            expect(li1.innerHTML).toEqual("Hello HTML");
+
+            const li2 = showMenu([{ text: "Hello World", html: () => "Hello HTML" }]);
+            expect(li2.innerHTML).toEqual("Hello HTML");
+        });
+
+        it("element property overwrites text property and gets attached as child", () => {
+            const li1 = showMenu([{ text: "Hello World", element }]);
+            expect(li1.innerHTML).toEqual("<p>Hello Paragraph</p>");
+
+            const li2 = showMenu([{ text: "Hello World", element: () => element }]);
+            expect(li2.innerHTML).toEqual("<p>Hello Paragraph</p>");
+        });
     });
 });
