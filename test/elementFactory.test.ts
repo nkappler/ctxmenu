@@ -88,6 +88,7 @@ describe("ElementFactory", () => {
                 expect(li2.style.margin).toEqual("10px");
                 expect(stringifyAttributes(li2)).toEqual([`class="heading"`, `style="margin: 10px"`, `title=""`]);
             });
+
             it("icon property generates classname icon and img element ", () => {
                 const li1 = showMenu([{ text: "Hello World", icon: "data:abcxyz" }]);
                 expect(li1.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
@@ -97,13 +98,49 @@ describe("ElementFactory", () => {
                 expect(li2.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
                 expect(stringifyAttributes(li2)).toEqual([`class="icon heading"`, `title=""`]);
             });
-
         });
 
         it("anchor");
         it("action");
-        it("devider");
+
+        describe("divider", () => {
+            it("has only classname divider", () => {
+                const li = showMenu([{ isDivider: true }, { text: "Hello World" }]);
+                expect(Array.from(li.classList)).toEqual(["divider"]);
+            });
+
+            it("has no additional attributes", () => {
+                const li = showMenu([{ isDivider: true }, { text: "Hello World" }]);
+                expect(Array.from(li.attributes).length).toEqual(1);
+            });
+
+            it("has no innerHTML", () => {
+                const li = showMenu([{ isDivider: true }, { text: "Hello World" }]);
+                expect(li.innerHTML).toBeFalsy();
+            });
+
+            it("ignores any additional properties", () => {
+                const li = showMenu([
+                    // @ts-expect-error TODO: isDivider together with other properties should be typescript error
+                    { 
+                        isDivider: true, 
+                        tooltip: "Test", 
+                        text: "Hello World", 
+                        subMenu: [], 
+                        disabled: true, 
+                        html: "<b></b>",
+                        element: document.createElement("h1"),
+                    },
+                    { text: "Hello World" }
+                ]);
+                expect(Array.from(li.attributes).length).toEqual(1);
+                expect(li.innerHTML).toBeFalsy();
+                expect(Array.from(li.classList)).toEqual(["divider"]);
+            });
+        });
+
         it("submenu");
+        
     });
 
     describe("event registry", () => {
