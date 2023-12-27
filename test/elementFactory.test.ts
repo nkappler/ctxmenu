@@ -100,7 +100,70 @@ describe("ElementFactory", () => {
             });
         });
 
-        it("anchor");
+        describe("anchor", () => {
+            it("has classname interactive", () => {
+                const li = showMenu([{ text: "Hello Anchor", href: () => "google.de" }]);
+                expect(Array.from(li.classList)).toEqual(["interactive"]);
+            });
+
+            it("has anchor and span child elements", () => {
+                const li = showMenu([{ text: "Hello Anchor", href: "google.de" }]);
+                const a = li.firstElementChild as HTMLAnchorElement;
+
+                expect(a.tagName).toEqual("A");
+                expect(a.innerHTML).toEqual(`<span>Hello Anchor</span>`);
+
+            });
+
+            it("target and download properties are passed to anchor element", () => {
+                const li = showMenu([{ text: "Hello Anchor", href: "google.de", target: () => "_blank", download: "" }]);
+                const a = li.firstElementChild as HTMLAnchorElement;
+                expect(a.tagName).toEqual("A");
+                expect(stringifyAttributes(a)).toEqual([`download=""`, `href="google.de"`, `target="_blank"`]);
+            });
+
+            it("clicking the anchor element should close the menu", () => {
+                const click = jasmine.createSpy().and.callFake((e: MouseEvent) => {
+                    expect((e.target as HTMLElement).tagName).toEqual("A");
+                    // cancel navigation
+                    e.preventDefault();
+                });
+
+                const li = showMenu([{ text: "Hello Anchor", href: "google.de", events: { click } }]);
+                const a = li.firstElementChild as HTMLAnchorElement;
+
+                a.click();
+
+                expect(click).toHaveBeenCalled();
+                expect(getMenu).toThrow();
+            });
+
+            describe("disabled", () => {
+
+                it("disabled item replaces classname with disabled", () => {
+                    const li = showMenu([{ text: "Hello Anchor", href: () => "google.de", disabled: () => true }]);
+                    expect(Array.from(li.classList)).toEqual(["disabled"]);
+                });
+
+                it("clicking the anchor element should do nothing", () => {
+                    const click = jasmine.createSpy().and.callFake((e: MouseEvent) => {
+                        expect((e.target as HTMLElement).tagName).toEqual("SPAN");
+                        // cancel navigation just in case something is broken
+                        e.preventDefault();
+                    });
+
+                    const li = showMenu([{ text: "Hello Anchor", href: "google.de", events: { click }, disabled: true }]);
+                    const a = li.firstElementChild as HTMLAnchorElement;
+
+                    a.click();
+
+                    expect(click).toHaveBeenCalled();
+                    expect(getMenu).not.toThrow();
+                });
+
+            });
+        });
+
         it("action");
 
         describe("divider", () => {
@@ -122,12 +185,12 @@ describe("ElementFactory", () => {
             it("ignores any additional properties", () => {
                 const li = showMenu([
                     // @ts-expect-error TODO: isDivider together with other properties should be typescript error
-                    { 
-                        isDivider: true, 
-                        tooltip: "Test", 
-                        text: "Hello World", 
-                        subMenu: [], 
-                        disabled: true, 
+                    {
+                        isDivider: true,
+                        tooltip: "Test",
+                        text: "Hello World",
+                        subMenu: [],
+                        disabled: true,
                         html: "<b></b>",
                         element: document.createElement("h1"),
                     },
@@ -140,7 +203,7 @@ describe("ElementFactory", () => {
         });
 
         it("submenu");
-        
+
     });
 
     describe("event registry", () => {
