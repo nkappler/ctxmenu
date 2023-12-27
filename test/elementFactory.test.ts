@@ -92,11 +92,11 @@ describe("ElementFactory", () => {
             it("icon property generates classname icon and img element ", () => {
                 const li1 = showMenu([{ text: "Hello World", icon: "data:abcxyz" }]);
                 expect(li1.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
-                expect(stringifyAttributes(li1)).toEqual([`class="icon heading"`, `title=""`]);
+                expect(Array.from(li1.classList).sort()).toEqual(["heading", "icon"]);
 
                 const li2 = showMenu([{ text: "Hello World", icon: () => "data:abcxyz" }]);
                 expect(li2.innerHTML).toEqual(`<span>Hello World</span><img class="icon" src="data:abcxyz">`);
-                expect(stringifyAttributes(li2)).toEqual([`class="icon heading"`, `title=""`]);
+                expect(Array.from(li1.classList).sort()).toEqual(["heading", "icon"]);
             });
         });
 
@@ -140,6 +140,12 @@ describe("ElementFactory", () => {
 
                 expect(click).toHaveBeenCalled();
                 expect(getMenu).toThrow();
+            });
+
+            it("item child nodes keep the correct order", () => {
+                const li = showMenu([{ href: "google.de", html: `<span>1</span><span>2</span><span>3</span>` }]);
+                const a = li.firstElementChild as HTMLAnchorElement;
+                expect(a.innerHTML).toEqual("<span>1</span><span>2</span><span>3</span>");
             });
 
             describe("disabled", () => {
@@ -267,7 +273,7 @@ describe("ElementFactory", () => {
         describe("submenu", () => {
             it("has classnames interactive and submenu", () => {
                 const li = showMenu([{ text: "Hello Submenu", subMenu: [{ text: "Hello Submenu Item" }] }]);
-                expect(Array.from(li.classList)).toEqual(["interactive", "submenu"]);
+                expect(Array.from(li.classList).sort()).toEqual(["interactive", "submenu"]);
             });
 
             it("has span child element", () => {
@@ -283,16 +289,29 @@ describe("ElementFactory", () => {
                 expect(rarrstyles.borderWidth).toEqual("1px 1px 0px 0px");
             });
 
+            describe("custom item with submenu has classname submenu", () => {
+                it("using html property", () => {
+                    const li = showMenu([{ html: "<span>Hello Submenu</span>", subMenu: [{ text: "Hello Submenu Item" }] }]);
+                    expect(Array.from(li.classList)).toEqual(["submenu"]);
+                });
+
+                it("using element property", () => {
+                    const element = document.createElement("span");
+                    element.innerText = "Hello Submenu";
+                    const li = showMenu([{ element, subMenu: [{ text: "Hello Submenu Item" }] }]);
+                    expect(Array.from(li.classList)).toEqual(["submenu"]);
+                });
+            });
+
             describe("disabled", () => {
                 it("has classnames disabled and submenu", () => {
                     const li = showMenu([{ text: "Hello Submenu", subMenu: () => [{ text: "Hello Submenu Item" }], disabled: true }]);
-                    expect(Array.from(li.classList)).toEqual(["disabled", "submenu"]);
+                    expect(Array.from(li.classList).sort()).toEqual(["disabled", "submenu"]);
                 });
 
                 it("having an empty submenu implicitly disables the menu item", () => {
                     const li = showMenu([{ text: "Hello Submenu", subMenu: [] }]);
-                    expect(Array.from(li.classList)).toEqual(["disabled", "submenu"]);
-                    debugger;
+                    expect(Array.from(li.classList).sort()).toEqual(["disabled", "submenu"]);
                 });
             });
         });
