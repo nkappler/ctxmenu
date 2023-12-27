@@ -106,13 +106,17 @@ describe("ElementFactory", () => {
                 expect(Array.from(li.classList)).toEqual(["interactive"]);
             });
 
+            it("has no additional attributes", () => {
+                const li = showMenu([{ text: "Hello Action", href: () => "google.de" }]);
+                expect(li.attributes.length).toEqual(2);
+            });
+
             it("has anchor and span child elements", () => {
                 const li = showMenu([{ text: "Hello Anchor", href: "google.de" }]);
                 const a = li.firstElementChild as HTMLAnchorElement;
 
                 expect(a.tagName).toEqual("A");
                 expect(a.innerHTML).toEqual(`<span>Hello Anchor</span>`);
-
             });
 
             it("target and download properties are passed to anchor element", () => {
@@ -164,7 +168,65 @@ describe("ElementFactory", () => {
             });
         });
 
-        it("action");
+        describe("action", () => {
+            const action = jasmine.createSpy();
+
+            afterEach(() => {
+                action.calls.reset();
+                action.and.stub();
+            });
+
+            it("has classname interactive", () => {
+                const li = showMenu([{ text: "Hello Action", action }]);
+                expect(Array.from(li.classList)).toEqual(["interactive"]);
+            });
+
+            it("has span as child element", () => {
+                const li = showMenu([{ text: "Hello Action", action }]);
+                expect(li.innerHTML).toEqual(`<span>Hello Action</span>`);
+            });
+
+            it("has no additional attributes", () => {
+                const li = showMenu([{ text: "Hello Action", action }]);
+                expect(li.attributes.length).toEqual(2);
+            });
+
+            it("handler is executed on click", () => {
+                showMenu([{ text: "Hello Action", action }]).click();
+
+                expect(action).toHaveBeenCalled();
+                expect(action.calls.mostRecent().args[0]).toBeInstanceOf(MouseEvent);
+            });
+
+            it("clicking the item closes the menu after the callback was executed", () => {
+                showMenu([{ text: "Hello Action", action }]).click();
+                expect(getMenu).toThrow();
+            });
+
+            it("action is executed before the menu is closed", () => {
+                let menu: any;
+                action.and.callFake(() => menu = getMenu());
+
+                showMenu([{ text: "Hello Action", action }]).click();
+
+                expect(menu).toBeDefined();
+            });
+
+            describe("disabled", () => {
+
+                it("disabled item replaces classname with disabled", () => {
+                    const li = showMenu([{ text: "Hello Action", action, disabled: true }]);
+                    expect(Array.from(li.classList)).toEqual(["disabled"]);
+                });
+
+                it("clicking disabled item should do nothing", () => {
+                    showMenu([{ text: "Hello Action", action, disabled: true }]).click();
+                    expect(action).not.toHaveBeenCalled();
+                    expect(getMenu).not.toThrow();
+                });
+            });
+
+        });
 
         describe("divider", () => {
             it("has only classname divider", () => {
