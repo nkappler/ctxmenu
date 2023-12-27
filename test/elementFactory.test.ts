@@ -264,7 +264,38 @@ describe("ElementFactory", () => {
             });
         });
 
-        it("submenu");
+        describe("submenu", () => {
+            it("has classnames interactive and submenu", () => {
+                const li = showMenu([{ text: "Hello Submenu", subMenu: [{ text: "Hello Submenu Item" }] }]);
+                expect(Array.from(li.classList)).toEqual(["interactive", "submenu"]);
+            });
+
+            it("has span child element", () => {
+                const li = showMenu([{ text: "Hello Submenu", subMenu: [{ text: "Hello Submenu Item" }] }]);
+                expect(li.innerHTML).toEqual(`<span>Hello Submenu</span>`)
+            });
+
+            it("has arrow pseudo element", () => {
+                const li = showMenu([{ text: "Hello Submenu", subMenu: () => [{ text: "Hello Submenu Item" }] }]);
+                // can't reference the pseudo element directly
+                const rarrstyles = window.getComputedStyle(li, ":after");
+                expect(rarrstyles.content).toEqual(`""`);
+                expect(rarrstyles.borderWidth).toEqual("1px 1px 0px 0px");
+            });
+
+            describe("disabled", () => {
+                it("has classnames disabled and submenu", () => {
+                    const li = showMenu([{ text: "Hello Submenu", subMenu: () => [{ text: "Hello Submenu Item" }], disabled: true }]);
+                    expect(Array.from(li.classList)).toEqual(["disabled", "submenu"]);
+                });
+
+                it("having an empty submenu implicitly disables the menu item", () => {
+                    const li = showMenu([{ text: "Hello Submenu", subMenu: [] }]);
+                    expect(Array.from(li.classList)).toEqual(["disabled", "submenu"]);
+                    debugger;
+                });
+            });
+        });
 
     });
 
