@@ -1,7 +1,7 @@
 {
   "srcDir": "./standalone",
   "srcFiles": [
-    "ctxmenu.js"
+    "ctxmenu.min.js"
   ],
   "specDir": "spec",
   "specFiles": [

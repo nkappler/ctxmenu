@@ -15,7 +15,7 @@
         return typeof prop === "function" ? prop() : prop;
     }
     function itemIsInteractive(item) {
-        return itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item) || itemIsCustom(item);
+        return !itemIsCustom(item) && (itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item));
     }
     function itemIsAction(item) {
         return item.hasOwnProperty("action");
@@ -32,6 +32,12 @@
     function itemIsCustom(item) {
         return item.hasOwnProperty("html") || item.hasOwnProperty("element");
     }
+    function itemIsHeading(item) {
+        return !itemIsInteractive(item) && !itemIsDivider(item) && !itemIsCustom(item);
+    }
+    function isDisabled(item) {
+        return itemIsInteractive(item) && getProp(item.disabled) || itemIsSubMenu(item) && getProp(item.subMenu).length === 0;
+    }
     function onHoverDebounced(target, action) {
         var timeout;
         target.addEventListener("mouseenter", (function(e) {
@@ -43,53 +49,43 @@
             return clearTimeout(timeout);
         }));
     }
-    function isDisabled(item) {
-        return getProp(item.disabled) || itemIsSubMenu(item) && typeof item.subMenu !== "function" && item.subMenu.length === 0;
-    }
     function generateMenuItem(item) {
         var li = document.createElement("li");
-        if (itemIsDivider(item)) {
-            li.className = "divider";
-            return li;
-        }
-        generateBaseItemContent(item, li);
-        if (!itemIsInteractive(item)) {
-            li.classList.add("heading");
-            return li;
-        }
-        if (isDisabled(item)) {
-            li.classList.add("disabled");
-            if (itemIsSubMenu(item) && !itemIsCustom(item)) li.classList.add("submenu");
-            return li;
-        }
-        if (!itemIsCustom(item)) li.classList.add("interactive");
-        if (itemIsAnchor(item)) {
-            var a = document.createElement("a");
-            a.append.apply(a, Array.from(li.childNodes));
-            a.href = getProp(item.href);
-            if (item.hasOwnProperty("download")) a.download = getProp(item.download);
-            if (item.hasOwnProperty("target")) a.target = getProp(item.target);
-            li.append(a);
-            return li;
-        }
-        if (itemIsAction(item)) {
-            li.addEventListener("click", item.action);
-            return li;
-        }
-        if (!itemIsCustom(item)) li.classList.add("submenu");
+        populateClassList([ [ itemIsDivider, "divider", false ], [ function(item) {
+            return item.icon;
+        }, "icon", true ], [ itemIsHeading, "heading", false ], [ itemIsSubMenu, "submenu", true ], [ isDisabled, "disabled", false ], [ itemIsInteractive, "interactive", true ] ], item, li);
+        if (itemIsDivider(item)) return li;
+        [ makeInnerHTML, makeAttributes, makeIcon, addEventHandlers, makeAnchor ].forEach((function(step) {
+            return step.apply(null, [ item, li ]);
+        }));
         return li;
     }
-    function generateBaseItemContent(item, li) {
-        var html = getProp(item.html);
-        var text = "<span>".concat(getProp(item.text), "</span>");
-        var elem = getProp(item.element);
-        elem ? li.append(elem) : li.innerHTML = html ? html : text;
-        li.title = getProp(item.tooltip) || "";
-        if (item.style) li.setAttribute("style", getProp(item.style));
-        if (item.icon) {
-            li.classList.add("icon");
-            li.innerHTML += '<img class="icon" src="'.concat(getProp(item.icon), '" />');
-        }
+    function populateClassList(rules, item, li) {
+        rules.filter((function(_a) {
+            var matcher = _a[0];
+            return matcher(item);
+        })).every((function(_a) {
+            _a[0];
+            var className = _a[1], supportsSubSequent = _a[2];
+            return !void li.classList.add(className) && supportsSubSequent;
+        }));
+    }
+    function makeInnerHTML(_a, li) {
+        var _b;
+        var html = _a.html, text = _a.text, element = _a.element;
+        var elem = getProp(element);
+        elem ? li.append(elem) : li.innerHTML = (_b = getProp(html)) !== null && _b !== void 0 ? _b : "<span>".concat(getProp(text), "</span>");
+    }
+    function makeAttributes(_a, li) {
+        var tooltip = _a.tooltip, style = _a.style;
+        li.title = getProp(tooltip) || "";
+        if (style) li.setAttribute("style", getProp(style));
+    }
+    function makeIcon(_a, li) {
+        var icon = _a.icon;
+        icon && (li.innerHTML += '<img class="icon" src="'.concat(getProp(icon), '" />'));
+    }
+    function addEventHandlers(item, li) {
         for (var _i = 0, _a = Object.entries(getProp(item.events) || {}); _i < _a.length; _i++) {
             var _b = _a[_i], event_1 = _b[0], handler = _b[1];
             var _c = typeof handler === "function" ? {
@@ -98,6 +94,18 @@
             } : handler, listener = _c.listener, options = _c.options;
             li.addEventListener(event_1, listener, options);
         }
+        if (!itemIsAction(item) || isDisabled(item)) return;
+        li.addEventListener("click", item.action);
+    }
+    function makeAnchor(item, li) {
+        if (!itemIsAnchor(item) || isDisabled(item)) return;
+        var href = item.href, download = item.download, target = item.target;
+        var a = document.createElement("a");
+        a.innerHTML = li.innerHTML;
+        a.href = getProp(href);
+        download !== void 0 && (a.download = getProp(download));
+        target && (a.target = getProp(target));
+        li.replaceChildren(a);
     }
     var hdir = "r";
     var vdir = "d";

@@ -1,11 +1,11 @@
 /*! ctxMenu v1.6.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
-import { generateMenuItem, isDisabled, onHoverDebounced } from "./elementFactory";
+import { generateMenuItem, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
 import { resetDirections, setPosition } from "./position";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
-import { getProp, itemIsInteractive, itemIsSubMenu } from "./typeguards";
+import { getProp, isDisabled, itemIsInteractive, itemIsSubMenu } from "./typeguards";
 
 type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
 
