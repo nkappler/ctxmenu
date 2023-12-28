@@ -56,7 +56,7 @@
         }, "icon", true ], [ itemIsHeading, "heading", false ], [ itemIsSubMenu, "submenu", true ], [ isDisabled, "disabled", false ], [ itemIsInteractive, "interactive", true ] ], item, li);
         if (itemIsDivider(item)) return li;
         [ makeInnerHTML, makeAttributes, makeIcon, addEventHandlers, makeAnchor ].forEach((function(step) {
-            return step.apply(null, [ item, li ]);
+            return step.call(null, item, li);
         }));
         return li;
     }
