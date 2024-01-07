@@ -197,18 +197,13 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     private static addStylesToDom() {
-        let append = () => {
-            if (document.readyState === "loading") {
-                return document.addEventListener("readystatechange", () => void append());
-            }
-            //insert default styles as first css -> low priority -> user can overwrite it easily
-            const style = document.createElement("style");
-            style.innerHTML = styles;
-            document.head.insertBefore(style, document.head.childNodes[0]);
-
-            append = () => { };
-        };
-        append();
+        if (document.readyState === "loading") {
+            return document.addEventListener("readystatechange", this.addStylesToDom, { once: true });
+        }
+        //insert default styles as first css -> low priority -> user can overwrite it easily
+        const style = document.createElement("style");
+        style.innerHTML = styles;
+        document.head.insertBefore(style, document.head.childNodes[0]);
     }
 }
 

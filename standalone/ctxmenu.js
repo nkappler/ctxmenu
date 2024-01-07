@@ -356,16 +356,12 @@
             listElement.appendChild(this.generateDOM(ctxMenu, listElement));
         };
         ContextMenu.addStylesToDom = function() {
-            var append = function() {
-                if (document.readyState === "loading") return document.addEventListener("readystatechange", (function() {
-                    return void append();
-                }));
-                var style = document.createElement("style");
-                style.innerHTML = styles;
-                document.head.insertBefore(style, document.head.childNodes[0]);
-                append = function() {};
-            };
-            append();
+            if (document.readyState === "loading") return document.addEventListener("readystatechange", this.addStylesToDom, {
+                once: true
+            });
+            var style = document.createElement("style");
+            style.innerHTML = styles;
+            document.head.insertBefore(style, document.head.childNodes[0]);
         };
         return ContextMenu;
     }();
