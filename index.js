@@ -70,10 +70,12 @@ function generateMenu(ctxMenu) {
     menu.className = "ctxmenu";
     menu.append.apply(menu, ctxMenu.map(generateMenuItem));
     if (ctxMenu.length === 0) menu.style.display = "none";
-    menu.addEventListener("contextmenu", (function(e) {
+    var noop = function(e) {
         e.stopPropagation();
         e.preventDefault();
-    }));
+    };
+    menu.addEventListener("contextmenu", noop);
+    menu.addEventListener("click", noop);
     return menu;
 }
 
@@ -128,7 +130,6 @@ function addEventHandlers(item, li) {
         li.addEventListener(event_1, listener, options);
     }
     li.addEventListener("click", (function(e) {
-        e.stopPropagation();
         if (isDisabled(item) || itemIsSubMenu(item)) return;
         itemIsAction(item) && item.action(e);
         itemIsInteractive(item) && ctxmenu.hide();

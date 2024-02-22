@@ -25,11 +25,14 @@ export function generateMenu(ctxMenu: CTXMenu) {
     if (ctxMenu.length === 0) {
         menu.style.display = "none";
     }
-    // avoid re-opening on itself
-    menu.addEventListener("contextmenu", e => {
+    const noop = (e: MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-    });
+    }
+    // avoid re-opening on itself
+    menu.addEventListener("contextmenu", noop);
+    // avoid close on click
+    menu.addEventListener("click", noop);
     return menu;
 }
 
@@ -94,7 +97,6 @@ function addEventHandlers(item: CTXMHeading, li: HTMLLIElement) {
     }
 
     li.addEventListener("click", e => {
-        e.stopPropagation();
         if (isDisabled(item) || itemIsSubMenu(item)) return;
         itemIsAction(item) && item.action(e);
         itemIsInteractive(item) && ctxmenu.hide();

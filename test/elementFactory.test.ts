@@ -12,6 +12,17 @@ const showMenu = (menu: Parameters<typeof window.ctxmenu.show>[0]) => {
  */
 describe("ElementFactory", () => {
 
+    describe("container", () => {
+        it("clicking it has no effect", () => {
+            showMenu([
+                { text: "Hello World" }
+            ]);
+            const menu = getMenu();
+            menu.click();
+            expect(getMenu).not.toThrow();
+        });
+    });
+
     describe("property callbacks", () => {
 
         it("are executed just before the menu opens", () => {
@@ -267,6 +278,11 @@ describe("ElementFactory", () => {
                 expect(Array.from(li.attributes).length).toEqual(1);
                 expect(li.innerHTML).toBeFalsy();
                 expect(Array.from(li.classList)).toEqual(["divider"]);
+            });
+
+            it("clicking it has no effect", () => {
+                showMenu([{ isDivider: true }, { text: "Hello World" }]).click();
+                expect(getMenu).not.toThrow();
             });
         });
 
