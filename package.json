@@ -13,7 +13,7 @@
     "prepublishOnly": "npm run version",
     "test:cli": "jasmine-browser-runner runSpecs",
     "test:interactive": "jasmine-browser-runner serve",
-    "test": "run-p 'build:src -- -w' 'build:test -- -w' test:interactive",
+    "test": "run-p 'build:* -- -w' test:interactive",
     "version": "node util/copyrightHeader.js && npm run build && npm run test:cli && git add ."
   },
   "repository": {
