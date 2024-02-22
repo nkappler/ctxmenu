@@ -317,6 +317,42 @@ describe("ElementFactory", () => {
         });
 
     });
+    describe("click away listener", function () {
+        it("clicking something in the window closes any open menu", () => {
+            const clickAway = jasmine.createSpy();
+            window.addEventListener("click", clickAway);
+            var click = jasmine.createSpy().and.callFake( e => {
+                expect(e.target.tagName).toEqual("A");
+                // cancel navigation
+                e.preventDefault();
+            });
+            showMenu([{ text: "Hello Anchor", href: "google.de", events: { click } }]);
+
+            document.body.click();
+
+            expect(click).not.toHaveBeenCalled();
+            expect(clickAway).toHaveBeenCalled();
+            expect(getMenu).toThrow();
+        });
+
+        it("clicking an action item closes the menu without triggering the click away listener", () => {
+            const clickAway = jasmine.createSpy();
+            window.addEventListener("click", clickAway);
+            var click = jasmine.createSpy().and.callFake( e => {
+                expect(e.target.tagName).toEqual("A");
+                // cancel navigation
+                e.preventDefault();
+            });
+            var li = showMenu([{ text: "Hello Anchor", href: "google.de", events: { click } }]);
+            var a = li.firstElementChild as HTMLAnchorElement;
+
+            a.click();
+            
+            expect(click).toHaveBeenCalled();
+            expect(clickAway).not.toHaveBeenCalled();
+            expect(getMenu).toThrow();
+        });
+    });
 
     describe("event registry", () => {
         const focus = jasmine.createSpy();
