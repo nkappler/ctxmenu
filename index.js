@@ -65,6 +65,18 @@ function onHoverDebounced(target, action) {
     }));
 }
 
+function generateMenu(ctxMenu) {
+    var menu = document.createElement("ul");
+    menu.className = "ctxmenu";
+    menu.append.apply(menu, ctxMenu.map(generateMenuItem));
+    if (ctxMenu.length === 0) menu.style.display = "none";
+    menu.addEventListener("contextmenu", (function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }));
+    return menu;
+}
+
 function generateMenuItem(item) {
     var li = document.createElement("li");
     populateClassList([ [ itemIsDivider, "divider", false ], [ function(item) {
@@ -115,8 +127,12 @@ function addEventHandlers(item, li) {
         } : handler, listener = _c.listener, options = _c.options;
         li.addEventListener(event_1, listener, options);
     }
-    if (!itemIsAction(item) || isDisabled(item)) return;
-    li.addEventListener("click", item.action);
+    li.addEventListener("click", (function(e) {
+        e.stopPropagation();
+        if (isDisabled(item) || itemIsSubMenu(item)) return;
+        itemIsAction(item) && item.action(e);
+        itemIsInteractive(item) && ctxmenu.hide();
+    }));
 }
 
 function makeAnchor(item, li) {
@@ -251,10 +267,8 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         var _this = this;
         this.cache = {};
         this.preventCloseOnScroll = false;
-        window.addEventListener("click", (function(ev) {
-            var item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && item.className === "interactive") return;
-            _this.hide();
+        window.addEventListener("click", (function() {
+            return void _this.hide();
         }));
         window.addEventListener("resize", (function() {
             return void _this.hide();
@@ -345,39 +359,27 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         var _a;
         if (menu === void 0) menu = this.menu;
         resetDirections();
-        if (menu) {
-            if (menu === this.menu) delete this.menu;
-            (_a = menu.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(menu);
-        }
+        if (!menu) return;
+        if (menu === this.menu) delete this.menu;
+        (_a = menu.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(menu);
     };
     ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent) {
         var _this = this;
-        var container = document.createElement("ul");
-        if (ctxMenu.length === 0) container.style.display = "none";
-        ctxMenu.forEach((function(item) {
-            var li = generateMenuItem(item);
+        var container = generateMenu(ctxMenu);
+        setPosition(container, parentOrEvent);
+        ctxMenu.forEach((function(item, i) {
+            var li = container.children[i];
             onHoverDebounced(li, (function() {
                 var _a;
                 var subMenu = (_a = li.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) _this.hide(subMenu);
             }));
-            if (itemIsInteractive(item) && !isDisabled(item)) if (itemIsSubMenu(item)) onHoverDebounced(li, (function(ev) {
+            if (isDisabled(item)) return;
+            if (!itemIsSubMenu(item)) return;
+            onHoverDebounced(li, (function(ev) {
                 var subMenu = li.querySelector("ul");
                 if (!subMenu) _this.openSubMenu(ev, getProp(item.subMenu), li);
-            })); else li.addEventListener("click", (function() {
-                return void _this.hide();
             }));
-            container.appendChild(li);
-        }));
-        container.className = "ctxmenu";
-        setPosition(container, parentOrEvent);
-        container.addEventListener("contextmenu", (function(ev) {
-            ev.stopPropagation();
-            ev.preventDefault();
-        }));
-        container.addEventListener("click", (function(ev) {
-            var item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && item.className !== "interactive") ev.stopPropagation();
         }));
         return container;
     };

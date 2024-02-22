@@ -1,11 +1,11 @@
 /*! ctxMenu v1.6.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
-import { generateMenuItem, onHoverDebounced } from "./elementFactory";
+import { generateMenu, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXMenu, CTXMenuSingleton } from "./interfaces";
 import { resetDirections, setPosition } from "./position";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
-import { getProp, isDisabled, itemIsInteractive, itemIsSubMenu } from "./typeguards";
+import { getProp, isDisabled, itemIsSubMenu } from "./typeguards";
 
 type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
 
@@ -27,13 +27,7 @@ class ContextMenu implements CTXMenuSingleton {
      */
     private preventCloseOnScroll = false;
     private constructor() {
-        window.addEventListener("click", ev => {
-            const item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && item.className === "interactive") {
-                return;
-            }
-            this.hide();
-        });
+        window.addEventListener("click", () => void this.hide());
         window.addEventListener("resize", () => void this.hide());
         let timeout = 0;
         window.addEventListener("wheel", () => {
@@ -131,25 +125,21 @@ class ContextMenu implements CTXMenuSingleton {
 
     public hide(menu: Element | undefined = this.menu) {
         resetDirections();
+        if (!menu) return;
 
-        if (menu) {
-            if (menu === this.menu) {
-                delete this.menu;
-            }
-            menu.parentElement?.removeChild(menu);
+        if (menu === this.menu) {
+            delete this.menu;
         }
+        menu.parentElement?.removeChild(menu);
     }
 
+    /** creates the menu Elements, sets the menu position and attaches submenu lifecycle handlers */
     private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent): HTMLUListElement {
-        //This has grown pretty messy and could use a rework
-
-        const container = document.createElement("ul");
-        if (ctxMenu.length === 0) {
-            container.style.display = "none";
-        }
-        ctxMenu.forEach(item => {
-            const li = generateMenuItem(item);
-            //all items shoud have a handler to close submenus on hover (except if its their own)
+        const container = generateMenu(ctxMenu);
+        setPosition(container, parentOrEvent);
+        ctxMenu.forEach((item, i) => {
+            const li = container.children[i] as HTMLLIElement;
+            //all items shoud close submenus on hover which are not their own
             onHoverDebounced(li, () => {
                 const subMenu = li.parentElement?.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) {
@@ -157,32 +147,15 @@ class ContextMenu implements CTXMenuSingleton {
                 }
             });
 
-            if (itemIsInteractive(item) && !isDisabled(item)) {
-                if (itemIsSubMenu(item)) {
-                    onHoverDebounced(li, (ev) => {
-                        const subMenu = li.querySelector("ul");
-                        if (!subMenu) { //if it's already open, do nothing
-                            this.openSubMenu(ev, getProp(item.subMenu), li);
-                        }
-                    });
-                } else {
-                    li.addEventListener("click", () => void this.hide());
-                }
-            }
-            container.appendChild(li);
-        });
-        container.className = "ctxmenu";
-        setPosition(container, parentOrEvent);
+            if (isDisabled(item)) return;
+            if (!itemIsSubMenu(item)) return;
 
-        container.addEventListener("contextmenu", ev => {
-            ev.stopPropagation();
-            ev.preventDefault();
-        });
-        container.addEventListener("click", ev => {
-            const item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && item.className !== "interactive") {
-                ev.stopPropagation();
-            }
+            onHoverDebounced(li, (ev) => {
+                const subMenu = li.querySelector("ul");
+                if (!subMenu) { //if it's already open, do nothing
+                    this.openSubMenu(ev, getProp(item.subMenu), li);
+                }
+            });
         });
         return container;
     }

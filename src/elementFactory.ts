@@ -1,5 +1,6 @@
 import { CTXMHeading } from "../index";
-import { CTXMItem } from "./interfaces";
+import { ctxmenu } from "./ctxmenu";
+import { CTXMenu, CTXMItem } from "./interfaces";
 import { getProp, isDisabled, itemIsAction, itemIsAnchor, itemIsDivider, itemIsHeading, itemIsInteractive, itemIsSubMenu } from "./typeguards";
 
 /**
@@ -17,7 +18,22 @@ export function onHoverDebounced(target: HTMLLIElement, action: (e: MouseEvent) 
     target.addEventListener("mouseleave", () => clearTimeout(timeout));
 }
 
-export function generateMenuItem(item: CTXMItem) {
+export function generateMenu(ctxMenu: CTXMenu) {
+    const menu = document.createElement("ul");
+    menu.className = "ctxmenu";
+    menu.append(...ctxMenu.map(generateMenuItem));
+    if (ctxMenu.length === 0) {
+        menu.style.display = "none";
+    }
+    // avoid re-opening on itself
+    menu.addEventListener("contextmenu", e => {
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    return menu;
+}
+
+function generateMenuItem(item: CTXMItem) {
     const li = document.createElement("li");
 
     populateClassList([
@@ -77,9 +93,12 @@ function addEventHandlers(item: CTXMHeading, li: HTMLLIElement) {
         li.addEventListener<any>(event, listener, options);
     }
 
-    if (!itemIsAction(item) || isDisabled(item)) { return; }
-
-    li.addEventListener("click", item.action);
+    li.addEventListener("click", e => {
+        e.stopPropagation();
+        if (isDisabled(item) || itemIsSubMenu(item)) return;
+        itemIsAction(item) && item.action(e);
+        itemIsInteractive(item) && ctxmenu.hide();
+    });
 }
 
 function makeAnchor(item: CTXMHeading, li: HTMLLIElement) {
