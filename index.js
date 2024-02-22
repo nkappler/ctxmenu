@@ -356,12 +356,11 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         if (eventOrElement instanceof MouseEvent) eventOrElement.preventDefault();
     };
     ContextMenu.prototype.hide = function(menu) {
-        var _a;
         if (menu === void 0) menu = this.menu;
         resetDirections();
         if (!menu) return;
         if (menu === this.menu) delete this.menu;
-        (_a = menu.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(menu);
+        menu.remove();
     };
     ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent) {
         var _this = this;
@@ -376,18 +375,12 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
             }));
             if (isDisabled(item)) return;
             if (!itemIsSubMenu(item)) return;
-            onHoverDebounced(li, (function(ev) {
-                var subMenu = li.querySelector("ul");
-                if (!subMenu) _this.openSubMenu(ev, getProp(item.subMenu), li);
+            onHoverDebounced(li, (function() {
+                if (li.querySelector("ul")) return;
+                li.appendChild(_this.generateDOM(getProp(item.subMenu), li));
             }));
         }));
         return container;
-    };
-    ContextMenu.prototype.openSubMenu = function(e, ctxMenu, listElement) {
-        var _a;
-        var subMenu = (_a = listElement.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("li > ul");
-        if (subMenu && subMenu.parentElement !== listElement) this.hide(subMenu);
-        listElement.appendChild(this.generateDOM(ctxMenu, listElement));
     };
     ContextMenu.addStylesToDom = function() {
         if (document.readyState === "loading") return document.addEventListener("readystatechange", this.addStylesToDom, {

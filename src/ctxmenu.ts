@@ -130,7 +130,7 @@ class ContextMenu implements CTXMenuSingleton {
         if (menu === this.menu) {
             delete this.menu;
         }
-        menu.parentElement?.removeChild(menu);
+        menu.remove();
     }
 
     /** creates the menu Elements, sets the menu position and attaches submenu lifecycle handlers */
@@ -150,23 +150,12 @@ class ContextMenu implements CTXMenuSingleton {
             if (isDisabled(item)) return;
             if (!itemIsSubMenu(item)) return;
 
-            onHoverDebounced(li, (ev) => {
-                const subMenu = li.querySelector("ul");
-                if (!subMenu) { //if it's already open, do nothing
-                    this.openSubMenu(ev, getProp(item.subMenu), li);
-                }
+            onHoverDebounced(li, () => {
+                if (li.querySelector("ul")) return;
+                li.appendChild(this.generateDOM(getProp(item.subMenu), li));
             });
         });
         return container;
-    }
-
-    private openSubMenu(e: MouseEvent, ctxMenu: CTXMenu, listElement: HTMLLIElement) {
-        // check if other submenus on this level are open and close them
-        const subMenu = listElement.parentElement?.querySelector("li > ul");
-        if (subMenu && subMenu.parentElement !== listElement) {
-            this.hide(subMenu);
-        }
-        listElement.appendChild(this.generateDOM(ctxMenu, listElement));
     }
 
     private static addStylesToDom() {
