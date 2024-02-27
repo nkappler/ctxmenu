@@ -89,7 +89,7 @@ function getPosition(rect: Rect, pos: Point): Point {
             : pos.x < minX ? minX : pos.x,
         y: vdir === "d"
             ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y
-            : pos.y < minY ? minY : pos.y
+            : pos.y < minY ? minY : pos.y + rect.height > maxY ? maxY - rect.height : pos.y
     };
 }
 
