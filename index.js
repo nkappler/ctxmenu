@@ -189,7 +189,7 @@ function getPosition(rect, pos) {
     var maxY = (height - top) / scale.y;
     return {
         x: hdir === "r" ? pos.x + rect.width > maxX ? maxX - rect.width : pos.x : pos.x < minX ? minX : pos.x,
-        y: vdir === "d" ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y
+        y: vdir === "d" ? pos.y + rect.height > maxY ? maxY - rect.height : pos.y : pos.y < minY ? minY : pos.y + rect.height > maxY ? maxY - rect.height : pos.y
     };
 }
 
