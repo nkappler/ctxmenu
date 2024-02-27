@@ -1,6 +1,6 @@
 {
   "name": "ctxmenu",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Tiny and Customizable Context Menu Generator",
   "main": "index.js",
   "types": "index.d.ts",
@@ -41,7 +41,8 @@
   "keywords": [
     "context menu",
     "contextmenu",
-    "context", "menu",
+    "context",
+    "menu",
     "rightclick"
   ]
 }
