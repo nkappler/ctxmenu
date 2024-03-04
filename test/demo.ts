@@ -1,4 +1,7 @@
 /// <reference types="../standalone/ctxmenu" />
+
+import { CTXConfig } from "../standalone/ctxmenu";
+
 (() => {
     let ctxmenu: typeof window.ctxmenu;
 
@@ -145,7 +148,7 @@
         ], {
             onBeforeShow: function (m, e) {
                 m.push({
-                    text: "e.g. Cursor Position: X:" + e.clientX + " / Y:" + e.clientY,
+                    text: "e.g. Cursor Position: X:" + e!.clientX + " / Y:" + e!.clientY,
                     href: "",
                     disabled: true
                 });
@@ -213,14 +216,21 @@
         }
     ];
 
+    const config: CTXConfig = {
+        onBeforeHide: (m) => console.log(m, "onBeforeHide"),
+        onHide: (m) => console.log(m, "onHide"),
+        onBeforeShow: (m, e) => void console.log(m, e, "onBeforeShow") ?? m,
+        onShow: (m) => console.log(m, "onShow"),
+    };
+
     Object.assign(window, {
         // functions used in html file
         showContextMenuForEvent: (e: MouseEvent) => {
-            ctxmenu.show(menuExample, e);
+            ctxmenu.show(menuExample, e, config);
         },
         showContextMenuForElement: (element: HTMLElement, e: MouseEvent) => {
             e.stopPropagation();
-            ctxmenu.show(menuExample, element);
+            ctxmenu.show(menuExample, element, config);
         },
         toggleDarkMode: () => {
             const darkCss = document.querySelector("#darkTheme")!;
