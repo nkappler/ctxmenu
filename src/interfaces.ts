@@ -79,7 +79,7 @@ export type CTXMenu = CTXMItem[];
  * Can be used to manipulate the menu based on the Event. (e.g. Cursor Position)
  * Needs to return a menu definition.
  */
-export type BeforeRenderFN = (menu: CTXMenu, e: MouseEvent) => CTXMenu;
+export type BeforeRenderFN = (menu: CTXMenu, e?: MouseEvent) => CTXMenu;
 
 export interface CTXConfig {
     onBeforeShow?: BeforeRenderFN;
@@ -120,6 +120,7 @@ export interface CTXMenuSingleton {
      * `beforeRender` needs to return a new menu definition which will be used.
      */
     update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN): void;
+    update(target: string, ctxMenu?: CTXMenu, config?: CTXConfig): void;
     /**
      * The delete method is used to delete a context menu
      * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)

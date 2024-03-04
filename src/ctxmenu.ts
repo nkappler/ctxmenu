@@ -13,7 +13,7 @@ interface CTXCache {
     [key: string]: {
         ctxMenu: CTXMenu,
         handler: CTXHandler,
-        config: Required<CTXConfig>
+        config: CTXConfig
     } | undefined;
 }
 
@@ -86,8 +86,7 @@ class ContextMenu implements CTXMenuSingleton {
             return;
         }
         const handler: CTXHandler = e => {
-            const newMenu = config.onBeforeShow([...ctxMenu], e);
-            this.show(newMenu, e, config);
+            this.show(ctxMenu, e, config);
         };
 
         this.cache[target] = {
@@ -104,7 +103,7 @@ class ContextMenu implements CTXMenuSingleton {
     public update(target: string, ctxMenu?: CTXMenu, _config: CTXConfig | BeforeRenderFN = {}) {
         if (typeof _config === "function") { return this.update(target, ctxMenu, { onBeforeShow: _config }); }
         const o = this.cache[target];
-        const config = { ...o?.config, ..._config };
+        const config = Object.assign({}, o?.config, _config);
         const t = document.querySelector<HTMLElement>(target);
         o && t?.removeEventListener("contextmenu", o.handler);
         delete this.cache[target];
@@ -129,6 +128,7 @@ class ContextMenu implements CTXMenuSingleton {
     public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent, _config?: CTXConfig) {
         if (eventOrElement instanceof MouseEvent) {
             eventOrElement.stopImmediatePropagation();
+            eventOrElement.preventDefault();
         }
         //close any open menu
         this.hide();
@@ -136,17 +136,14 @@ class ContextMenu implements CTXMenuSingleton {
 
         this.onHide = config.onHide;
         this.onBeforeHide = config.onBeforeHide;
-        this.menu = this.generateDOM([...ctxMenu], eventOrElement);
 
+        const newMenu = config.onBeforeShow?.(ctxMenu.slice(), eventOrElement instanceof MouseEvent ? eventOrElement : undefined) ?? ctxMenu;
+        this.menu = this.generateDOM(newMenu, eventOrElement);
 
         document.body.appendChild(this.menu);
-        config.onShow(this.menu);
+        config.onShow?.(this.menu);
 
         this.menu.addEventListener("wheel", () => void (this.preventCloseOnScroll = true), { passive: true });
-
-        if (eventOrElement instanceof MouseEvent) {
-            eventOrElement.preventDefault();
-        }
     }
 
     public hide(menu: Element | undefined = this.menu) {
@@ -165,14 +162,13 @@ class ContextMenu implements CTXMenuSingleton {
         this.onHide = undefined;
     }
 
-    private getConfig(config: CTXConfig = {}): Required<CTXConfig>{
-        return {
+    private getConfig(config: CTXConfig = {}): CTXConfig {
+        return Object.assign({
             onBeforeShow: m => m,
             onBeforeHide: () => { },
             onShow: () => { },
-            onHide: () => { },
-            ...config
-        } as Required<CTXConfig>;
+            onHide: () => { }
+        }, config);
     }
 
     private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent): HTMLUListElement {
