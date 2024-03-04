@@ -131,13 +131,17 @@
                     }
                 }
             }
-        ], function (m, e) {
-            m.push({
-                text: "e.g. Cursor Position: X:" + e.clientX + " / Y:" + e.clientY,
-                href: "",
-                disabled: true
-            });
-            return m;
+        ], {
+            onBeforeShow: function (m, e) {
+                m.push({
+                    text: "e.g. Cursor Position: X:" + e.clientX + " / Y:" + e.clientY,
+                    href: "",
+                    disabled: true
+                });
+                return m;
+            },
+            onBeforeHide: function (m) { return console.log("will be hidden", m); },
+            onHide: function (m) { return console.log("menu hidden:", m); }
         });
         ctxmenu.attach("#header", []);
         ctxmenu.attach("header", []);

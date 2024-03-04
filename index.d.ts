@@ -68,18 +68,31 @@ type CTXMenu = CTXMItem[];
  * Needs to return a menu definition.
  */
 type BeforeRenderFN = (menu: CTXMenu, e: MouseEvent) => CTXMenu;
+interface CTXConfig {
+    onBeforeShow?: BeforeRenderFN;
+    onShow?: Function;
+    onBeforeHide?: Function;
+    onHide?: Function;
+}
 interface CTXMenuSingleton {
     /**
      * The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
      * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
      * @param ctxMenu An array of objects defining the menu layout.
-     * @param beforeRender An optional callback function that is called before the context menu is opened.
+     * @param config A config object, See `CTXConfig`.
+     * @deprecated @param beforeRender An optional callback function that is called before the context menu is opened.
      * It is passed two arguments:
      * `menu` - the menu definition,
      * `event` - the MouseEvent.
      * `beforeRender` needs to return a new menu definition which will be used.
+     *
+     * as of version 1.7.
+     * Method Signature changed. Third parameter should be a config option now.
+     * You can pass the beforeRender callback like this: `attach("#target", [...], { onBeforeShow: beforeRender })`
+     * Calling the old signature won't work in a future update
      */
     attach(target: string, ctxMenu: CTXMenu, beforeRender?: BeforeRenderFN): void;
+    attach(target: string, ctxMenu: CTXMenu, config?: CTXConfig): void;
     /**
      * The update method is used to update an existing context menu.
      * You can update each the menu definition or beforeRender function only by passing undefined for the other argument.
@@ -103,15 +116,15 @@ interface CTXMenuSingleton {
      * @param ctxMenu An array of objects defining the menu layout.
      * @param e Either a MouseEvent or an HTMLElement, defining where the context menu should be opened.
      */
-    show(ctxMenu: CTXMenu, e: MouseEvent | HTMLElement): void;
+    show(ctxMenu: CTXMenu, e: MouseEvent | HTMLElement, config?: CTXConfig): void;
     /**
      * Close any contextmenu that might be open at the moment
      */
     hide(): void;
 }
 
-/*! ctxMenu v1.6.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.6.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 declare const ctxmenu: CTXMenuSingleton;
 
-export { BeforeRenderFN, CTXMAction, CTXMAnchor, CTXMDivider, CTXMHeading, CTXMInteractive, CTXMItem, CTXMItemEventListener, CTXMItemEventRegistry, CTXMSubMenu, CTXMenu, CTXMenuSingleton, ValueOrFunction, ctxmenu };
+export { BeforeRenderFN, CTXConfig, CTXMAction, CTXMAnchor, CTXMDivider, CTXMHeading, CTXMInteractive, CTXMItem, CTXMItemEventListener, CTXMItemEventRegistry, CTXMSubMenu, CTXMenu, CTXMenuSingleton, ValueOrFunction, ctxmenu };
