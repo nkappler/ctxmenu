@@ -4,30 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-
-function __spreadArray(to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) if (ar || !(i in from)) {
-        if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-        ar[i] = from[i];
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-}
-
-typeof SuppressedError === "function" ? SuppressedError : function(error, suppressed, message) {
-    var e = new Error(message);
-    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
-};
-
 function getProp(prop) {
     return typeof prop === "function" ? prop() : prop;
 }
@@ -279,12 +255,11 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         var _this = this;
         this.cache = {};
         this.preventCloseOnScroll = false;
-        window.addEventListener("click", (function() {
+        var _hide = function() {
             return void _this.hide();
-        }));
-        window.addEventListener("resize", (function() {
-            return void _this.hide();
-        }));
+        };
+        window.addEventListener("click", _hide);
+        window.addEventListener("resize", _hide);
         var timeout = 0;
         window.addEventListener("wheel", (function() {
             clearTimeout(timeout);
@@ -331,8 +306,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
             return;
         }
         var handler = function(e) {
-            var newMenu = config.onBeforeShow(__spreadArray([], ctxMenu, true), e);
-            _this.show(newMenu, e, config);
+            _this.show(ctxMenu, e, config);
         };
         this.cache[target] = {
             ctxMenu: ctxMenu,
@@ -347,7 +321,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
             onBeforeShow: _config
         });
         var o = this.cache[target];
-        var config = __assign(__assign({}, o === null || o === void 0 ? void 0 : o.config), _config);
+        var config = Object.assign({}, o === null || o === void 0 ? void 0 : o.config, _config);
         var t = document.querySelector(target);
         o && (t === null || t === void 0 ? void 0 : t.removeEventListener("contextmenu", o.handler));
         delete this.cache[target];
@@ -363,20 +337,24 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.prototype.show = function(ctxMenu, eventOrElement, _config) {
         var _this = this;
-        if (eventOrElement instanceof MouseEvent) eventOrElement.stopImmediatePropagation();
+        var _a, _b, _c;
+        if (eventOrElement instanceof MouseEvent) {
+            eventOrElement.stopImmediatePropagation();
+            eventOrElement.preventDefault();
+        }
         this.hide();
         var config = this.getConfig(_config);
         this.onHide = config.onHide;
         this.onBeforeHide = config.onBeforeHide;
-        this.menu = this.generateDOM(__spreadArray([], ctxMenu, true), eventOrElement);
+        var newMenu = (_b = (_a = config.onBeforeShow) === null || _a === void 0 ? void 0 : _a.call(config, ctxMenu.slice(), eventOrElement instanceof MouseEvent ? eventOrElement : void 0)) !== null && _b !== void 0 ? _b : ctxMenu;
+        this.menu = this.generateDOM(newMenu, eventOrElement);
         document.body.appendChild(this.menu);
-        config.onShow(this.menu);
+        (_c = config.onShow) === null || _c === void 0 ? void 0 : _c.call(config, this.menu);
         this.menu.addEventListener("wheel", (function() {
             return void (_this.preventCloseOnScroll = true);
         }), {
             passive: true
         });
-        if (eventOrElement instanceof MouseEvent) eventOrElement.preventDefault();
     };
     ContextMenu.prototype.hide = function(menu) {
         var _a, _b;
@@ -392,7 +370,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.prototype.getConfig = function(config) {
         if (config === void 0) config = {};
-        return __assign({
+        return Object.assign({
             onBeforeShow: function(m) {
                 return m;
             },

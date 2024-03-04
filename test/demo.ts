@@ -145,7 +145,7 @@
         ], {
             onBeforeShow: function (m, e) {
                 m.push({
-                    text: "e.g. Cursor Position: X:" + e.clientX + " / Y:" + e.clientY,
+                    text: "e.g. Cursor Position: X:" + e!.clientX + " / Y:" + e!.clientY,
                     href: "",
                     disabled: true
                 });

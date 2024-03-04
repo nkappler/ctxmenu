@@ -388,7 +388,7 @@ describe("CTXMenu", () => {
         describe("menu definition can be altered in onBeforeShow", () => {
             it("using attach", () => {
                 window.ctxmenu.attach("#TARGET", defaultMenuDeclaration, {
-                    onBeforeShow: () => [{ isDivider: true }]
+                    onBeforeShow: () => [{ isDivider: true } as const]
                 });
 
                 getTarget().dispatchEvent(new MouseEvent("contextmenu"));
