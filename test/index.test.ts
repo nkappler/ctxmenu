@@ -20,6 +20,11 @@ const getMenu = (): HTMLUListElement => {
     throw ("element .ctxmenu not found");
 };
 
+const showMenu = (menu: Parameters<typeof window.ctxmenu.show>[0], config?: Parameters<typeof window.ctxmenu.show>[2]) => {
+    window.ctxmenu.show(menu, getTarget(), config);
+    return getMenu().firstElementChild! as HTMLElement;
+}
+
 let error: jasmine.Spy;
 
 const makeTarget = () => {

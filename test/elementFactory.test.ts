@@ -1,11 +1,6 @@
 const stringifyAttribute = ({ name, value }: Attr) => `${name}="${value}"`;
 const stringifyAttributes = ({ attributes }: Element) => Array.from(attributes).map(stringifyAttribute).sort();
 
-const showMenu = (menu: Parameters<typeof window.ctxmenu.show>[0]) => {
-    window.ctxmenu.show(menu, getTarget());
-    return getMenu().firstElementChild! as HTMLElement;
-}
-
 /**
  * Although this suite tests code specifically from the element factory,
  * we won't call it directly but use only the public API until deemed necessary
