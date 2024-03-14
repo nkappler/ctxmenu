@@ -138,7 +138,7 @@ class ContextMenu implements CTXMenuSingleton {
         this.onBeforeHide = config.onBeforeHide;
 
         const newMenu = config.onBeforeShow?.(ctxMenu.slice(), eventOrElement instanceof MouseEvent ? eventOrElement : undefined) ?? ctxMenu;
-        this.menu = this.generateDOM(newMenu, eventOrElement);
+        this.menu = this.generateDOM(newMenu, eventOrElement, config.attributes);
 
         document.body.appendChild(this.menu);
         config.onShow?.(this.menu);
@@ -171,7 +171,7 @@ class ContextMenu implements CTXMenuSingleton {
         }, config);
     }
 
-    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent): HTMLUListElement {
+    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent, attributes: Record<string, string> = {}): HTMLUListElement {
         //This has grown pretty messy and could use a rework
 
         const container = document.createElement("ul");
@@ -193,7 +193,7 @@ class ContextMenu implements CTXMenuSingleton {
                     onHoverDebounced(li, (ev) => {
                         const subMenu = li.querySelector("ul");
                         if (!subMenu) { //if it's already open, do nothing
-                            this.openSubMenu(ev, getProp(item.subMenu), li);
+                            this.openSubMenu(ev, getProp(item.subMenu), li, getProp(item.subMenuAttributes));
                         }
                     });
                 } else {
@@ -202,7 +202,9 @@ class ContextMenu implements CTXMenuSingleton {
             }
             container.appendChild(li);
         });
-        container.className = "ctxmenu";
+        Object.entries(attributes).forEach(([attr, val]) => container.setAttribute(attr, val));
+
+        container.classList.add("ctxmenu");
         setPosition(container, parentOrEvent);
 
         container.addEventListener("contextmenu", ev => {
@@ -218,13 +220,13 @@ class ContextMenu implements CTXMenuSingleton {
         return container;
     }
 
-    private openSubMenu(e: MouseEvent, ctxMenu: CTXMenu, listElement: HTMLLIElement) {
+    private openSubMenu(e: MouseEvent, ctxMenu: CTXMenu, listElement: HTMLLIElement, attributes: Record<string, string> = {}) {
         // check if other submenus on this level are open and close them
         const subMenu = listElement.parentElement?.querySelector("li > ul");
         if (subMenu && subMenu.parentElement !== listElement) {
             this.hide(subMenu);
         }
-        listElement.appendChild(this.generateDOM(ctxMenu, listElement));
+        listElement.appendChild(this.generateDOM(ctxMenu, listElement, attributes ));
     }
 
     private static addStylesToDom() {
