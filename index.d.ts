@@ -30,6 +30,8 @@ interface CTXMHeading {
     style?: ValueOrFunction<string>;
     /** A record of event listeners */
     events?: ValueOrFunction<CTXMItemEventRegistry>;
+    /** A record of attributes to assign to the menu item, possibly overwriting existing ones */
+    attributes?: ValueOrFunction<Record<string, string>>;
 }
 interface CTXMInteractive extends CTXMHeading {
     /** Whether the Context Menu Item is disabled or not. Defaults to `false` */
@@ -55,6 +57,8 @@ interface CTXMAnchor extends CTXMInteractive {
 interface CTXMSubMenu extends CTXMInteractive {
     /** The menu definition for the nested menu */
     subMenu: ValueOrFunction<CTXMenu>;
+    /** The attributes for the nested menus container */
+    subMenuAttributes: ValueOrFunction<Record<string, string>>;
 }
 type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
 /**
@@ -73,6 +77,7 @@ interface CTXConfig {
     onShow?: Function;
     onBeforeHide?: Function;
     onHide?: Function;
+    attributes?: Record<string, string>;
 }
 interface CTXMenuSingleton {
     /**
