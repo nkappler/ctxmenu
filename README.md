@@ -58,7 +58,6 @@ to use it, just download and link ctxmenu.js or ctxmenu.min.js in your websites 
 
 Menu definitions are used to describe the content of a context menu. A menu definition is an array of objects, where each object defines a single item in the menu.
 
-
 Example:
 
 ![Screenshot](https://raw.githubusercontent.com/nkappler/ctxmenu/master/docs/simpleMenu.png)
@@ -89,8 +88,11 @@ var menuDefinition = [
 
 ### Heading Item
 
-This is a heading item which displays a `text` and optionally shows a `tooltip` when hovering over it. If you need finer control over the content of the menu item, you can supply your own HTML string by using the `html` property instead of `text`. Alternatively you can also supply an HTMLElement JavaScript Object. For all properties you can supply the value directly or a factory function which will be called just before the menu is opened (i.e. on right click). You can also supply a URL or Data URL to an image used as icon for the menu item. Recommended resolution is 18×18px. \
-For more information about the `EventRegistry`, see [Custom Events](#custom-events).
+This is a heading item which displays a `text` and optionally shows a `tooltip` when hovering over it. If you need finer control over the content of the menu item, you can supply your own HTML string by using the `html` property instead of `text`. Alternatively you can also supply an HTMLElement JavaScript Object. For all properties you can supply the value directly or a factory function which will be called just before the menu is opened (i.e. on right click). You can also supply a URL or Data URL to an image used as `icon` for the menu item. Recommended resolution is 18×18px. \
+For more information about the `EventRegistry`, see [Custom Events](#custom-events). With the `attributes` record you can define arbitrary attributes for the list item, like you can with the `Element.setAttribute` browser API, for example, `id`, `class` or data attributes.
+
+> [!NOTE]
+> Keep in mind that with the `attributes` record you can overwrite other config options like `style` or `tooltip` for example
 
 ```typescript
 {
@@ -101,6 +103,7 @@ For more information about the `EventRegistry`, see [Custom Events](#custom-even
     icon?: string | () => string,
     style?: string | () => string,
     events?: EventRegistry | () => EventRegistry,
+    attributes?: Record<string, string> | () => Record<string, string>
 }
 ```
 
@@ -145,6 +148,7 @@ The callback receives the event as parameter, so you can access the Action Item 
 ### Submenu Item
 
 This is an interactive item which holds another [menu definition](#menu-definition). You can create infinitely deep nested submenus.
+With `subMenuAttributes` you define HTML attributes for the submenu container (the UL element), with `attributes` you can define those for the list item itself.
 
 ```typescript
 {
@@ -152,6 +156,9 @@ This is an interactive item which holds another [menu definition](#menu-definiti
 
     /** Submenu Definition, */
     subMenu: Array | () => Array,       // A menu definition
+
+    /** Attribute record for the submenu container */
+    subMenuAttributes: Record<string, string> | () => Record<string, string>
 
     /** defaults to false */
     disabled?: boolean | () => boolean  // default false
@@ -178,27 +185,33 @@ It has the following five APIs:
 [show](#ctxmenushow)\
 [hide](#ctxmenuhide)
 
+### Interfaces
+[CTXConfig](#ctxconfig)
+
 ### `ctxmenu.attach`
 ```typescript
-ctxmenu.attach(target: string, ctxmenu: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
+ctxmenu.attach(target: string, ctxmenu: Array, config?: CTXConfig)
 ```
 
 The `attach` method is used to bind a context menu to any DOM Node and takes the following arguments:
-- `target`: A selector string to define the target node (eg `'body'`, or `'#someID'`)
-- `ctxmenu`: An Array of objects defining the menu layout. See [Menu Definition](#menu-definition).
-- `beforeRender?`: An optional callback function that is called before the context menu is opened. It is passed two arguments: `menu` - the menu definition, `event` - the MouseEvent and needs to return a new menu definition which will be used.
+- `target` - A selector string to define the target node (eg `'body'`, or `'#someID'`)
+- `ctxmenu` - An Array of objects defining the menu layout. See [Menu Definition](#menu-definition).
+- `config?` -  A config object, See [CTXConfig](#ctxconfig).
 
 ### `ctxmenu.update`
 ```typescript
-ctxmenu.update(target: string, ctxmenu?: Array, beforeRender?: (menu: Array, event: MouseEvent) => Array)
+ctxmenu.update(target: string, ctxmenu?: Array,  config?: CTXConfig)
 ```
 
-The update method is used to update an existing context menu. You can update each the menu definition or beforeRender function only by passing undefined for the other argument. If you try to update a menu which does not exist, it will silently be [attached](#ctxmenuattach) instead.
+The update method is used to update an existing context menu. You can pass `undefined` for each optional parameter in order to not change it. If you pass a partial [CTXConfig](#ctxconfig) object, only the specified members will be overwritten.
 
 `update` takes two or three arguments: 
 - `target` - the selector string to define the target element
 - `ctxmenu` - the updated menu definition.  _(might be undefined when only updating beforeRender)_
-- `beforeRender` - the updated callback function that is called before the context menu is opened.
+- `config?` - A config object, See [CTXConfig](#ctxconfig).
+
+> [!NOTE]
+> If you try to update a menu which does not exist, it will silently be [attached](#ctxmenuattach) instead.
 
 ### `ctxmenu.delete`
 ```typescript
@@ -230,6 +243,29 @@ clickHandler(e: MouseEvent) {
 ctxmenu.hide()
 ```
 Hide any open context menu. 
+
+## CTXConfig
+
+With this interface you can define __lifecycle events__ and __attributes__ for a context menu via the [attach](#ctxmenuattach) and [update](#ctxmenuupdate) methods.
+
+```typescript
+    onBeforeShow?: () => Array;
+    onShow?: Function;
+    onBeforeHide?: Function;
+    onHide?: Function;
+    attributes?: Record<string, string>
+```
+
+The `onBeforeShow` method can be used to change the menu definition just before it is shown. This can be useful to customize the menu based on the event properties (for example, the cursor position). The function should return a new menu definition.
+
+The `onShow` method can be used to execute code after the menu is shown. This can be useful to execute code that depends on the menu being visible (for example, to focus an input field).
+
+The `onBeforeHide` method can be used to execute code just before the menu is hidden. This can be useful to execute code that depends on the menu being visible (for example, to save the state of the menu).
+
+The `onHide` method can be used to execute code after the menu is hidden. This can be useful to execute code that depends on the menu being hidden (for example, to reset the state of the menu).
+
+The `attributes` record can be used to define arbitrary attributes for the menu container (the UL element), like you can with the `Element.setAttribute` browser API, for example, `id`, `class` or data attributes.
+
 
 ## Custom Events
 

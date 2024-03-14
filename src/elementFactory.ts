@@ -32,6 +32,8 @@ export function generateMenuItem(item: CTXMItem) {
         return li;
     }
 
+    Object.entries(getProp(item.attributes) ?? {}).forEach(([attr, val]) => li.setAttribute(attr, val));
+
     generateBaseItemContent(item, li);
 
     if (!itemIsInteractive(item)) {
