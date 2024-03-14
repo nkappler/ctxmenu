@@ -147,7 +147,7 @@ interface CTXMenuSingleton {
     hide(): void;
 }
 
-/*! ctxMenu v1.6.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.7.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 declare const ctxmenu: CTXMenuSingleton;
 
