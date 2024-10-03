@@ -1,7 +1,7 @@
 /*! ctxMenu v1.7.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 import { generateMenu, onHoverDebounced } from "./elementFactory";
-import type { BeforeRenderFN, CTXConfig, CTXMenu, CTXMenuSingleton } from "./interfaces";
+import type { CTXConfig, CTXMenu, CTXMenuSingleton } from "./interfaces";
 import { resetDirections, setPosition } from "./position";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
@@ -65,11 +65,7 @@ class ContextMenu implements CTXMenuSingleton {
         };
     }
 
-    /** @deprecated */
-    public attach(target: string, ctxMenu: CTXMenu, beforeRender?: BeforeRenderFN): void;
-    public attach(target: string, ctxMenu: CTXMenu, config?: CTXConfig): void;
-    public attach(target: string, ctxMenu: CTXMenu, _config: CTXConfig | BeforeRenderFN = {}): void {
-        if (typeof _config === "function") { return this.attach(target, ctxMenu, { onBeforeShow: _config }) }
+    public attach(target: string, ctxMenu: CTXMenu, _config: CTXConfig = {}): void {
         const config = this.getConfig(_config);
         const t = document.querySelector<HTMLElement>(target);
         if (this.cache[target] !== undefined) {
@@ -92,11 +88,7 @@ class ContextMenu implements CTXMenuSingleton {
         t.addEventListener("contextmenu", handler);
     }
 
-    /** @deprecated */
-    public update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN): void;
-    public update(target: string, ctxMenu?: CTXMenu, config?: CTXConfig): void;
-    public update(target: string, ctxMenu?: CTXMenu, _config: CTXConfig | BeforeRenderFN = {}) {
-        if (typeof _config === "function") { return this.update(target, ctxMenu, { onBeforeShow: _config }); }
+    public update(target: string, ctxMenu?: CTXMenu, _config: CTXConfig = {}) {
         const o = this.cache[target];
         const config = Object.assign({}, o?.config, _config);
         const t = document.querySelector<HTMLElement>(target);

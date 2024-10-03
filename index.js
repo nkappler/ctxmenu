@@ -73,6 +73,10 @@ function generateMenuItem(item) {
         return item.icon;
     }, "icon", true ], [ itemIsHeading, "heading", false ], [ itemIsSubMenu, "submenu", true ], [ isDisabled, "disabled", false ], [ itemIsInteractive, "interactive", true ] ], item, li);
     if (itemIsDivider(item)) return li;
+    Object.entries((_a = getProp(item.attributes)) !== null && _a !== void 0 ? _a : {}).forEach((function(_a) {
+        var attr = _a[0], val = _a[1];
+        return li.setAttribute(attr, val);
+    }));
     [ makeInnerHTML, makeAttributes, makeIcon, addEventHandlers, makeAnchor ].forEach((function(step) {
         return step.call(null, item, li);
     }));
@@ -293,9 +297,6 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     ContextMenu.prototype.attach = function(target, ctxMenu, _config) {
         var _this = this;
         if (_config === void 0) _config = {};
-        if (typeof _config === "function") return this.attach(target, ctxMenu, {
-            onBeforeShow: _config
-        });
         var config = this.getConfig(_config);
         var t = document.querySelector(target);
         if (this.cache[target] !== void 0) {
@@ -318,9 +319,6 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.prototype.update = function(target, ctxMenu, _config) {
         if (_config === void 0) _config = {};
-        if (typeof _config === "function") return this.update(target, ctxMenu, {
-            onBeforeShow: _config
-        });
         var o = this.cache[target];
         var config = Object.assign({}, o === null || o === void 0 ? void 0 : o.config, _config);
         var t = document.querySelector(target);
@@ -348,7 +346,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
         this.onHide = config.onHide;
         this.onBeforeHide = config.onBeforeHide;
         var newMenu = (_b = (_a = config.onBeforeShow) === null || _a === void 0 ? void 0 : _a.call(config, ctxMenu.slice(), eventOrElement instanceof MouseEvent ? eventOrElement : void 0)) !== null && _b !== void 0 ? _b : ctxMenu;
-        this.menu = this.generateDOM(newMenu, eventOrElement);
+        this.menu = this.generateDOM(newMenu, eventOrElement, config.attributes);
         document.body.appendChild(this.menu);
         (_c = config.onShow) === null || _c === void 0 ? void 0 : _c.call(config, this.menu);
         this.menu.addEventListener("wheel", (function() {
@@ -382,6 +380,7 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
     };
     ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent, attributes) {
         var _this = this;
+        if (attributes === void 0) attributes = {};
         var container = generateMenu(ctxMenu);
         setPosition(container, parentOrEvent);
         ctxMenu.forEach((function(item, i) {
@@ -395,8 +394,12 @@ var styles = 'html{min-height:100%}.ctxmenu{position:fixed;border:1px solid #999
             if (!itemIsSubMenu(item)) return;
             onHoverDebounced(li, (function() {
                 if (li.querySelector("ul")) return;
-                li.appendChild(_this.generateDOM(getProp(item.subMenu), li));
+                li.appendChild(_this.generateDOM(getProp(item.subMenu), li, getProp(item.subMenuAttributes)));
             }));
+        }));
+        Object.entries(attributes).forEach((function(_a) {
+            var attr = _a[0], val = _a[1];
+            return container.setAttribute(attr, val);
         }));
         return container;
     };
