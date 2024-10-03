@@ -1,3 +1,5 @@
+"use strict";
+exports.__esModule = true;
 (function () {
     var ctxmenu;
     var script = document.createElement("script");
@@ -184,27 +186,52 @@
                 {
                     text: "ctxmenu.js",
                     href: "ctxmenu.js",
-                    download: ""
+                    download: "",
+                    attributes: {
+                        "style": "display: flex"
+                    }
                 },
                 {
                     text: "ctxmenu.min.js",
                     href: "ctxmenu.min.js",
-                    download: ""
+                    download: "",
+                    attributes: {
+                        name: "minified"
+                    }
                 }
-            ]
+            ],
+            attributes: function () {
+                return {
+                    id: "downloads",
+                    name: "downloads"
+                };
+            },
+            subMenuAttributes: {
+                "class": "downloadsContainer"
+            }
         },
         {
             text: "Documentation (github)",
             href: "https://www.github.com/nkappler/ctxmenu"
         }
     ];
+    var config = {
+        onBeforeHide: function (m) { return console.log(m, "onBeforeHide"); },
+        onHide: function (m) { return console.log(m, "onHide"); },
+        onBeforeShow: function (m, e) { var _a; return (_a = void console.log(m, e, "onBeforeShow")) !== null && _a !== void 0 ? _a : m; },
+        onShow: function (m) { return console.log(m, "onShow"); },
+        attributes: {
+            "class": "shouldRetainCtxMenu",
+            id: "myID"
+        }
+    };
     Object.assign(window, {
         showContextMenuForEvent: function (e) {
-            ctxmenu.show(menuExample, e);
+            ctxmenu.show(menuExample, e, config);
         },
         showContextMenuForElement: function (element, e) {
             e.stopPropagation();
-            ctxmenu.show(menuExample, element);
+            ctxmenu.show(menuExample, element, config);
         },
         toggleDarkMode: function () {
             var darkCss = document.querySelector("#darkTheme");

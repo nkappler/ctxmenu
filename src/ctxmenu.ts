@@ -1,4 +1,4 @@
-/*! ctxMenu v1.6.2 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v1.7.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 import { generateMenu, onHoverDebounced } from "./elementFactory";
 import type { BeforeRenderFN, CTXConfig, CTXMenu, CTXMenuSingleton } from "./interfaces";
@@ -132,7 +132,7 @@ class ContextMenu implements CTXMenuSingleton {
         this.onBeforeHide = config.onBeforeHide;
 
         const newMenu = config.onBeforeShow?.(ctxMenu.slice(), eventOrElement instanceof MouseEvent ? eventOrElement : undefined) ?? ctxMenu;
-        this.menu = this.generateDOM(newMenu, eventOrElement);
+        this.menu = this.generateDOM(newMenu, eventOrElement, config.attributes);
 
         document.body.appendChild(this.menu);
         config.onShow?.(this.menu);
@@ -165,7 +165,7 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     /** creates the menu Elements, sets the menu position and attaches submenu lifecycle handlers */
-    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent): HTMLUListElement {
+    private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent, attributes: Record<string, string> = {}): HTMLUListElement {
         const container = generateMenu(ctxMenu);
         setPosition(container, parentOrEvent);
         ctxMenu.forEach((item, i) => {
@@ -183,9 +183,12 @@ class ContextMenu implements CTXMenuSingleton {
 
             onHoverDebounced(li, () => {
                 if (li.querySelector("ul")) return;
-                li.appendChild(this.generateDOM(getProp(item.subMenu), li));
+                li.appendChild(this.generateDOM(getProp(item.subMenu), li, getProp(item.subMenuAttributes)));
             });
         });
+
+        Object.entries(attributes).forEach(([attr, val]) => container.setAttribute(attr, val));
+
         return container;
     }
 

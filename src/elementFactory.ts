@@ -50,6 +50,8 @@ function generateMenuItem(item: CTXMItem) {
 
     if (itemIsDivider(item)) { return li; }
 
+    Object.entries(getProp(item.attributes) ?? {}).forEach(([attr, val]) => li.setAttribute(attr, val));
+
     [
         makeInnerHTML,
         makeAttributes,

@@ -52,6 +52,7 @@
         return menu;
     }
     function generateMenuItem(item) {
+        var _a;
         var li = document.createElement("li");
         populateClassList([ [ itemIsDivider, "divider", false ], [ function(item) {
             return item.icon;
@@ -348,7 +349,7 @@
                 onHide: function() {}
             }, config);
         };
-        ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent) {
+        ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent, attributes) {
             var _this = this;
             var container = generateMenu(ctxMenu);
             setPosition(container, parentOrEvent);

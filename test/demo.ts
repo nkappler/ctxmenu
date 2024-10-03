@@ -1,4 +1,7 @@
 /// <reference types="../standalone/ctxmenu" />
+
+import type { CTXConfig, CTXMenu } from "../standalone/ctxmenu";
+
 (() => {
     let ctxmenu: typeof window.ctxmenu;
 
@@ -191,21 +194,36 @@
         }];
     }
 
-    const menuExample = [
+    const menuExample: CTXMenu = [
         {
             text: "Downloads",
             subMenu: [
                 {
                     text: "ctxmenu.js",
                     href: "ctxmenu.js",
-                    download: ""
+                    download: "",
+                    attributes: {
+                        "style": "display: flex"
+                    }
                 },
                 {
                     text: "ctxmenu.min.js",
                     href: "ctxmenu.min.js",
-                    download: ""
+                    download: "",
+                    attributes: {
+                        name: "minified",
+                    }
                 }
-            ]
+            ],
+            attributes() {
+                return {
+                    id: "downloads",
+                    name: "downloads"
+                }
+            },
+            subMenuAttributes: {
+                class: "downloadsContainer"
+            }
         },
         {
             text: "Documentation (github)",
@@ -213,14 +231,25 @@
         }
     ];
 
+    const config: CTXConfig = {
+        onBeforeHide: (m) => console.log(m, "onBeforeHide"),
+        onHide: (m) => console.log(m, "onHide"),
+        onBeforeShow: (m, e) => void console.log(m, e, "onBeforeShow") ?? m,
+        onShow: (m) => console.log(m, "onShow"),
+        attributes: {
+            class: "shouldRetainCtxMenu",
+            id: "myID"
+        }
+    };
+
     Object.assign(window, {
         // functions used in html file
         showContextMenuForEvent: (e: MouseEvent) => {
-            ctxmenu.show(menuExample, e);
+            ctxmenu.show(menuExample, e, config);
         },
         showContextMenuForElement: (element: HTMLElement, e: MouseEvent) => {
             e.stopPropagation();
-            ctxmenu.show(menuExample, element);
+            ctxmenu.show(menuExample, element, config);
         },
         toggleDarkMode: () => {
             const darkCss = document.querySelector("#darkTheme")!;

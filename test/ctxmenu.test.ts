@@ -1,3 +1,4 @@
+/// <reference path="./index.test.ts" />
 
 describe("CTXMenu", () => {
 
@@ -404,5 +405,13 @@ describe("CTXMenu", () => {
                 expect(getMenu().childElementCount).toBe(1);
             });
         });
+    });
+
+    describe("attributes", () => {
+
+        xit("todo", () => {
+            //todo
+        });
+
     });
 });

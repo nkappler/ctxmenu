@@ -35,6 +35,8 @@ export interface CTXMHeading {
     style?: ValueOrFunction<string>;
     /** A record of event listeners */
     events?: ValueOrFunction<CTXMItemEventRegistry>;
+    /** A record of attributes to assign to the menu item, possibly overwriting existing ones */
+    attributes?: ValueOrFunction<Record<string, string>>;
 }
 
 export interface CTXMInteractive extends CTXMHeading {
@@ -64,6 +66,8 @@ export interface CTXMAnchor extends CTXMInteractive {
 export interface CTXMSubMenu extends CTXMInteractive {
     /** The menu definition for the nested menu */
     subMenu: ValueOrFunction<CTXMenu>;
+    /** The attributes for the nested menus container */
+    subMenuAttributes: ValueOrFunction<Record<string, string>>;
 }
 
 export type CTXMItem = CTXMAnchor | CTXMAction | CTXMHeading | CTXMDivider | CTXMSubMenu;
@@ -86,6 +90,7 @@ export interface CTXConfig {
     onShow?: Function;
     onBeforeHide?: Function;
     onHide?: Function;
+    attributes?: Record<string, string>
 }
 
 export interface CTXMenuSingleton {
@@ -94,30 +99,49 @@ export interface CTXMenuSingleton {
      * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
      * @param ctxMenu An array of objects defining the menu layout.
      * @param config A config object, See `CTXConfig`.
-     * @deprecated @param beforeRender An optional callback function that is called before the context menu is opened.
+     */
+    attach(target: string, ctxMenu: CTXMenu, config?: CTXConfig): void;
+    /**
+     * The attach method is used to bind a context menu to any DOM Node and takes the following arguments:
+     * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
+     * @param ctxMenu An array of objects defining the menu layout.
+     * @param beforeRender An optional callback function that is called before the context menu is opened.
      * It is passed two arguments:
      * `menu` - the menu definition,
      * `event` - the MouseEvent.
      * `beforeRender` needs to return a new menu definition which will be used.
      * 
-     * as of version 1.7.
+     * @deprecated as of version 1.7.
      * Method Signature changed. Third parameter should be a config option now. 
      * You can pass the beforeRender callback like this: `attach("#target", [...], { onBeforeShow: beforeRender })`
-     * Calling the old signature won't work in a future update
+     * Calling this signature won't work in a future update
      */
     attach(target: string, ctxMenu: CTXMenu, beforeRender?: BeforeRenderFN): void;
-    attach(target: string, ctxMenu: CTXMenu, config?: CTXConfig): void;
     /**
      * The update method is used to update an existing context menu.
      * You can update each the menu definition or beforeRender function only by passing undefined for the other argument.
      * If you try to update a menu which does not exist, it will silently be attached instead.
      * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
-     * @param ctxMenu An array of objects defining the updated menu layout. _(might be undefined when only updating beforeRender)_
+     * @param ctxMenu An array of objects defining the updated menu layout. _(can be undefined when only updating config)_
+     * @param config A config object, See `CTXConfig`. Only defined members will be updated.
+     */
+    update(target: string, ctxMenu?: CTXMenu, config?: CTXConfig): void;
+    /**
+     * The update method is used to update an existing context menu.
+     * You can update each the menu definition or beforeRender function only by passing undefined for the other argument.
+     * If you try to update a menu which does not exist, it will silently be attached instead.
+     * @param target A selector string to define the target node (eg `'body'`, or `'#someID'`)
+     * @param ctxMenu An array of objects defining the updated menu layout. _(can be undefined when only updating beforeRender)_
      * @param beforeRender The updated callback function that is called before the context menu is opened.
      * It is passed two arguments:
      * `menu` - the menu definition,
      * `event` - the MouseEvent.
      * `beforeRender` needs to return a new menu definition which will be used.
+     *
+     * @deprecated as of version 1.7.
+     * Method Signature changed. Third parameter should be a config option now. 
+     * You can pass the beforeRender callback like this: `update("#target", [...], { onBeforeShow: beforeRender })`
+     * Calling this signature won't work in a future update
      */
     update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN): void;
     update(target: string, ctxMenu?: CTXMenu, config?: CTXConfig): void;
