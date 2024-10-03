@@ -313,9 +313,3 @@ You can find the source code in the `src/` directory and the files for manual te
 ### Test your changes
 Please test your changes before opening a PR. To test your changes locally, run `npm run build`. This will compile the typescript source files
 and update the files in the `standalone/` and `docs/` directories. You can now open the `docs/index.html` file in your browser to test your changes.
-
-### Adding Commits
-Currently, the build pipeline updates all javascript files simultaneously, including those used for the demo website and downloads.
-Those files should be kept in sync with the releases however.
-Please only commit changes to the typescript source files, if possible. If you need to touch other files as well, please add a note in the PR explaining why.
-I am working on an update for the build pipeline to address this manual step... 🙂
