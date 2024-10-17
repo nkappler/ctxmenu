@@ -1,6 +1,9 @@
 import typescript from '@rollup/plugin-typescript';
-import { terser } from "rollup-plugin-terser";
+import fs from "fs";
+import analyzer from "rollup-plugin-analyzer";
 import dts from 'rollup-plugin-dts';
+import { terser } from "rollup-plugin-terser";
+import zlib from 'zlib';
 
 const minifyOptions = {
     format: {
@@ -41,7 +44,27 @@ export default [{
     }, {
         file: 'standalone/ctxmenu.min.js',
         format: 'iife',
-        plugins: [terser(minifyOptions)]
+        plugins: [
+            terser(minifyOptions),
+            {
+                name: 'log-file-size',
+                writeBundle() {
+                    const stats = fs.statSync('standalone/ctxmenu.min.js');
+                    const fileContents = fs.readFileSync("standalone/ctxmenu.min.js");
+                    const gzippedSize = zlib.gzipSync(fileContents).length;
+                    console.log(
+                        `
+***********
+Final minified file size: ${stats.size} bytes
+Gzipped file size: ${gzippedSize} bytes
+***********
+
+`
+                    );
+                }
+            },
+            analyzer({ summaryOnly: true, })
+        ]
     }],
     plugins: [typescript()]
 },
