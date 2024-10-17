@@ -32,6 +32,7 @@ interface CTXMHeading {
     events?: ValueOrFunction<CTXMItemEventRegistry>;
     /** A record of attributes to assign to the menu item, possibly overwriting existing ones */
     attributes?: ValueOrFunction<Record<string, string>>;
+    isDivider?: never;
 }
 interface CTXMInteractive extends CTXMHeading {
     /** Whether the Context Menu Item is disabled or not. Defaults to `false` */

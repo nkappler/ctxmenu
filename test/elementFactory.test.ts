@@ -258,9 +258,9 @@ describe("ElementFactory", () => {
 
             it("ignores any additional properties", () => {
                 const li = showMenu([
-                    // @ts-expect-error TODO: isDivider together with other properties should be typescript error
                     {
                         isDivider: true,
+                        // @ts-expect-error isDivider together with other properties should be typescript error
                         tooltip: "Test",
                         text: "Hello World",
                         subMenu: [],
@@ -332,7 +332,7 @@ describe("ElementFactory", () => {
         it("clicking something in the window closes any open menu", () => {
             const clickAway = jasmine.createSpy();
             window.addEventListener("click", clickAway);
-            var click = jasmine.createSpy().and.callFake( e => {
+            var click = jasmine.createSpy().and.callFake(e => {
                 expect(e.target.tagName).toEqual("A");
                 // cancel navigation
                 e.preventDefault();
@@ -349,7 +349,7 @@ describe("ElementFactory", () => {
         it("clicking an action item closes the menu without triggering the click away listener", () => {
             const clickAway = jasmine.createSpy();
             window.addEventListener("click", clickAway);
-            var click = jasmine.createSpy().and.callFake( e => {
+            var click = jasmine.createSpy().and.callFake(e => {
                 expect(e.target.tagName).toEqual("A");
                 // cancel navigation
                 e.preventDefault();
@@ -358,7 +358,7 @@ describe("ElementFactory", () => {
             var a = li.firstElementChild as HTMLAnchorElement;
 
             a.click();
-            
+
             expect(click).toHaveBeenCalled();
             expect(clickAway).not.toHaveBeenCalled();
             expect(getMenu).toThrow();

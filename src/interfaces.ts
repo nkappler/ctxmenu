@@ -37,6 +37,7 @@ export interface CTXMHeading {
     events?: ValueOrFunction<CTXMItemEventRegistry>;
     /** A record of attributes to assign to the menu item, possibly overwriting existing ones */
     attributes?: ValueOrFunction<Record<string, string>>;
+    isDivider?: never;
 }
 
 export interface CTXMInteractive extends CTXMHeading {
