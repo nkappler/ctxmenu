@@ -41,7 +41,14 @@ export default [{
         file: 'standalone/ctxmenu.js',
         format: 'iife',
         plugins: [terser(options)]
-    }, {
+    }],
+    plugins: [
+        typescript(),
+        analyzer({ summaryOnly: true, })
+    ],
+}, {
+    input: 'src/standalone.ts',
+    output: [{
         file: 'standalone/ctxmenu.min.js',
         format: 'iife',
         plugins: [
@@ -62,11 +69,12 @@ Gzipped file size: ${gzippedSize} bytes
 `
                     );
                 }
-            },
-            analyzer({ summaryOnly: true, })
+            }
         ]
     }],
-    plugins: [typescript()]
+    plugins: [
+        typescript(),
+    ]
 },
 {
     input: 'src/ctxmenu.ts',
@@ -83,4 +91,4 @@ Gzipped file size: ${gzippedSize} bytes
         format: 'es'
     }],
     plugins: [dts({ respectExternal: true })],
-}];
+}]; 
