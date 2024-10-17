@@ -42,7 +42,7 @@
         var menu = document.createElement("ul");
         menu.className = "ctxmenu";
         menu.append.apply(menu, ctxMenu.map(generateMenuItem));
-        if (ctxMenu.length === 0) menu.style.display = "none";
+        if (!ctxMenu.length) menu.style.display = "none";
         var noop = function(e) {
             e.stopPropagation();
             e.preventDefault();

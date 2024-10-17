@@ -57,11 +57,11 @@ class ContextMenu implements CTXMenuSingleton {
         const instance = ContextMenu.instance;
         return {
             // proxy element to prevent access to internals
-            attach: instance.attach.bind(instance),
-            delete: instance.delete.bind(instance),
-            hide: instance.hide.bind(instance),
-            show: instance.show.bind(instance),
-            update: instance.update.bind(instance)
+            "attach": instance.attach.bind(instance),
+            "delete": instance.delete.bind(instance),
+            "hide": instance.hide.bind(instance),
+            "show": instance.show.bind(instance),
+            "update": instance.update.bind(instance)
         };
     }
 
@@ -197,3 +197,4 @@ class ContextMenu implements CTXMenuSingleton {
 
 export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
 export * from "./interfaces";
+

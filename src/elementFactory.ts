@@ -22,7 +22,7 @@ export function generateMenu(ctxMenu: CTXMenu) {
     const menu = document.createElement("ul");
     menu.className = "ctxmenu";
     menu.append(...ctxMenu.map(generateMenuItem));
-    if (ctxMenu.length === 0) {
+    if (!ctxMenu.length) {
         menu.style.display = "none";
     }
     const noop = (e: MouseEvent) => {

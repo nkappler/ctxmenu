@@ -8,7 +8,73 @@ import zlib from 'zlib';
 const minifyOptions = {
     format: {
         comments: /ctxMenu/
-    }
+    },
+    // keep_fnames: true,
+    mangle: {
+        properties: {
+            keep_quoted: "strict",
+            builtins: false,
+            reserved: [
+                "subMenu",
+                "html",
+                "element",
+                "text",
+                "icon",
+                "style",
+                "prototype",
+                "events",
+                "tooltip",
+                "title",
+                "onShow",
+                "onHide",
+                "onBeforeShow",
+                "onBeforeHide",
+                "attributes",
+                "subMenuAttributes",
+
+                // most of the used builtins we would also need to reserve
+                // "addEventListener",
+                // "removeEventListener",
+                // "bind",
+                // "body",
+                // "createElement",
+                // "querySelector",
+                // "call",
+                // "slice",
+                // "preventDefault",
+                // "stopImmediatePropagation",
+                // "append",
+                // "map",
+                // "filter",
+                // "hasOwnProperty",
+                // "entries",
+                // "forEach",
+                // "every",
+                // "classList",
+                // "add",
+                // "concat",
+                // "call",
+                // "apply",
+                // "getBoundingClientRect",
+                // "assign",
+                // "visualViewport",
+                // "cloneNode",
+                // "appendChild",
+                // "removeChild",
+                // "replaceChildren",
+                // "width",
+                // "height",
+                // "children",
+                // "remove",
+                // "className",
+                // "includes",
+                // "stopPropagation",
+                // "action",
+                // "hide",
+                // "setAttribute"
+            ]
+        }
+    },
 };
 
 const options = {
