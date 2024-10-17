@@ -2,11 +2,11 @@
 
 const params = new URLSearchParams(window.location.search);
 
-const defaultMenuDeclaration = [
+const defaultMenuDeclaration: any = [
     { text: "Heading" },
     { isDivider: true },
     { text: "Link", href: "javascript:void" }
-];
+]; // as const would work when making the API arguments readonly, which in turn would guarantee that there are no sideeffects, however this is only necessary because we have no CTXMenu type here to begin with
 
 const getTarget = (): HTMLElement => {
     const target = document.querySelector("#TARGET");

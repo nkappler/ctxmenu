@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "outDir": "../spec",
+        "target": "es6",
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "*.test.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

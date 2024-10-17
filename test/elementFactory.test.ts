@@ -1,3 +1,5 @@
+/// <reference path="./index.test.ts" />
+
 const stringifyAttribute = ({ name, value }: Attr) => `${name}="${value}"`;
 const stringifyAttributes = ({ attributes }: Element) => Array.from(attributes).map(stringifyAttribute).sort();
 
