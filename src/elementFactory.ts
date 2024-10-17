@@ -73,6 +73,7 @@ function populateClassList(rules: [Function, string, boolean][], item: CTXMItem,
     rules
         .filter(([matcher]) => matcher(item))
         .every(([_, className, supportsSubSequent]) =>
+            // @ts-ignore
             !void li.classList.add(className) && supportsSubSequent);
 }
 
