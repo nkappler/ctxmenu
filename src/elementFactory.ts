@@ -85,7 +85,7 @@ function makeInnerHTML({ html, text, element }: CTXMHeading, li: HTMLLIElement) 
 function makeAttributes({ tooltip, style, attributes }: CTXMHeading, li: HTMLLIElement) {
     li.title = getProp(tooltip) || "";
     style && li.setAttribute("style", getProp(style));
-    attributes && Object.entries(getProp(attributes)).forEach(([attr, val]) => li.setAttribute(attr, val));
+    attributes && Object.entries(getProp(attributes)).forEach(([attr, val]) => { li.setAttribute(attr, val) });
 }
 
 function makeIcon({ icon }: CTXMHeading, li: HTMLLIElement) {

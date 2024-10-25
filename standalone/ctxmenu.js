@@ -84,7 +84,7 @@
         style && li.setAttribute("style", getProp(style));
         attributes && Object.entries(getProp(attributes)).forEach((function(_a) {
             var attr = _a[0], val = _a[1];
-            return li.setAttribute(attr, val);
+            li.setAttribute(attr, val);
         }));
     }
     function makeIcon(_a, li) {
@@ -229,7 +229,7 @@
             this.cache = {};
             this.preventCloseOnScroll = false;
             var _hide = function() {
-                return void _this.hide();
+                _this.hide();
             };
             window.addEventListener("click", _hide);
             window.addEventListener("resize", _hide);
@@ -318,7 +318,7 @@
             document.body.appendChild(this.menu);
             (_c = config.onShow) === null || _c === void 0 ? void 0 : _c.call(config, this.menu);
             this.menu.addEventListener("wheel", (function() {
-                return void (_this.preventCloseOnScroll = true);
+                _this.preventCloseOnScroll = true;
             }), {
                 passive: true
             });

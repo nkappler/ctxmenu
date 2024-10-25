@@ -29,7 +29,7 @@ class ContextMenu implements CTXMenuSingleton {
      */
     private preventCloseOnScroll = false;
     private constructor() {
-        const _hide = () => void this.hide()
+        const _hide = () => { this.hide() }
         window.addEventListener("click", _hide);
         window.addEventListener("resize", _hide);
         let timeout = 0;
@@ -129,7 +129,7 @@ class ContextMenu implements CTXMenuSingleton {
         document.body.appendChild(this.menu);
         config.onShow?.(this.menu);
 
-        this.menu.addEventListener("wheel", () => void (this.preventCloseOnScroll = true), { passive: true });
+        this.menu.addEventListener("wheel", () => { this.preventCloseOnScroll = true }, { passive: true });
     }
 
     public hide(menu: Element | undefined = this.menu) {
