@@ -9,6 +9,11 @@ const stringifyAttributes = ({ attributes }: Element) => Array.from(attributes).
  */
 describe("ElementFactory", () => {
 
+    beforeAll(() => {
+        // disable timeout for opening submenu
+        (window.setTimeout as any) = (callback: Function, _timeout: number) => callback() as any;
+    });
+
     describe("container", () => {
         it("clicking it has no effect", () => {
             showMenu([
@@ -491,5 +496,65 @@ describe("ElementFactory", () => {
             const li2 = showMenu([{ text: "Hello World", element: () => element }]);
             expect(li2.innerHTML).toEqual("<p>Hello Paragraph</p>");
         });
+    });
+
+    describe("can set attributes", () => {
+
+        it("on list item, arbitrarily", () => {
+            const li1 = showMenu([{ text: "Hello World", attributes: { "data-hello": "world" } }]);
+            expect(li1.innerHTML).toEqual("<span>Hello World</span>");
+            expect(li1.dataset["hello"]).toEqual("world");
+
+            const li2 = showMenu([{ text: "Hello World", attributes: () => ({ "data-hello": "world" }) }]);
+            expect(li2.innerHTML).toEqual("<span>Hello World</span>");
+            expect(li2.dataset["hello"]).toEqual("world");
+        });
+
+        it("already set by other properties", () => {
+            const li1 = showMenu([{ text: "Hello World", attributes: { "title": "overwrite" }, tooltip: "Tooltip" }]);
+            expect(li1.title).toEqual("overwrite");
+
+            const li2 = showMenu([{ text: "Hello World", attributes: () => ({ "title": "overwrite" }), tooltip: "Tooltip" }]);
+            expect(li2.title).toEqual("overwrite");
+        });
+
+        it("on individual submenu items", () => {
+            const li1 = showMenu([{
+                text: "Submenu",
+                subMenu: [
+                    {
+                        text: "Hello World",
+                        attributes: { "data-hello": "world" }
+                    }
+                ]
+            }]);
+            li1.dispatchEvent(new MouseEvent("mouseenter"));
+
+            const lili1 = li1.querySelector("li");
+            expect(lili1?.dataset["hello"]).toEqual("world");
+
+        });
+
+        it("on the nested container (ul) of as submenu item", () => {
+            const li1 = showMenu([{
+                text: "Submenu",
+                subMenu: [
+                    {
+                        text: "Hello World",
+                    }
+                ],
+                subMenuAttributes: { "data-hello": "world" }
+            }]);
+            li1.dispatchEvent(new MouseEvent("mouseenter"));
+
+            const liul = li1.querySelector("ul");
+            expect(liul?.dataset["hello"]).toEqual("world");
+        });
+
+        it("on the parent container (ul)", () => {
+            const li1 = showMenu([{ text: "Hello World" }], { attributes: { "data-hello": "world" } });
+            expect(li1.parentElement?.dataset["hello"]).toEqual("world");
+        });
+
     });
 });

@@ -67,16 +67,11 @@ function generateMenu(ctxMenu) {
 }
 
 function generateMenuItem(item) {
-    var _a;
     var li = document.createElement("li");
     populateClassList([ [ itemIsDivider, "divider", false ], [ function(item) {
         return item.icon;
     }, "icon", true ], [ itemIsHeading, "heading", false ], [ itemIsSubMenu, "submenu", true ], [ isDisabled, "disabled", false ], [ itemIsInteractive, "interactive", true ] ], item, li);
     if (itemIsDivider(item)) return li;
-    Object.entries((_a = getProp(item.attributes)) !== null && _a !== void 0 ? _a : {}).forEach((function(_a) {
-        var attr = _a[0], val = _a[1];
-        return li.setAttribute(attr, val);
-    }));
     [ makeInnerHTML, makeAttributes, makeIcon, addEventHandlers, makeAnchor ].forEach((function(step) {
         return step.call(null, item, li);
     }));
@@ -102,9 +97,13 @@ function makeInnerHTML(_a, li) {
 }
 
 function makeAttributes(_a, li) {
-    var tooltip = _a.tooltip, style = _a.style;
+    var tooltip = _a.tooltip, style = _a.style, attributes = _a.attributes;
     li.title = getProp(tooltip) || "";
-    if (style) li.setAttribute("style", getProp(style));
+    style && li.setAttribute("style", getProp(style));
+    attributes && Object.entries(getProp(attributes)).forEach((function(_a) {
+        var attr = _a[0], val = _a[1];
+        return li.setAttribute(attr, val);
+    }));
 }
 
 function makeIcon(_a, li) {

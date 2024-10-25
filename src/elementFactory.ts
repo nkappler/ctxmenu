@@ -50,8 +50,6 @@ function generateMenuItem(item: CTXMItem) {
 
     if (itemIsDivider(item)) { return li; }
 
-    Object.entries(getProp(item.attributes) ?? {}).forEach(([attr, val]) => li.setAttribute(attr, val));
-
     [
         makeInnerHTML,
         makeAttributes,
@@ -84,9 +82,10 @@ function makeInnerHTML({ html, text, element }: CTXMHeading, li: HTMLLIElement) 
         : li.innerHTML = getProp(html) ?? `<span>${getProp(text)}</span>`;
 }
 
-function makeAttributes({ tooltip, style }: CTXMHeading, li: HTMLLIElement) {
+function makeAttributes({ tooltip, style, attributes }: CTXMHeading, li: HTMLLIElement) {
     li.title = getProp(tooltip) || "";
-    if (style) { li.setAttribute("style", getProp(style)) }
+    style && li.setAttribute("style", getProp(style));
+    attributes && Object.entries(getProp(attributes)).forEach(([attr, val]) => li.setAttribute(attr, val));
 }
 
 function makeIcon({ icon }: CTXMHeading, li: HTMLLIElement) {

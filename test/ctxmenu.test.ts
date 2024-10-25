@@ -406,12 +406,4 @@ describe("CTXMenu", () => {
             });
         });
     });
-
-    describe("attributes", () => {
-
-        xit("todo", () => {
-            //todo
-        });
-
-    });
 });
