@@ -228,11 +228,12 @@
             var _this = this;
             this.cache = {};
             this.preventCloseOnScroll = false;
-            var _hide = function() {
-                _this.hide();
-            };
-            window.addEventListener("click", _hide);
-            window.addEventListener("resize", _hide);
+            window.addEventListener("click", (function() {
+                return void _this.hide();
+            }));
+            window.addEventListener("resize", (function() {
+                return void _this.hide();
+            }));
             var timeout = 0;
             window.addEventListener("wheel", (function() {
                 clearTimeout(timeout);
@@ -262,10 +263,9 @@
                 update: instance.update.bind(instance)
             };
         };
-        ContextMenu.prototype.attach = function(target, ctxMenu, _config) {
+        ContextMenu.prototype.attach = function(target, ctxMenu, config) {
             var _this = this;
-            if (_config === void 0) _config = {};
-            var config = this.getConfig(_config);
+            if (config === void 0) config = {};
             var t = document.querySelector(target);
             if (this.cache[target] !== void 0) {
                 console.error("target element ".concat(target, " already has a context menu assigned. Use ContextMenu.update() intstead."));
@@ -302,15 +302,15 @@
             if (!t) return console.error("target element ".concat(target, " does not exist (anymore)"));
             t.removeEventListener("contextmenu", o.handler);
         };
-        ContextMenu.prototype.show = function(ctxMenu, eventOrElement, _config) {
+        ContextMenu.prototype.show = function(ctxMenu, eventOrElement, config) {
             var _this = this;
             var _a, _b, _c;
+            if (config === void 0) config = {};
             if (eventOrElement instanceof MouseEvent) {
                 eventOrElement.stopImmediatePropagation();
                 eventOrElement.preventDefault();
             }
             this.hide();
-            var config = this.getConfig(_config);
             this.onHide = config.onHide;
             this.onBeforeHide = config.onBeforeHide;
             var newMenu = (_b = (_a = config.onBeforeShow) === null || _a === void 0 ? void 0 : _a.call(config, ctxMenu.slice(), eventOrElement instanceof MouseEvent ? eventOrElement : void 0)) !== null && _b !== void 0 ? _b : ctxMenu;
@@ -323,28 +323,21 @@
                 passive: true
             });
         };
-        ContextMenu.prototype.hide = function(menu) {
-            var _a, _b;
-            if (menu === void 0) menu = this.menu;
-            (_a = this.onBeforeHide) === null || _a === void 0 ? void 0 : _a.call(this, menu);
-            resetDirections();
-            if (!menu) return;
-            if (menu === this.menu) delete this.menu;
-            menu.remove();
-            (_b = this.onHide) === null || _b === void 0 ? void 0 : _b.call(this, menu);
-            this.onBeforeHide = void 0;
-            this.onHide = void 0;
+        ContextMenu.prototype.hide = function() {
+            this._hide(this.menu);
         };
-        ContextMenu.prototype.getConfig = function(config) {
-            if (config === void 0) config = {};
-            return Object.assign({
-                onBeforeShow: function(m) {
-                    return m;
-                },
-                onBeforeHide: function() {},
-                onShow: function() {},
-                onHide: function() {}
-            }, config);
+        ContextMenu.prototype._hide = function(menuOrSubMenu) {
+            var _a, _b;
+            (_a = this.onBeforeHide) === null || _a === void 0 ? void 0 : _a.call(this, menuOrSubMenu);
+            resetDirections();
+            if (!menuOrSubMenu) return;
+            menuOrSubMenu.remove();
+            (_b = this.onHide) === null || _b === void 0 ? void 0 : _b.call(this, menuOrSubMenu);
+            if (menuOrSubMenu === this.menu) {
+                delete this.menu;
+                this.onBeforeHide = void 0;
+                this.onHide = void 0;
+            }
         };
         ContextMenu.prototype.generateDOM = function(ctxMenu, parentOrEvent, attributes) {
             var _this = this;
@@ -356,7 +349,7 @@
                 onHoverDebounced(li, (function() {
                     var _a;
                     var subMenu = (_a = li.parentElement) === null || _a === void 0 ? void 0 : _a.querySelector("ul");
-                    if (subMenu && subMenu.parentElement !== li) _this.hide(subMenu);
+                    if (subMenu && subMenu.parentElement !== li) _this._hide(subMenu);
                 }));
                 if (isDisabled(item)) return;
                 if (!itemIsSubMenu(item)) return;
