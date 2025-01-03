@@ -136,14 +136,14 @@ class ContextMenu implements CTXMenuSingleton {
         resetDirections();
         if (!menu) return;
 
-        if (menu === this.menu) {
-            delete this.menu;
-        }
         menu.remove();
         this.onHide?.(menu);
 
-        this.onBeforeHide = undefined;
-        this.onHide = undefined;
+        if (menu === this.menu) {
+            delete this.menu;
+            this.onBeforeHide = undefined;
+            this.onHide = undefined;
+        }
     }
 
     /** creates the menu Elements, sets the menu position and attaches submenu lifecycle handlers */
