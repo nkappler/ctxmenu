@@ -65,8 +65,7 @@ class ContextMenu implements CTXMenuSingleton {
         };
     }
 
-    public attach(target: string, ctxMenu: CTXMenu, _config: CTXConfig = {}): void {
-        const config = this.getConfig(_config);
+    public attach(target: string, ctxMenu: CTXMenu, config: CTXConfig = {}): void {
         const t = document.querySelector<HTMLElement>(target);
         if (this.cache[target] !== undefined) {
             console.error(`target element ${target} already has a context menu assigned. Use ContextMenu.update() intstead.`);
@@ -111,14 +110,13 @@ class ContextMenu implements CTXMenuSingleton {
         t.removeEventListener("contextmenu", o.handler);
     }
 
-    public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent, _config?: CTXConfig) {
+    public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent, config: CTXConfig = {}) {
         if (eventOrElement instanceof MouseEvent) {
             eventOrElement.stopImmediatePropagation();
             eventOrElement.preventDefault();
         }
         //close any open menu
         this.hide();
-        const config = this.getConfig(_config);
 
         this.onHide = config.onHide;
         this.onBeforeHide = config.onBeforeHide;
@@ -132,6 +130,7 @@ class ContextMenu implements CTXMenuSingleton {
         this.menu.addEventListener("wheel", () => { this.preventCloseOnScroll = true }, { passive: true });
     }
 
+    // menu might not be the current menu, but a submenu
     public hide(menu: Element | undefined = this.menu) {
         this.onBeforeHide?.(menu);
         resetDirections();
@@ -145,15 +144,6 @@ class ContextMenu implements CTXMenuSingleton {
 
         this.onBeforeHide = undefined;
         this.onHide = undefined;
-    }
-
-    private getConfig(config: CTXConfig = {}): CTXConfig {
-        return Object.assign({
-            onBeforeShow: m => m,
-            onBeforeHide: () => { },
-            onShow: () => { },
-            onHide: () => { }
-        }, config);
     }
 
     /** creates the menu Elements, sets the menu position and attaches submenu lifecycle handlers */
