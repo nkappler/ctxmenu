@@ -2,11 +2,22 @@
     "compilerOptions": {
         "outDir": "../spec",
         "target": "es6",
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
         "module": "commonjs",
         "strict": true,
         "esModuleInterop": true,
         "sourceMap": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "typeRoots": [
+            "../node_modules/@types",
+        ],
+        "types": [
+            "../standalone/ctxmenu",
+            "jasmine"
+        ]
     },
     "include": [
         "*.test.ts"

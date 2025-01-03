@@ -1,5 +1,3 @@
-/// <reference path="./index.test.ts" />
-
 describe("CTXMenu", () => {
 
     describe("setup", () => {
