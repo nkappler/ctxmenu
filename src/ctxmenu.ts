@@ -1,11 +1,11 @@
 /*! ctxMenu v1.7.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
-import { generateMenuItem, isDisabled, onHoverDebounced } from "./elementFactory";
-import type { BeforeRenderFN, CTXConfig, CTXMenu, CTXMenuSingleton } from "./interfaces";
+import { generateMenu, onHoverDebounced } from "./elementFactory";
+import type { CTXConfig, CTXMenu, CTXMenuSingleton } from "./interfaces";
 import { resetDirections, setPosition } from "./position";
 //@ts-ignore file will only be present after first run of npm run build
 import { styles } from "./styles";
-import { getProp, itemIsInteractive, itemIsSubMenu } from "./typeguards";
+import { getProp, isDisabled, itemIsSubMenu } from "./typeguards";
 
 type CTXHandler = Exclude<HTMLElement["oncontextmenu"], null>;
 
@@ -29,14 +29,9 @@ class ContextMenu implements CTXMenuSingleton {
      */
     private preventCloseOnScroll = false;
     private constructor() {
-        window.addEventListener("click", ev => {
-            const item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && item.className === "interactive") {
-                return;
-            }
-            this.hide();
-        });
-        window.addEventListener("resize", () => void this.hide());
+        const _hide = () => { this.hide() }
+        window.addEventListener("click", _hide);
+        window.addEventListener("resize", _hide);
         let timeout = 0;
         window.addEventListener("wheel", () => {
             clearTimeout(timeout);
@@ -62,19 +57,15 @@ class ContextMenu implements CTXMenuSingleton {
         const instance = ContextMenu.instance;
         return {
             // proxy element to prevent access to internals
-            attach: instance.attach.bind(instance),
-            delete: instance.delete.bind(instance),
-            hide: instance.hide.bind(instance),
-            show: instance.show.bind(instance),
-            update: instance.update.bind(instance)
+            "attach": instance.attach.bind(instance),
+            "delete": instance.delete.bind(instance),
+            "hide": instance.hide.bind(instance),
+            "show": instance.show.bind(instance),
+            "update": instance.update.bind(instance)
         };
     }
 
-    /** @deprecated */
-    public attach(target: string, ctxMenu: CTXMenu, beforeRender?: BeforeRenderFN): void;
-    public attach(target: string, ctxMenu: CTXMenu, config?: CTXConfig): void;
-    public attach(target: string, ctxMenu: CTXMenu, _config: CTXConfig | BeforeRenderFN = {}): void {
-        if (typeof _config === "function") { return this.attach(target, ctxMenu, { onBeforeShow: _config }) }
+    public attach(target: string, ctxMenu: CTXMenu, _config: CTXConfig = {}): void {
         const config = this.getConfig(_config);
         const t = document.querySelector<HTMLElement>(target);
         if (this.cache[target] !== undefined) {
@@ -97,11 +88,7 @@ class ContextMenu implements CTXMenuSingleton {
         t.addEventListener("contextmenu", handler);
     }
 
-    /** @deprecated */
-    public update(target: string, ctxMenu?: CTXMenu, beforeRender?: BeforeRenderFN): void;
-    public update(target: string, ctxMenu?: CTXMenu, config?: CTXConfig): void;
-    public update(target: string, ctxMenu?: CTXMenu, _config: CTXConfig | BeforeRenderFN = {}) {
-        if (typeof _config === "function") { return this.update(target, ctxMenu, { onBeforeShow: _config }); }
+    public update(target: string, ctxMenu?: CTXMenu, _config: CTXConfig = {}) {
         const o = this.cache[target];
         const config = Object.assign({}, o?.config, _config);
         const t = document.querySelector<HTMLElement>(target);
@@ -113,16 +100,15 @@ class ContextMenu implements CTXMenuSingleton {
     public delete(target: string) {
         const o = this.cache[target];
         if (!o) {
-            console.error(`no context menu for target element ${target} found`);
-            return;
+            return console.error(`no context menu for target element ${target} found`);
         }
+        delete this.cache[target];
+
         const t = document.querySelector<HTMLElement>(target);
         if (!t) {
-            console.error(`target element ${target} does not exist (anymore)`);
-            return;
+            return console.error(`target element ${target} does not exist (anymore)`);;
         }
         t.removeEventListener("contextmenu", o.handler);
-        delete this.cache[target];
     }
 
     public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent, _config?: CTXConfig) {
@@ -143,19 +129,18 @@ class ContextMenu implements CTXMenuSingleton {
         document.body.appendChild(this.menu);
         config.onShow?.(this.menu);
 
-        this.menu.addEventListener("wheel", () => void (this.preventCloseOnScroll = true), { passive: true });
+        this.menu.addEventListener("wheel", () => { this.preventCloseOnScroll = true }, { passive: true });
     }
 
     public hide(menu: Element | undefined = this.menu) {
         this.onBeforeHide?.(menu);
         resetDirections();
+        if (!menu) return;
 
-        if (menu) {
-            if (menu === this.menu) {
-                delete this.menu;
-            }
-            menu.parentElement?.removeChild(menu);
+        if (menu === this.menu) {
+            delete this.menu;
         }
+        menu.remove();
         this.onHide?.(menu);
 
         this.onBeforeHide = undefined;
@@ -171,16 +156,13 @@ class ContextMenu implements CTXMenuSingleton {
         }, config);
     }
 
+    /** creates the menu Elements, sets the menu position and attaches submenu lifecycle handlers */
     private generateDOM(ctxMenu: CTXMenu, parentOrEvent: HTMLElement | MouseEvent, attributes: Record<string, string> = {}): HTMLUListElement {
-        //This has grown pretty messy and could use a rework
-
-        const container = document.createElement("ul");
-        if (ctxMenu.length === 0) {
-            container.style.display = "none";
-        }
-        ctxMenu.forEach(item => {
-            const li = generateMenuItem(item);
-            //all items shoud have a handler to close submenus on hover (except if its their own)
+        const container = generateMenu(ctxMenu);
+        setPosition(container, parentOrEvent);
+        ctxMenu.forEach((item, i) => {
+            const li = container.children[i] as HTMLLIElement;
+            //all items shoud close submenus on hover which are not their own
             onHoverDebounced(li, () => {
                 const subMenu = li.parentElement?.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) {
@@ -188,62 +170,31 @@ class ContextMenu implements CTXMenuSingleton {
                 }
             });
 
-            if (itemIsInteractive(item) && !isDisabled(item)) {
-                if (itemIsSubMenu(item)) {
-                    onHoverDebounced(li, (ev) => {
-                        const subMenu = li.querySelector("ul");
-                        if (!subMenu) { //if it's already open, do nothing
-                            this.openSubMenu(ev, getProp(item.subMenu), li, getProp(item.subMenuAttributes));
-                        }
-                    });
-                } else {
-                    li.addEventListener("click", () => void this.hide());
-                }
-            }
-            container.appendChild(li);
+            if (isDisabled(item)) return;
+            if (!itemIsSubMenu(item)) return;
+
+            onHoverDebounced(li, () => {
+                if (li.querySelector("ul")) return;
+                li.appendChild(this.generateDOM(getProp(item.subMenu), li, getProp(item.subMenuAttributes)));
+            });
         });
+
         Object.entries(attributes).forEach(([attr, val]) => container.setAttribute(attr, val));
 
-        container.classList.add("ctxmenu");
-        setPosition(container, parentOrEvent);
-
-        container.addEventListener("contextmenu", ev => {
-            ev.stopPropagation();
-            ev.preventDefault();
-        });
-        container.addEventListener("click", ev => {
-            const item = ev.target instanceof Element && ev.target.parentElement;
-            if (item && item.className !== "interactive") {
-                ev.stopPropagation();
-            }
-        });
         return container;
     }
 
-    private openSubMenu(e: MouseEvent, ctxMenu: CTXMenu, listElement: HTMLLIElement, attributes: Record<string, string> = {}) {
-        // check if other submenus on this level are open and close them
-        const subMenu = listElement.parentElement?.querySelector("li > ul");
-        if (subMenu && subMenu.parentElement !== listElement) {
-            this.hide(subMenu);
-        }
-        listElement.appendChild(this.generateDOM(ctxMenu, listElement, attributes ));
-    }
-
     private static addStylesToDom() {
-        let append = () => {
-            if (document.readyState === "loading") {
-                return document.addEventListener("readystatechange", () => void append());
-            }
-            //insert default styles as first css -> low priority -> user can overwrite it easily
-            const style = document.createElement("style");
-            style.innerHTML = styles;
-            document.head.insertBefore(style, document.head.childNodes[0]);
-
-            append = () => { };
-        };
-        append();
+        if (document.readyState === "loading") {
+            return document.addEventListener("readystatechange", this.addStylesToDom, { once: true });
+        }
+        //insert default styles as first css -> low priority -> user can overwrite it easily
+        const style = document.createElement("style");
+        style.innerHTML = styles;
+        document.head.insertBefore(style, document.head.childNodes[0]);
     }
 }
 
 export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
 export * from "./interfaces";
+

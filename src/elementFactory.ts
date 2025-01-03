@@ -1,5 +1,7 @@
-import { CTXMHeading, CTXMInteractive, CTXMItem } from "./interfaces";
-import { getProp, itemIsAction, itemIsAnchor, itemIsDivider, itemIsInteractive, itemIsSubMenu } from "./typeguards";
+import { CTXMHeading } from "../index";
+import { ctxmenu } from "./ctxmenu";
+import { CTXMenu, CTXMItem } from "./interfaces";
+import { getProp, isDisabled, itemIsAction, itemIsAnchor, itemIsDivider, itemIsHeading, itemIsInteractive, itemIsSubMenu } from "./typeguards";
 
 /**
  * assigns an eventhandler to a list item, that gets triggered after a short timeout,
@@ -16,81 +18,103 @@ export function onHoverDebounced(target: HTMLLIElement, action: (e: MouseEvent) 
     target.addEventListener("mouseleave", () => clearTimeout(timeout));
 }
 
-/** checks if an item is disabled
- *
- *  will be true if disabled flag is set or it has an empty submenu
- */
-export function isDisabled(item: CTXMInteractive) {
-    return getProp(item.disabled) || (itemIsSubMenu(item) && typeof item.subMenu !== "function" && item.subMenu.length === 0);
+export function generateMenu(ctxMenu: CTXMenu) {
+    const menu = document.createElement("ul");
+    menu.className = "ctxmenu";
+    menu.append(...ctxMenu.map(generateMenuItem));
+    if (!ctxMenu.length) {
+        menu.style.display = "none";
+    }
+    const noop = (e: MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+    // avoid re-opening on itself
+    menu.addEventListener("contextmenu", noop);
+    // avoid close on click
+    menu.addEventListener("click", noop);
+    return menu;
 }
 
-export function generateMenuItem(item: CTXMItem) {
+function generateMenuItem(item: CTXMItem) {
     const li = document.createElement("li");
 
-    if (itemIsDivider(item)) {
-        li.className = "divider";
-        return li;
-    }
+    populateClassList([
+        [itemIsDivider, "divider", false],
+        [item => item.icon, "icon", true],
+        [itemIsHeading, "heading", false],
+        [itemIsSubMenu, "submenu", true],
+        [isDisabled, "disabled", false],
+        [itemIsInteractive, "interactive", true],
+    ], item, li);
 
-    Object.entries(getProp(item.attributes) ?? {}).forEach(([attr, val]) => li.setAttribute(attr, val));
+    if (itemIsDivider(item)) { return li; }
 
-    generateBaseItemContent(item, li);
+    [
+        makeInnerHTML,
+        makeAttributes,
+        makeIcon,
+        addEventHandlers,
+        makeAnchor,
+    ].forEach(step => step.call(null, item, li));
 
-    if (!itemIsInteractive(item)) {
-        li.classList.add("heading");
-        return li;
-    }
-
-    if (isDisabled(item)) {
-        li.classList.add("disabled");
-        if (itemIsSubMenu(item)) {
-            li.classList.add("submenu");
-        }
-        return li;
-    }
-
-    li.classList.add("interactive");
-
-    if (itemIsAnchor(item)) {
-        // wrap anchor element around li children
-        const a = document.createElement("a");
-        a.append(...Array.from(li.childNodes));
-
-        a.href = getProp(item.href);
-        if (item.hasOwnProperty("download")) { a.download = getProp(item.download!) }
-        if (item.hasOwnProperty("target")) { a.target = getProp(item.target!) }
-        li.append(a);
-        return li;
-    }
-
-    if (itemIsAction(item)) {
-        li.addEventListener("click", item.action);
-        return li;
-    }
-
-    li.classList.add("submenu");
     return li;
 }
 
-/**
- * generates the content html of a base item, attaches it to the list element,
- * applies the style attribute if provided and appends the icon if provided.
- */
-function generateBaseItemContent(item: CTXMHeading, li: HTMLLIElement) {
-    const html = getProp(item.html);
-    const text = `<span>${getProp(item.text)}</span>`;
-    const elem = getProp(item.element);
+/** takes an array of rules, each consisting of a matching function,
+ * a classname and a boolean flag that indicates wether to keep going.
+ * the function first filters the rules based on the matchers and then
+ * adds the classnames to the list element until the current rule
+ * doesn't support additional classnames
+  */
+function populateClassList(rules: [Function, string, boolean][], item: CTXMItem, li: HTMLLIElement) {
+    rules
+        .filter(([matcher]) => matcher(item))
+        .every(([_, className, supportsSubSequent]) =>
+            // @ts-ignore
+            !void li.classList.add(className) && supportsSubSequent);
+}
+
+function makeInnerHTML({ html, text, element }: CTXMHeading, li: HTMLLIElement) {
+    const elem = getProp(element);
     elem
         ? li.append(elem)
-        : li.innerHTML = html ? html : text;
-    li.title = getProp(item.tooltip) || "";
-    if (item.style) { li.setAttribute("style", getProp(item.style)) }
-    if (item.icon) {
-        li.classList.add("icon");
-        li.innerHTML += `<img class="icon" src="${getProp(item.icon)}" />`;
-    }
+        : li.innerHTML = getProp(html) ?? `<span>${getProp(text)}</span>`;
+}
+
+function makeAttributes({ tooltip, style, attributes }: CTXMHeading, li: HTMLLIElement) {
+    li.title = getProp(tooltip) || "";
+    style && li.setAttribute("style", getProp(style));
+    attributes && Object.entries(getProp(attributes)).forEach(([attr, val]) => { li.setAttribute(attr, val) });
+}
+
+function makeIcon({ icon }: CTXMHeading, li: HTMLLIElement) {
+    icon && (li.innerHTML += `<img class="icon" src="${getProp(icon)}" />`);
+}
+
+function addEventHandlers(item: CTXMHeading, li: HTMLLIElement) {
     for (const [event, handler] of Object.entries(getProp(item.events) || {})) {
         const { listener, options } = typeof handler === "function" ? { listener: handler, options: {} as EventListenerOptions } : handler;
         li.addEventListener<any>(event, listener, options);
     }
+
+    li.addEventListener("click", e => {
+        if (isDisabled(item) || itemIsSubMenu(item)) return;
+        itemIsAction(item) && item.action(e);
+        itemIsInteractive(item) && ctxmenu.hide();
+    });
+}
+
+function makeAnchor(item: CTXMHeading, li: HTMLLIElement) {
+    if (!itemIsAnchor(item) || isDisabled(item)) { return; }
+
+    const { href, download, target } = item;
+    // wrap anchor element around li children
+    const a = document.createElement("a");
+    a.innerHTML = li.innerHTML;
+
+    a.href = getProp(href);
+    download !== undefined && (a.download = getProp(download));
+    target && (a.target = getProp(target));
+    li.replaceChildren(a);
 }

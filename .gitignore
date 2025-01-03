@@ -1,3 +1,5 @@
 node_modules
 src/styles.ts
+spec/*[.js|.js.map]
 dist
+*.test.js

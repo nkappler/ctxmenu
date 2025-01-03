@@ -1,0 +1,23 @@
+{
+  "srcDir": "./standalone",
+  "srcFiles": [
+    "ctxmenu.min.js"
+  ],
+  "_latest": "https://unpkg.com/ctxmenu@latest/standalone/ctxmenu.js",
+  "specDir": "spec",
+  "specFiles": [
+    "**/*[sS]pec.js",
+    "**/*.test.js"
+  ],
+  "helpers": [
+    "helpers/**/*.js"
+  ],
+  "env": {
+    "stopSpecOnExpectationFailure": false,
+    "stopOnSpecFailure": false,
+    "random": true
+  },
+  "browser": {
+    "name": "firefox"
+  }
+}
