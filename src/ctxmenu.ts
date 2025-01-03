@@ -29,9 +29,8 @@ class ContextMenu implements CTXMenuSingleton {
      */
     private preventCloseOnScroll = false;
     private constructor() {
-        const _hide = () => { this.hide() }
-        window.addEventListener("click", _hide);
-        window.addEventListener("resize", _hide);
+        window.addEventListener("click", () => void this.hide());
+        window.addEventListener("resize", () => void this.hide());
         let timeout = 0;
         window.addEventListener("wheel", () => {
             clearTimeout(timeout);
@@ -130,16 +129,20 @@ class ContextMenu implements CTXMenuSingleton {
         this.menu.addEventListener("wheel", () => { this.preventCloseOnScroll = true }, { passive: true });
     }
 
-    // menu might not be the current menu, but a submenu
-    public hide(menu: Element | undefined = this.menu) {
-        this.onBeforeHide?.(menu);
+
+    public hide() {
+        this._hide(this.menu);
+    }
+
+    private _hide(menuOrSubMenu: Element | undefined) {
+        this.onBeforeHide?.(menuOrSubMenu);
         resetDirections();
-        if (!menu) return;
+        if (!menuOrSubMenu) return;
 
-        menu.remove();
-        this.onHide?.(menu);
+        menuOrSubMenu.remove();
+        this.onHide?.(menuOrSubMenu);
 
-        if (menu === this.menu) {
+        if (menuOrSubMenu === this.menu) {
             delete this.menu;
             this.onBeforeHide = undefined;
             this.onHide = undefined;
@@ -156,7 +159,7 @@ class ContextMenu implements CTXMenuSingleton {
             onHoverDebounced(li, () => {
                 const subMenu = li.parentElement?.querySelector("ul");
                 if (subMenu && subMenu.parentElement !== li) {
-                    this.hide(subMenu);
+                    this._hide(subMenu);
                 }
             });
 
