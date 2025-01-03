@@ -249,20 +249,20 @@ Hide any open context menu.
 With this interface you can define __lifecycle events__ and __attributes__ for a context menu via the [attach](#ctxmenuattach) and [update](#ctxmenuupdate) methods.
 
 ```typescript
-    onBeforeShow?: () => Array;
-    onShow?: Function;
-    onBeforeHide?: Function;
-    onHide?: Function;
+    onBeforeShow?: (menu: CTXMenu, event?: MouseEvent) => CTXMenu;
+    onShow?: (dom: HTMLUListElement) => void;
+    onBeforeHide?: (dom: Element) => void;
+    onHide?: (dom: Element) => void;
     attributes?: Record<string, string>
 ```
 
-The `onBeforeShow` method can be used to change the menu definition just before it is shown. This can be useful to customize the menu based on the event properties (for example, the cursor position). The function should return a new menu definition.
+The `onBeforeShow` method can be used to change the menu definition just before it is shown. This can be useful to customize the menu based on the event properties (for example, the cursor position). The function must return a valid menu definition.
 
-The `onShow` method can be used to execute code after the menu is shown. This can be useful to execute code that depends on the menu being visible (for example, to focus an input field).
+The `onShow` method can be used to execute code after the menu is attached to the DOM. This can be useful to execute code that depends on the menu being visible (for example, to focus an input field). Gets passed a reference to the DOM Element representing the context menu.
 
-The `onBeforeHide` method can be used to execute code just before the menu is hidden. This can be useful to execute code that depends on the menu being visible (for example, to save the state of the menu).
+The `onBeforeHide` method can be used to execute code just before the menu is detached from DOM. This can be useful to execute code that depends on the menu being visible (for example, to save the state of the menu). Will be called for any submenu that is closed as well. Gets passed a reference to the DOM element which will be removed.
 
-The `onHide` method can be used to execute code after the menu is hidden. This can be useful to execute code that depends on the menu being hidden (for example, to reset the state of the menu).
+The `onHide` method can be used to execute code after the menu is hidden. This can be useful to execute code that depends on the menu being hidden (for example, to reset the state of the menu). Will be called for any submenu that is closed as well. Gets passed a reference to the DOM element which has been removed.
 
 The `attributes` record can be used to define arbitrary attributes for the menu container (the UL element), like you can with the `Element.setAttribute` browser API, for example, `id`, `class` or data attributes.
 

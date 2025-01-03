@@ -84,12 +84,32 @@ export interface CTXConfig {
      * Can be used to manipulate the menu based on the Event. (e.g. to appear at the Cursor Position)
      * @param menu - the original menu definition
      * @param event - mouse event, when openend from context menu event
-     * @returns Needs to return a menu definition.
+     * @returns Needs to return a menu definition, which will be used to render the context menu
      */
     onBeforeShow?: (menu: CTXMenu, event?: MouseEvent) => CTXMenu;
-    onShow?: Function;
-    onBeforeHide?: Function;
-    onHide?: Function;
+    /**
+     * Callback that is called after the context menu has been attached to the DOM.
+     * @param dom the HTMLUListElement that represents the context menu
+     * @returns void
+     */
+    onShow?: (dom: HTMLUListElement) => void;
+    /**
+     * Callback that is called just before the context menu will be closed, but still present in DOM
+     * Will be called for any submenu that is closed as well.
+     * @param dom the Element that represents the context menu or submenu
+     * @returns void
+     */
+    onBeforeHide?: (dom: Element) => void;
+    /**
+     * Callback that is called after the context menu has been removed from the DOM.
+     * Will be called for any submenu that is closed as well.
+     * @param dom a reference to the DOM Element that has just been removed
+     * @returns void
+     */
+    onHide?: (dom: Element) => void;
+    /**
+     * A Record of DOM Attributes to assign to the context menu itself, possibly overwriting existing ones.
+     */
     attributes?: Record<string, string>
 }
 
