@@ -3,6 +3,7 @@
   "srcFiles": [
     "ctxmenu.min.js"
   ],
+  "_latest": "https://unpkg.com/ctxmenu@latest/standalone/ctxmenu.js",
   "specDir": "spec",
   "specFiles": [
     "**/*[sS]pec.js",
