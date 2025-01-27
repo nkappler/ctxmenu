@@ -25,14 +25,13 @@ export function generateMenu(ctxMenu: CTXMenu) {
     if (!ctxMenu.length) {
         menu.style.display = "none";
     }
-    const noop = (e: MouseEvent) => {
+    // avoid re-opening on itself
+    menu.addEventListener("contextmenu", (e: MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-    }
-    // avoid re-opening on itself
-    menu.addEventListener("contextmenu", noop);
+    });
     // avoid close on click
-    menu.addEventListener("click", noop);
+    menu.addEventListener("click", (e: MouseEvent) => void e.stopPropagation());
     return menu;
 }
 

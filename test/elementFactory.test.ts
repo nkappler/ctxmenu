@@ -1,6 +1,8 @@
 const stringifyAttribute = ({ name, value }: Attr) => `${name}="${value}"`;
 const stringifyAttributes = ({ attributes }: Element) => Array.from(attributes).map(stringifyAttribute).sort();
 
+const timeout = window.setTimeout;
+
 /**
  * Although this suite tests code specifically from the element factory,
  * we won't call it directly but use only the public API until deemed necessary
@@ -137,20 +139,17 @@ describe("ElementFactory", () => {
                 expect(stringifyAttributes(a)).toEqual([`download=""`, `href="google.de"`, `target="_blank"`]);
             });
 
-            it("clicking the anchor element should close the menu", () => {
-                const click = jasmine.createSpy().and.callFake((e: MouseEvent) => {
-                    expect((e.target as HTMLElement).tagName).toEqual("A");
-                    // cancel navigation
-                    e.preventDefault();
-                });
-
-                const li = showMenu([{ text: "Hello Anchor", href: "google.de", events: { click } }]);
+            it("clicking the anchor element should close the menu", async () => {
+                window.location.hash = "";
+                const li = showMenu([{ text: "Hello Anchor", href: "#clicked" }]);
                 const a = li.firstElementChild as HTMLAnchorElement;
 
                 a.click();
 
-                expect(click).toHaveBeenCalled();
                 expect(getMenu).toThrow();
+                await new Promise(resolve => timeout(resolve));
+                expect(window.location.hash).toEqual("#clicked");
+                window.location.hash = "";
             });
 
             it("item child nodes keep the correct order", () => {
