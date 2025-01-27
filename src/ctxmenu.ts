@@ -1,4 +1,4 @@
-/*! ctxMenu v2.0.0 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
+/*! ctxMenu v2.0.1 | (c) Nikolaj Kappler | https://github.com/nkappler/ctxmenu/blob/master/LICENSE !*/
 
 import { generateMenu, onHoverDebounced } from "./elementFactory";
 import type { CTXConfig, CTXMenu, CTXMenuSingleton } from "./interfaces";
