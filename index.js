@@ -9,7 +9,7 @@ function getProp(prop) {
 }
 
 function itemIsInteractive(item) {
-    return !itemIsCustom(item) && (itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item));
+    return itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item);
 }
 
 function itemIsAction(item) {
@@ -57,12 +57,13 @@ function generateMenu(ctxMenu) {
     menu.className = "ctxmenu";
     menu.append.apply(menu, ctxMenu.map(generateMenuItem));
     if (!ctxMenu.length) menu.style.display = "none";
-    var noop = function(e) {
+    menu.addEventListener("contextmenu", (function(e) {
         e.stopPropagation();
         e.preventDefault();
-    };
-    menu.addEventListener("contextmenu", noop);
-    menu.addEventListener("click", noop);
+    }));
+    menu.addEventListener("click", (function(e) {
+        return void e.stopPropagation();
+    }));
     return menu;
 }
 
