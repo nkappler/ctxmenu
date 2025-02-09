@@ -31,7 +31,7 @@
 ## Installation
 
 ### with npm:
-Install ctxmenu
+Install ctxmenuo
 ```shell
 your_project> npm install -s ctxmenu
 ```
@@ -207,7 +207,7 @@ The update method is used to update an existing context menu. You can pass `unde
 
 `update` takes two or three arguments: 
 - `target` - the selector string to define the target element
-- `ctxmenu` - the updated menu definition.  _(might be undefined when only updating beforeRender)_
+- `ctxmenu` - the updated menu definition.  _(may be undefined when only updating the config)_
 - `config?` - A config object, See [CTXConfig](#ctxconfig).
 
 > [!NOTE]
