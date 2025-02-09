@@ -31,7 +31,7 @@
 ## Installation
 
 ### with npm:
-Install ctxmenuo
+Install ctxmenu
 ```shell
 your_project> npm install -s ctxmenu
 ```
