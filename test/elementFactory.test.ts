@@ -1,6 +1,8 @@
 const stringifyAttribute = ({ name, value }: Attr) => `${name}="${value}"`;
 const stringifyAttributes = ({ attributes }: Element) => Array.from(attributes).map(stringifyAttribute).sort();
 
+const timeout = window.setTimeout;
+
 /**
  * Although this suite tests code specifically from the element factory,
  * we won't call it directly but use only the public API until deemed necessary
@@ -137,20 +139,17 @@ describe("ElementFactory", () => {
                 expect(stringifyAttributes(a)).toEqual([`download=""`, `href="google.de"`, `target="_blank"`]);
             });
 
-            it("clicking the anchor element should close the menu", () => {
-                const click = jasmine.createSpy().and.callFake((e: MouseEvent) => {
-                    expect((e.target as HTMLElement).tagName).toEqual("A");
-                    // cancel navigation
-                    e.preventDefault();
-                });
-
-                const li = showMenu([{ text: "Hello Anchor", href: "google.de", events: { click } }]);
+            it("clicking the anchor element should close the menu", async () => {
+                window.location.hash = "";
+                const li = showMenu([{ text: "Hello Anchor", href: "#clicked" }]);
                 const a = li.firstElementChild as HTMLAnchorElement;
 
                 a.click();
 
-                expect(click).toHaveBeenCalled();
                 expect(getMenu).toThrow();
+                await new Promise(resolve => timeout(resolve));
+                expect(window.location.hash).toEqual("#clicked");
+                window.location.hash = "";
             });
 
             it("item child nodes keep the correct order", () => {
@@ -229,6 +228,30 @@ describe("ElementFactory", () => {
                 expect(menu).toBeDefined();
             });
 
+            it("with custom element also has interactive class", () => {
+                const element = document.createElement("span");
+                element.innerText = "Hello Action";
+                const li = showMenu([{ element, action }]);
+                expect(Array.from(li.classList)).toEqual(["interactive"]);
+            });
+
+            it("clicking the item with custom element also closes the menu", () => {
+                const element = document.createElement("span");
+                element.innerText = "Hello Action";
+                showMenu([{ element, action }]).click();
+                expect(getMenu).toThrow();
+            });
+
+            it("with custom html also has interactive class", () => {
+                const li = showMenu([{ html: "<span>Hello Action</span>", action }]);
+                expect(Array.from(li.classList)).toEqual(["interactive"]);
+            });
+
+            it("clicking the item with custom html also closes the menu", () => {
+                showMenu([{ html: "<span>Hello Action</span>", action }]).click();
+                expect(getMenu).toThrow();
+            });
+
             describe("disabled", () => {
 
                 it("disabled item replaces classname with disabled", () => {
@@ -305,17 +328,17 @@ describe("ElementFactory", () => {
                 expect(rarrstyles.borderWidth).toEqual("1px 1px 0px 0px");
             });
 
-            describe("custom item with submenu has classname submenu", () => {
+            describe("custom item with submenu has classname and interactive submenu", () => {
                 it("using html property", () => {
                     const li = showMenu([{ html: "<span>Hello Submenu</span>", subMenu: [{ text: "Hello Submenu Item" }] }]);
-                    expect(Array.from(li.classList)).toEqual(["submenu"]);
+                    expect(Array.from(li.classList)).toEqual(["submenu", "interactive"]);
                 });
 
                 it("using element property", () => {
                     const element = document.createElement("span");
                     element.innerText = "Hello Submenu";
                     const li = showMenu([{ element, subMenu: [{ text: "Hello Submenu Item" }] }]);
-                    expect(Array.from(li.classList)).toEqual(["submenu"]);
+                    expect(Array.from(li.classList)).toEqual(["submenu", "interactive"]);
                 });
             });
 

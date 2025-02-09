@@ -6,7 +6,7 @@ export function getProp<T>(prop: ValueOrFunction<T>): T {
 }
 
 export function itemIsInteractive(item: CTXMItem): item is (CTXMAction | CTXMAnchor | CTXMSubMenu) {
-    return !itemIsCustom(item) && (itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item));
+    return itemIsAction(item) || itemIsAnchor(item) || itemIsSubMenu(item);
 }
 
 export function itemIsAction(item: CTXMItem): item is CTXMAction {
