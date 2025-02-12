@@ -186,10 +186,7 @@ exports.__esModule = true;
                 {
                     text: "ctxmenu.js",
                     href: "ctxmenu.js",
-                    download: "",
-                    attributes: {
-                        "style": "display: flex"
-                    }
+                    download: ""
                 },
                 {
                     text: "ctxmenu.min.js",
@@ -205,9 +202,6 @@ exports.__esModule = true;
                     id: "downloads",
                     name: "downloads"
                 };
-            },
-            subMenuAttributes: {
-                "class": "downloadsContainer"
             }
         },
         {
@@ -219,11 +213,7 @@ exports.__esModule = true;
         onBeforeHide: function (m) { return console.log(m, "onBeforeHide"); },
         onHide: function (m) { return console.log(m, "onHide"); },
         onBeforeShow: function (m, e) { var _a; return (_a = void console.log(m, e, "onBeforeShow")) !== null && _a !== void 0 ? _a : m; },
-        onShow: function (m) { return console.log(m, "onShow"); },
-        attributes: {
-            "class": "shouldRetainCtxMenu",
-            id: "myID"
-        }
+        onShow: function (m) { return console.log(m, "onShow"); }
     };
     Object.assign(window, {
         showContextMenuForEvent: function (e) {

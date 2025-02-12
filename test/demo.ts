@@ -202,9 +202,6 @@ import type { CTXConfig, CTXMenu } from "../standalone/ctxmenu";
                     text: "ctxmenu.js",
                     href: "ctxmenu.js",
                     download: "",
-                    attributes: {
-                        "style": "display: flex"
-                    }
                 },
                 {
                     text: "ctxmenu.min.js",
@@ -221,9 +218,6 @@ import type { CTXConfig, CTXMenu } from "../standalone/ctxmenu";
                     name: "downloads"
                 }
             },
-            subMenuAttributes: {
-                class: "downloadsContainer"
-            }
         },
         {
             text: "Documentation (github)",
@@ -236,10 +230,6 @@ import type { CTXConfig, CTXMenu } from "../standalone/ctxmenu";
         onHide: (m) => console.log(m, "onHide"),
         onBeforeShow: (m, e) => void console.log(m, e, "onBeforeShow") ?? m,
         onShow: (m) => console.log(m, "onShow"),
-        attributes: {
-            class: "shouldRetainCtxMenu",
-            id: "myID"
-        }
     };
 
     Object.assign(window, {
