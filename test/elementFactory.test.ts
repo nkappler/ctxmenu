@@ -252,6 +252,18 @@ describe("ElementFactory", () => {
                 expect(getMenu).toThrow();
             });
 
+            it("stopImmediatePropagation needs to intersect the close handler", () => {
+                showMenu([{
+                    html: "<span>Hello Action</span>", action: e => {
+                        action();
+                        e.stopImmediatePropagation();
+                    }
+                }]).click();
+
+                expect(action).toHaveBeenCalled();
+                expect(getMenu).not.toThrow();
+            });
+
             describe("disabled", () => {
 
                 it("disabled item replaces classname with disabled", () => {
