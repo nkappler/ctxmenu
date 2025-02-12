@@ -40,7 +40,7 @@ function generateMenuItem(item: CTXMItem) {
 
     populateClassList([
         [itemIsDivider, "divider", false],
-        [item => item.icon, "icon", true],
+        [item => "icon" in item, "icon", true],
         [itemIsHeading, "heading", false],
         [itemIsSubMenu, "submenu", true],
         [isDisabled, "disabled", false],
@@ -66,11 +66,10 @@ function generateMenuItem(item: CTXMItem) {
  * adds the classnames to the list element until the current rule
  * doesn't support additional classnames
   */
-function populateClassList(rules: [Function, string, boolean][], item: CTXMItem, li: HTMLLIElement) {
+function populateClassList(rules: [(item: CTXMItem) => Boolean, string, boolean][], item: CTXMItem, li: HTMLLIElement) {
     rules
         .filter(([matcher]) => matcher(item))
         .every(([_, className, supportsSubSequent]) =>
-            // @ts-ignore
             !void li.classList.add(className) && supportsSubSequent);
 }
 
