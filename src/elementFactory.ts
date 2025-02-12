@@ -100,7 +100,7 @@ function addEventHandlers(item: CTXMHeading, li: HTMLLIElement) {
     if (isDisabled(item) || itemIsSubMenu(item)) return;
 
     itemIsAction(item) && li.addEventListener("click", item.action);
-    itemIsInteractive(item) && li.addEventListener("click", () => ctxmenu.hide());
+    itemIsInteractive(item) && li.addEventListener("click", ctxmenu.hide);
 }
 
 function makeAnchor(item: CTXMHeading, li: HTMLLIElement) {
