@@ -177,13 +177,14 @@ This is a divider item which draws a horizontal line.
 
 This library exports a singleton object `ctxmenu`.
 In the standalone version the singleton is a global variable (`window.ctxmenu`).
-It has the following five APIs:
+It has the following six APIs:
 
 [attach](#ctxmenuattach)\
 [update](#ctxmenuupdate)\
 [delete](#ctxmenudelete)\
 [show](#ctxmenushow)\
-[hide](#ctxmenuhide)
+[hide](#ctxmenuhide)\
+[setNonce](#ctxmenusetnonce)
 
 ### Interfaces
 [CTXConfig](#ctxconfig)
@@ -244,6 +245,23 @@ ctxmenu.hide()
 ```
 Hide any open context menu. 
 
+### `ctxmenu.setNonce`
+```typescript
+ctxmenu.setNonce(nonce: string)
+```
+Set a CSP (Content Security Policy) nonce to be used for the style element. This is useful when you have a strict CSP that requires nonces for inline styles.
+
+The nonce will be applied to the style element that contains the default menu styles.
+
+Example:
+```typescript
+// Set a nonce for all menus
+ctxmenu.setNonce('your-csp-nonce-here');
+
+// Attach menus as usual
+ctxmenu.attach('#myElement', menuDefinition);
+```
+
 ## CTXConfig
 
 With this interface you can define __lifecycle events__ and __attributes__ for a context menu via the [attach](#ctxmenuattach) and [update](#ctxmenuupdate) methods.
@@ -253,7 +271,7 @@ With this interface you can define __lifecycle events__ and __attributes__ for a
     onShow?: (dom: HTMLUListElement) => void;
     onBeforeHide?: (dom: Element) => void;
     onHide?: (dom: Element) => void;
-    attributes?: Record<string, string>
+    attributes?: Record<string, string>;
 ```
 
 The `onBeforeShow` method can be used to change the menu definition just before it is shown. This can be useful to customize the menu based on the event properties (for example, the cursor position). The function must return a valid menu definition.
@@ -265,7 +283,6 @@ The `onBeforeHide` method can be used to execute code just before the menu is de
 The `onHide` method can be used to execute code after the menu is hidden. This can be useful to execute code that depends on the menu being hidden (for example, to reset the state of the menu). Will be called for any submenu that is closed as well. Gets passed a reference to the DOM element which has been removed.
 
 The `attributes` record can be used to define arbitrary attributes for the menu container (the UL element), like you can with the `Element.setAttribute` browser API, for example, `id`, `class` or data attributes.
-
 
 ## Custom Events
 
