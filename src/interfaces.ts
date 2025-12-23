@@ -145,4 +145,9 @@ export interface CTXMenuSingleton {
      * Close any contextmenu that might be open at the moment
      */
     hide(): void;
+    /**
+     * Set a CSP nonce to be used for all style elements created by the library.
+     * @param nonce The CSP nonce value
+     */
+    setNonce(nonce: string): void;
 }
