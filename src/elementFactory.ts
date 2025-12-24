@@ -55,7 +55,7 @@ function generateMenuItem(item: CTXMItem) {
         makeIcon,
         addEventHandlers,
         makeAnchor,
-    ].forEach(step => step.call(null, item, li));
+    ].forEach(step => step(item, li));
 
     return li;
 }
