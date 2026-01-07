@@ -253,9 +253,12 @@ Set a CSP (Content Security Policy) nonce to be used for the style element. This
 
 The nonce will be applied to the style element that contains the default menu styles.
 
+> [!IMPORTANT]
+> `setNonce` must be called **before the first menu is shown**. Once styles have been added to the DOM, calling `setNonce` will have no effect. In most cases this shouldn't matter, but make sure to call this method early in your application initialization.
+
 Example:
 ```typescript
-// Set a nonce for all menus
+// Set a nonce for all menus (must be called before showing any menu)
 ctxmenu.setNonce('your-csp-nonce-here');
 
 // Attach menus as usual

@@ -147,6 +147,8 @@ export interface CTXMenuSingleton {
     hide(): void;
     /**
      * Set a CSP nonce to be used for all style elements created by the library.
+     * 
+     * **Important:** This must be called before the first menu is shown, otherwise it will have no effect.
      * @param nonce The CSP nonce value
      */
     setNonce(nonce: string): void;
