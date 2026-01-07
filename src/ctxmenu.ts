@@ -28,7 +28,7 @@ class ContextMenu implements CTXMenuSingleton {
      * in that case we don't want to close the menu. (#28)
      */
     private preventCloseOnScroll = false;
-    private nonce: string | undefined;
+    private static nonce: string | undefined;
     private static stylesAdded = false;
     private constructor() {
         window.addEventListener("click", () => void this.hide());
@@ -143,7 +143,7 @@ class ContextMenu implements CTXMenuSingleton {
         if (ContextMenu.stylesAdded) {
             console.error('setNonce must be called before the first menu is shown. The nonce will have no effect.');
         }
-        this.nonce = nonce;
+        ContextMenu.nonce = nonce;
     }
 
     private _hide(menuOrSubMenu: Element | undefined) {
@@ -201,10 +201,7 @@ class ContextMenu implements CTXMenuSingleton {
         
         //insert default styles as first css -> low priority -> user can overwrite it easily
         const style = document.createElement("style");
-        const nonce = ContextMenu.instance?.nonce;
-        if (nonce) {
-            style.nonce = nonce;
-        }
+        style.nonce = this.nonce ?? "";
         style.innerHTML = styles;
         document.head.insertBefore(style, document.head.childNodes[0]);
     }
