@@ -140,6 +140,9 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     public setNonce(nonce: string): void {
+        if (ContextMenu.stylesAdded) {
+            console.error('setNonce must be called before the first menu is shown. The nonce will have no effect.');
+        }
         this.nonce = nonce;
     }
 
