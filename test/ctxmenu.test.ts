@@ -6,6 +6,10 @@ describe("CTXMenu", () => {
         });
 
         it("stylesheet is attached only once and as first stylesheet", () => {
+            // Trigger style addition by showing a menu (styles are lazy-loaded on first show)
+            window.ctxmenu.show(defaultMenuDeclaration, document.body);
+            window.ctxmenu.hide();
+            
             const findCTXRule = (sheet: CSSStyleSheet) => Array.from(sheet.cssRules).find(rule => rule.cssText.startsWith(".ctxmenu"));
             const sheets = Array.from(document.styleSheets);
             expect(sheets.filter(findCTXRule).length).toEqual(1);
@@ -17,7 +21,39 @@ describe("CTXMenu", () => {
         });
 
         it("only public API should be exposed", () => {
-            expect(Object.keys(window.ctxmenu)).toEqual(["attach", "delete", "hide", "show", "update"]);
+            expect(Object.keys(window.ctxmenu)).toEqual(["attach", "delete", "hide", "show", "update", "setNonce"]);
+        });
+    });
+
+    describe("setNonce method", () => {
+        it("logs error when called after styles have been added to DOM", () => {
+            error.and.stub();
+            
+            // First show a menu to add styles to DOM
+            window.ctxmenu.show(defaultMenuDeclaration, document.body);
+            window.ctxmenu.hide();
+            
+            // Now try to set nonce - should log error
+            window.ctxmenu.setNonce('test-nonce');
+            expect(console.error).toHaveBeenCalledWith('setNonce must be called before the first menu is shown. The nonce will have no effect.');
+        });
+
+        it("applies nonce attribute to style element when styles are added", () => {
+            // Show a menu to add styles to DOM
+            window.ctxmenu.show(defaultMenuDeclaration, document.body);
+            window.ctxmenu.hide();
+            
+            // Find the ctxmenu style element (should be the first stylesheet)
+            const styleElements = Array.from(document.head.querySelectorAll('style'));
+            const ctxmenuStyle = styleElements.find(style => style.innerHTML.includes('.ctxmenu'));
+            
+            expect(ctxmenuStyle).toBeDefined();
+            expect(ctxmenuStyle).not.toBeNull();
+            
+            // The nonce attribute should exist (even if empty string by default)
+            if (ctxmenuStyle) {
+                expect(ctxmenuStyle.hasAttribute('nonce')).toBe(true);
+            }
         });
     });
 
