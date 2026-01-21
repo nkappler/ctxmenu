@@ -50,7 +50,8 @@
     "index.min.js",
     "index.d.ts",
     "standalone/ctxmenu.js",
-    "standalone/ctxmenu.min.js"
+    "standalone/ctxmenu.min.js",
+    "standalone/ctxmenu.d.ts"
   ],
   "keywords": [
     "context menu",
