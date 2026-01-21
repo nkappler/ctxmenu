@@ -9,7 +9,7 @@ describe("CTXMenu", () => {
             // Trigger style addition by showing a menu (styles are lazy-loaded on first show)
             window.ctxmenu.show(defaultMenuDeclaration, document.body);
             window.ctxmenu.hide();
-            
+
             const findCTXRule = (sheet: CSSStyleSheet) => Array.from(sheet.cssRules).find(rule => rule.cssText.startsWith(".ctxmenu"));
             const sheets = Array.from(document.styleSheets);
             expect(sheets.filter(findCTXRule).length).toEqual(1);
@@ -26,34 +26,36 @@ describe("CTXMenu", () => {
     });
 
     describe("setNonce method", () => {
-        it("logs error when called after styles have been added to DOM", () => {
-            error.and.stub();
-            
-            // First show a menu to add styles to DOM
-            window.ctxmenu.show(defaultMenuDeclaration, document.body);
-            window.ctxmenu.hide();
-            
-            // Now try to set nonce - should log error
-            window.ctxmenu.setNonce('test-nonce');
-            expect(console.error).toHaveBeenCalledWith('setNonce must be called before the first menu is shown. The nonce will have no effect.');
-        });
-
         it("applies nonce attribute to style element when styles are added", () => {
             // Show a menu to add styles to DOM
+            window.ctxmenu.setNonce('test-nonce-1');
             window.ctxmenu.show(defaultMenuDeclaration, document.body);
             window.ctxmenu.hide();
-            
-            // Find the ctxmenu style element (should be the first stylesheet)
-            const styleElements = Array.from(document.head.querySelectorAll('style'));
-            const ctxmenuStyle = styleElements.find(style => style.innerHTML.includes('.ctxmenu'));
-            
+
+            const ctxmenuStyle = findCTXMenuStyleElements()[0];
+
             expect(ctxmenuStyle).toBeDefined();
-            expect(ctxmenuStyle).not.toBeNull();
-            
-            // The nonce attribute should exist (even if empty string by default)
-            if (ctxmenuStyle) {
-                expect(ctxmenuStyle.hasAttribute('nonce')).toBe(true);
-            }
+            expect(ctxmenuStyle?.nonce).toEqual('test-nonce-1');
+        });
+
+        it("logs error when called after styles have been added to DOM and reapplies styles", () => {
+            error.and.stub();
+
+            // First show a menu to add styles to DOM
+            window.ctxmenu.show(defaultMenuDeclaration, document.body);
+            expect(findCTXMenuStyleElements()[0]?.nonce).toEqual('');
+            window.ctxmenu.hide();
+
+            // Now try to set nonce - should log error
+            window.ctxmenu.setNonce('test-nonce-2');
+            expect(console.error).toHaveBeenCalledWith('setNonce must be called before the first menu is shown.');
+            // Nonce should still be the original one
+            expect(findCTXMenuStyleElements()[0]?.nonce).not.toEqual('test-nonce-2');
+
+            // After showing another menu, nonce should be updated
+            window.ctxmenu.show(defaultMenuDeclaration, document.body);
+            expect(findCTXMenuStyleElements()[0]?.nonce).toEqual('test-nonce-2');
+            window.ctxmenu.hide();
         });
     });
 
@@ -415,8 +417,6 @@ describe("CTXMenu", () => {
                 expect(onBeforeShow).toHaveBeenCalledTimes(1);
                 expect(onHide).toHaveBeenCalledTimes(1);
                 expect(onBeforeHide).toHaveBeenCalledTimes(1);
-
-                window.ctxmenu.delete("body");
             });
         });
 

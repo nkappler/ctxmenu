@@ -28,8 +28,7 @@ class ContextMenu implements CTXMenuSingleton {
      * in that case we don't want to close the menu. (#28)
      */
     private preventCloseOnScroll = false;
-    private static nonce: string | undefined;
-    private static stylesAdded = false;
+    private styleNode = document.createElement("style");
     private constructor() {
         window.addEventListener("click", () => void this.hide());
         window.addEventListener("resize", () => void this.hide());
@@ -113,8 +112,8 @@ class ContextMenu implements CTXMenuSingleton {
 
     public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent, config: CTXConfig = {}) {
         // Ensure styles are added before showing the first menu
-        ContextMenu.addStylesToDom();
-        
+        this.addStylesToDom();
+
         if (eventOrElement instanceof MouseEvent) {
             eventOrElement.stopImmediatePropagation();
             eventOrElement.preventDefault();
@@ -139,11 +138,17 @@ class ContextMenu implements CTXMenuSingleton {
         this._hide(this.menu);
     }
 
-    public setNonce(nonce: string): void {
-        if (ContextMenu.stylesAdded) {
-            console.error('setNonce must be called before the first menu is shown. The nonce will have no effect.');
+    public setNonce(nonce?: string): void {
+        if (this.styleNode.isConnected) {
+            // we need to reattach the style node to apply the nonce.
+            // This is pretty nonsensical in practice, since at least one menu has already been shown without the nonce,
+            // which likely already violated the CSP policy and resulting in display issues since the styles did not apply.
+            // However, this makes writing tests for the nonce functionality very easy as we would otherwise need to reset and reload the library between tests.
+            // Thus we show an error, although it works for subsequent menus.
+            console.error('setNonce must be called before the first menu is shown.');
+            this.styleNode.remove();
         }
-        ContextMenu.nonce = nonce;
+        this.styleNode.nonce = nonce ?? "";
     }
 
     private _hide(menuOrSubMenu: Element | undefined) {
@@ -189,24 +194,19 @@ class ContextMenu implements CTXMenuSingleton {
         return container;
     }
 
-    private static addStylesToDom() {
+    private addStylesToDom() {
         // Only add styles once
-        if (this.stylesAdded) return;
-        
+        if (this.styleNode.isConnected) { return; }
+
         if (document.readyState === "loading") {
             return document.addEventListener("readystatechange", this.addStylesToDom, { once: true });
         }
-        
-        this.stylesAdded = true;
-        
+
         //insert default styles as first css -> low priority -> user can overwrite it easily
-        const style = document.createElement("style");
-        style.nonce = this.nonce ?? "";
-        style.innerHTML = styles;
-        document.head.insertBefore(style, document.head.childNodes[0]);
+        this.styleNode.innerHTML = styles;
+        document.head.insertBefore(this.styleNode, document.head.childNodes[0]);
     }
 }
 
 export const ctxmenu: CTXMenuSingleton = ContextMenu.getInstance();
 export * from "./interfaces";
-

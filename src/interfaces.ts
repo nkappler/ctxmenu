@@ -57,8 +57,8 @@ export interface CTXMAnchor extends CTXMInteractive {
     href: ValueOrFunction<string>;
     /** Specifies where to display the linked URL. (e.g. `"_blank"` to open it in a new tab) */
     target?: ValueOrFunction<string>;
-    /** Prompts the user to save the linked URL instead of navigating to it. The specified value will be the filename, use empty string to inherit filename from target url. 
-     * 
+    /** Prompts the user to save the linked URL instead of navigating to it. The specified value will be the filename, use empty string to inherit filename from target url.
+     *
      * __Note:__ works only with same-origin URLs */
     download?: ValueOrFunction<string>;
 }
@@ -147,9 +147,9 @@ export interface CTXMenuSingleton {
     hide(): void;
     /**
      * Set a CSP nonce to be used for all style elements created by the library.
-     * 
-     * **Important:** This must be called before the first menu is shown, otherwise it will have no effect.
+     *
+     * **Important:** This must be called before the first menu is shown.
      * @param nonce The CSP nonce value
      */
-    setNonce(nonce: string): void;
+    setNonce(nonce?: string): void;
 }

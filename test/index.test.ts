@@ -38,6 +38,21 @@ const makeTarget = () => {
     return target;
 }
 
+const findCTXMenuStyleElements = (): HTMLStyleElement[] => {
+    return Array.from(document.head.querySelectorAll("style"))
+    .filter(style => style.innerHTML.includes(".ctxmenu"));
+}
+
+const resetStyles = () => {
+    // due to setNonce only working before the first menu is shown,
+    // we need to reset the stylesheet between tests
+    const style = findCTXMenuStyleElements()[0];
+    if (!style) return;
+    style.remove();
+    style.nonce = undefined;
+    window.ctxmenu.setNonce("");
+}
+
 beforeAll(async () => new Promise<void>((resolve, reject) => {
     error = spyOn(console, "error");
     const content = document.querySelector("#jasmine_content");
@@ -56,6 +71,7 @@ beforeAll(async () => new Promise<void>((resolve, reject) => {
 
 beforeEach(() => {
     expect(console.error).not.toHaveBeenCalled();
+    expect(findCTXMenuStyleElements().length).withContext("styles from previous test were not cleaned up").toBe(0);
     expect(document.querySelector(".ctxmenu")).withContext("cleanup failed").toBeNull();
     getTarget().dispatchEvent(new MouseEvent("contextmenu"));
     expect(getMenu).toThrow();
@@ -70,9 +86,10 @@ afterEach(async () => {
         ]);
     }
 
-    window.ctxmenu.hide(); // todo should deleting an attached context menu also remove it from DOM? (probably should)
+    window.ctxmenu.hide();
     error.and.stub();
     window.ctxmenu.delete("#TARGET");
     error.and.callThrough();
     error.calls.reset();
+    resetStyles();
 });

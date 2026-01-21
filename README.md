@@ -131,7 +131,7 @@ This is an interactive item which implements an anchor tag (`<a>`) and will redi
 ### Action Item
 
 This is an interactive item which will execute a given callback function when clicked.
-The callback receives the event as parameter, so you can access the Action Item List Element via `e.currentTarget`. 
+The callback receives the event as parameter, so you can access the Action Item List Element via `e.currentTarget`.
 
 ```typescript
 {
@@ -206,7 +206,7 @@ ctxmenu.update(target: string, ctxmenu?: Array,  config?: CTXConfig)
 
 The update method is used to update an existing context menu. You can pass `undefined` for each optional parameter in order to not change it. If you pass a partial [CTXConfig](#ctxconfig) object, only the specified members will be overwritten.
 
-`update` takes two or three arguments: 
+`update` takes two or three arguments:
 - `target` - the selector string to define the target element
 - `ctxmenu` - the updated menu definition.  _(may be undefined when only updating the config)_
 - `config?` - A config object, See [CTXConfig](#ctxconfig).
@@ -227,7 +227,7 @@ ctxmenu.show(ctxmenu: Array, e: MouseEvent | HTMLElement)
 The `show` method can be used to show a context menu without using the [`attach`](#ctxmenuattach) method to set up a contextmenu for specific elements first. You need to pass the original event or a target element, which will be used to calculate the menu's position.
 
 This may be useful when integrating with other libraries or frameworks that already provide a contextmenu handler or when trying to show a context menu on a different user interaction (for example showing a context menu when left-clicking a button).
-    
+
 ⚠️**Positioning of the menu:** If the second parameter you pass is of type `MouseEvent`, the menu will appear at the cursors position, if it is of type `HTMLElement` it will appear next to the element. See [#36](https://github.com/nkappler/ctxmenu/issues/36)
 
 ⚠️ **Event propagation:** When passing a target element, you will need to stop the propagation of the event to prevent the context menu from being immediately closed again:
@@ -243,18 +243,16 @@ clickHandler(e: MouseEvent) {
 ```typescript
 ctxmenu.hide()
 ```
-Hide any open context menu. 
+Hide any open context menu.
 
 ### `ctxmenu.setNonce`
 ```typescript
 ctxmenu.setNonce(nonce: string)
 ```
-Set a CSP (Content Security Policy) nonce to be used for the style element. This is useful when you have a strict CSP that requires nonces for inline styles.
-
-The nonce will be applied to the style element that contains the default menu styles.
+Set a CSP (Content Security Policy) nonce to be used for ctxmenus style element. This is useful when you have a strict CSP that requires nonces for inline styles.
 
 > [!IMPORTANT]
-> `setNonce` must be called **before the first menu is shown**. Once styles have been added to the DOM, calling `setNonce` will have no effect. In most cases this shouldn't matter, but make sure to call this method early in your application initialization.
+> `setNonce` must be called **before the first menu is shown**, otherwise you have to expect rendering issues due to missing styles. If required by your CSP, make sure to call this method early in your application initialization, ideally before any `attach` calls.
 
 Example:
 ```typescript
