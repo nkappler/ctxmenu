@@ -28,6 +28,8 @@ class ContextMenu implements CTXMenuSingleton {
      * in that case we don't want to close the menu. (#28)
      */
     private preventCloseOnScroll = false;
+    private static nonce: string | undefined;
+    private static stylesAdded = false;
     private constructor() {
         window.addEventListener("click", () => void this.hide());
         window.addEventListener("resize", () => void this.hide());
@@ -46,7 +48,6 @@ class ContextMenu implements CTXMenuSingleton {
         window.addEventListener("keydown", e => {
             if (e.key === "Escape") this.hide();
         });
-        ContextMenu.addStylesToDom();
     }
 
     public static getInstance(): CTXMenuSingleton {
@@ -60,7 +61,8 @@ class ContextMenu implements CTXMenuSingleton {
             "delete": instance.delete.bind(instance),
             "hide": instance.hide.bind(instance),
             "show": instance.show.bind(instance),
-            "update": instance.update.bind(instance)
+            "update": instance.update.bind(instance),
+            "setNonce": instance.setNonce.bind(instance)
         };
     }
 
@@ -110,6 +112,9 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     public show(ctxMenu: CTXMenu, eventOrElement: HTMLElement | MouseEvent, config: CTXConfig = {}) {
+        // Ensure styles are added before showing the first menu
+        ContextMenu.addStylesToDom();
+        
         if (eventOrElement instanceof MouseEvent) {
             eventOrElement.stopImmediatePropagation();
             eventOrElement.preventDefault();
@@ -132,6 +137,13 @@ class ContextMenu implements CTXMenuSingleton {
 
     public hide() {
         this._hide(this.menu);
+    }
+
+    public setNonce(nonce: string): void {
+        if (ContextMenu.stylesAdded) {
+            console.error('setNonce must be called before the first menu is shown. The nonce will have no effect.');
+        }
+        ContextMenu.nonce = nonce;
     }
 
     private _hide(menuOrSubMenu: Element | undefined) {
@@ -178,11 +190,18 @@ class ContextMenu implements CTXMenuSingleton {
     }
 
     private static addStylesToDom() {
+        // Only add styles once
+        if (this.stylesAdded) return;
+        
         if (document.readyState === "loading") {
             return document.addEventListener("readystatechange", this.addStylesToDom, { once: true });
         }
+        
+        this.stylesAdded = true;
+        
         //insert default styles as first css -> low priority -> user can overwrite it easily
         const style = document.createElement("style");
+        style.nonce = this.nonce ?? "";
         style.innerHTML = styles;
         document.head.insertBefore(style, document.head.childNodes[0]);
     }
