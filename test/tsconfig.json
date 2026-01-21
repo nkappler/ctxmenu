@@ -13,6 +13,7 @@
         "skipLibCheck": true,
         "typeRoots": [
             "../node_modules/@types",
+            "../standalone"
         ],
         "types": [
             "../standalone/ctxmenu",
