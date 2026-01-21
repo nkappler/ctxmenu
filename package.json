@@ -9,12 +9,16 @@
     "build:demo": "tsc test/demo.ts --outDir docs --removeComments",
     "build:test": "tsc -p test",
     "build": "run-s build:*",
-    "postversion": "git push --follow-tags",
-    "prepublishOnly": "npm run version",
+
     "test:cli": "jasmine-browser-runner runSpecs",
     "test:interactive": "jasmine-browser-runner serve",
     "test": "run-p \"build:* -- -w\" test:interactive",
-    "version": "node util/copyrightHeader.js && npm run build && npm run test:cli && git add ."
+
+    "prepublishOnly": "npm run version",
+    "version": "node util/copyrightHeader.js && npm run build && npm run test:cli && git add .",
+    "postversion": "git push --follow-tags",
+
+    "dependencies": "npm run build"
   },
   "repository": {
     "type": "git",
