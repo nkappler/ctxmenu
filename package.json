@@ -1,6 +1,6 @@
 {
   "name": "ctxmenu",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Tiny and Customizable Context Menu Generator",
   "main": "index.js",
   "types": "index.d.ts",
@@ -9,15 +9,12 @@
     "build:demo": "tsc test/demo.ts --outDir docs --removeComments",
     "build:test": "tsc -p test",
     "build": "run-s build:*",
-
     "test:cli": "jasmine-browser-runner runSpecs",
     "test:interactive": "jasmine-browser-runner serve",
     "test": "run-p \"build:* -- -w\" test:interactive",
-
     "prepublishOnly": "npm run version",
     "version": "node util/copyrightHeader.js && npm run build && npm run test:cli && git add .",
     "postversion": "git push --follow-tags",
-
     "dependencies": "npm run build"
   },
   "repository": {
