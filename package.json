@@ -5,8 +5,8 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
-    "build:demo": "tsc test/demo.ts --outDir docs --removeComments",
     "build:src": "node util/convertStyles.js && rollup -c",
+    "build:demo": "tsc test/demo.ts --outDir docs --removeComments",
     "build:test": "tsc -p test",
     "build": "run-s build:*",
     "postversion": "git push --follow-tags",

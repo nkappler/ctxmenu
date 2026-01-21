@@ -1,5 +1,6 @@
 node_modules
 src/styles.ts
-spec/*[.js|.js.map]
+*[.js|.js.map|.d.ts]
 dist
-*.test.js
+
+!rollup.config.js
