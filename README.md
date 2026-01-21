@@ -325,9 +325,27 @@ ctxmenu.js uses the following css classes which you might want to overwrite:
 ```
 
 ## Contributing
-You can find the source code in the `src/` directory and the files for manual testing in the `test/` directory.
-> ⚠ Don't change any JavaScript files manually, as those changes will be overwritten by the build!
 
-### Test your changes
-Please test your changes before opening a PR. To test your changes locally, run `npm run build`. This will compile the typescript source files
-and update the files in the `standalone/` and `docs/` directories. You can now open the `docs/index.html` file in your browser to test your changes.
+### Step 1: Setup
+After cloning the repo, run `npm install`. This will install all dev-dependencies and also should transpile the library to javascript, as the tests use the transpiled files to be as close to a real-world setup as possible.
+
+Until you do this step, you might see errors in the test files.
+
+After this step, these directories should be generated in the repository:
+`dist`, `standalone` and `node_modules`.
+
+If you don't see the `standalone` or `dist` directory, run the build command manually:
+
+### Step 2: Build and Test Commands
+- `npm run build` transpiles all source files into javascript once.
+- `npm run test` launches the build in watch mode and starts the test proxy at [localhost:8888](http://localhost:8888)
+- `npm run dev` transpiles all source files in watch mode, open the demo page (`docs/index.html`) in your browser to test your changes manually.
+
+### Step 3: Test your changes
+Please test your changes before opening a PR. To test your changes locally, run `npm run dev`. This will transpile the typescript source files. You can now open the `docs/index.html` file in your browser to test your changes manually.
+
+### Step 4: Open a Pull Request
+Your PR should describe your use case and your changes in detail and must include automated tests. You can add your tests cases in the `test/*.test.ts` files.
+
+If you feel that your modification should be part of the demo page, add an example to `test/demo.ts`.
+This file will be transpiled by any of the build commands into `/docs/demo.js`, don't modify the JavaScript file directly, or the changes will be overwritten.

@@ -9,6 +9,7 @@
     "build:demo": "tsc test/demo.ts --outDir docs --removeComments",
     "build:test": "tsc -p test",
     "build": "run-s build:*",
+    "dev": "run-p \"build:* -- -w\"",
     "test:cli": "jasmine-browser-runner runSpecs",
     "test:interactive": "jasmine-browser-runner serve",
     "test": "run-p \"build:* -- -w\" test:interactive",
